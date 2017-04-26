@@ -1,0 +1,110 @@
+2015-03-20 Makoto Yamashita <Makoto.Yamashita@is.titech.ac.jp>
+        * Modification for the latest gcc compilers.
+
+2009-10-05 Nakata Maho <maho@riken.jp>
+        * mpack 0.5.1 integration.
+
+2009-09-28 Nakata Maho <maho@riken.jp>
+        * read sufficiently large precision (reported by Henry Cohn)
+
+2009-02-12 Nakata Maho <maho@riken.jp>
+        * Allow link against external mpack.
+          ./configure --with-system-mpack
+        * Now sdpa_gmp is statically linked which is faster except for MacOSX [1].
+          http://developer.apple.com/qa/qa2001/qa1118.html [1]
+
+2009-02-02 Nakata Maho <maho@riken.jp>
+        * migrate to mpack for linear algebra part. Just take routines.
+          http://mplapack.sourceforge.net/
+
+2008-08-04 Nakata Maho <maho@riken.jp>
+        * Fix a bug in gmp_dsterf [1]
+        * remove mpf_abs_
+
+         Reported by "Hayato Waki" <hayato.waki@jsb.cs.uec.ac.jp> [1]
+
+2008-08-01 Nakata Maho <maho@riken.jp>
+        * peep hole speedup for gmp_sign
+        * add mBSD header to sdpa_gmpalgebra.cpp
+
+2008-07-31 Nakata Maho <maho@riken.jp>
+        * better implementation of gmp_dlamchE; once it has calculated,
+          then saves the value.
+        * better implementation of gmp_dlamchS by using mp_limb_t.
+          2^31-1 for exponent for i386 machines. still it does not seem 
+          to be correct. 2^122 seems to be the right number, but not 
+          consistent with the manual [manual says: 
+	  2^-68719476768 to 2^68719476736; which are about 2^36-1 to 2^36-1]
+        * peep hole speedup for gmp_sign
+
+         Reported by "Hayato Waki" <hayato.waki@jsb.cs.uec.ac.jp>
+
+2008-06-17 Nakata Maho <maho@riken.jp>
+
+        * Catch up to SDPA 7.1.1, and updated accordingly.
+	* Fix floating point error during the calculation.
+          This was due to passing 0.0 to double log10().
+          It happens when the "digits" of sdpa_io.cpp is very small
+          so that it becomes zero when converted to double from mpf_class.
+        * Correct implementation for quicksort of eigenvalues. 
+
+         Reported by "Hayato Waki" <hayato.waki@jsb.cs.uec.ac.jp>
+
+2008-06-16 Nakata Maho <maho@riken.jp>
+
+	* Fix DIMACS_ERROS -> DIMACS_ERRORS.
+         Reported by "Hayato Waki" <hayato.waki@jsb.cs.uec.ac.jp>
+
+2008-06-13 Nakata Maho <maho@riken.jp>
+
+	* Use P_FORMAT instead of GMP_P_FORMAT. Accordance with the manual. 
+        * Fix DIMACS print build and correctly output DIMACS error 
+             to the result file [2].
+        * remove param.sdpa~
+         Reported by "Hayato Waki" <hayato.waki@jsb.cs.uec.ac.jp> [1], [2]
+
+2008-04-01 Nakata Maho
+
+	* Catch up to sdpa-7.1.0.
+
+2008-02-09  Nakata Maho <maho@riken.jp>
+
+        * 7.0.5 RC2
+        * Many clean ups.
+
+2008-02-09  Fujisawa Katsuki
+
+        * 7.0.5 RC1
+	* sdpa_main.cpp KAPPA value has been changed to 1.2
+	-static double KAPPA = 1.0;
+	+static double KAPPA = 1.2;
+        * remove some warnings
+
+2007-12-11  Nakata Maho <maho@riken.jp>
+
+        * Catch up to 7.0.5 of double version.
+
+2007-09-16 Kazuhide Nakata 
+
+	* Modify stopping criteria and step length.
+	* Add SolveInfo::check (print various information of current point)
+
+2007-06-29  Nakata Maho <maho@riken.jp>
+
+        * Remove GPL.txt. COPYING is newer and better.
+        * Update to 7.0.2. Fixes of memory leaks from Kazuhide Nakata.
+        * better configure.in, Makefile.am.
+
+2007-06-26  Nakata Maho <maho@riken.jp>
+
+        * Remove sdpa_dpotrf.h, sdpa_dpotrf.cpp, sdpa_linear.h, sdpa_linear.cpp.
+          We do not need them since we use GNU Multi Precision.
+
+2007-06-25  Nakata Maho <maho@riken.jp>
+
+        * Rewrite for gmp version.
+
+2007-06-01  Nakata Maho <maho@riken.jp>
+
+        * Initial ./configure support.
+

@@ -1,0 +1,18 @@
+--- A2/makefile~	1998-12-18 00:46:06.000000000 +0900
++++ A2/makefile	2007-12-10 13:51:52.000000000 +0900
+@@ -1,10 +1,10 @@
+ all_drivers :
+-	cd drivers ; make drivers
++	cd drivers ; ${MAKE} drivers
+ 
+ lib :
+-	cd src ; make makeLib
++	cd src ; ${MAKE} makeLib
+ 
+ clean :
+-	cd src ; make clean
+-	cd drivers ; make clean
+-	cd doc ; make clean
++	cd src ; ${MAKE} clean
++	cd drivers ; ${MAKE} clean
++	cd doc ; ${MAKE} clean
