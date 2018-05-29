@@ -20,7 +20,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 ------------------------------------------------------------- */
 
 // printing presicion of such as vector 
-#define P_FORMAT "%+18.12Fe"
+#define P_FORMAT "%+15.9Fe"
+#define NO_P_FORMAT "NOPRINT"
 
 #ifndef __sdpa_struct_h__
 #define __sdpa_struct_h__
@@ -44,8 +45,8 @@ public:
   void terminate();
 
   void setZero();
-  void display(FILE* fpout = stdout);
-  void display(FILE* fpout,mpf_class scalar);
+  void display(FILE* fpout = stdout, const char* printFormat = P_FORMAT);
+  void display(FILE* fpout,mpf_class scalar, const char* printFormat = P_FORMAT);
   bool copyFrom(Vector& other);
 };
 
@@ -66,7 +67,7 @@ public:
   void terminate();
 
   void setZero();
-  void display(FILE* fpout = stdout);
+  void display(FILE* fpout = stdout, const char* printFormat = P_FORMAT);
   bool copyFrom(BlockVector& other);
 };
 
@@ -100,7 +101,7 @@ public:
   void initialize(int nRow,int nCol, Type type, int NonZeroNumber);
   void terminate();
 
-  void display(FILE* fpout = stdout);
+  void display(FILE* fpout = stdout, const char* printFormat = P_FORMAT);
   bool copyFrom(SparseMatrix& other);
 
   void changeToDense(bool forceChange = false);
@@ -127,7 +128,7 @@ public:
   void initialize(int nRow,int nCol, Type type);
   void terminate();
   
-  void display(FILE* fpout = stdout);
+  void display(FILE* fpout = stdout, const char* printFormat = P_FORMAT);
   bool copyFrom(DenseMatrix& other);
   bool copyFrom(SparseMatrix& other);
 
@@ -188,7 +189,7 @@ public:
   void terminate();
   
   void changeToDense(bool forceChange=false);
-  void display(FILE* fpout = stdout);
+  void display(FILE* fpout = stdout, const char* printFormat = P_FORMAT);
   bool copyFrom(SparseLinearSpace& other);
   
   void setElement_SDP(int block, int nCol, int nRow, mpf_class ele);
@@ -222,7 +223,7 @@ class DenseLinearSpace
 		  int LP_nBlock);
   void terminate();
 
-  void display(FILE* fpout = stdout);
+  void display(FILE* fpout = stdout, const char* printFormat = P_FORMAT);
   bool copyFrom(DenseLinearSpace& other);
   void setElement_SDP(int block, int nCol, int nRow, mpf_class ele);
   void setElement_SOCP(int block, int nCol, int nRow, mpf_class ele);

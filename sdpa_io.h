@@ -145,6 +145,7 @@ public:
                                          int* blockStruct,
                                          int* blockType,
                                          int* blockNumber,
+                                         const char* printFormat, 
                                          FILE* fpout);
 
 };

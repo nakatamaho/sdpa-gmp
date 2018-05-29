@@ -220,7 +220,17 @@ void Parameter::setDefaultParameter(Parameter::parameterType type)
     precision    =  200;
     mpf_set_default_prec(precision);
   }    
+  strcpy(xPrint,xPRINT_DEFAULT);
+  strcpy(XPrint,XPRINT_DEFAULT);
+  strcpy(YPrint,YPRINT_DEFAULT);
+  strcpy(infPrint,infPRINT_DEFAULT);
 }
+
+char Parameter::xPRINT_DEFAULT[PRINT_DEFAULT_LENGTH] = "%+50.40Fe";
+char Parameter::XPRINT_DEFAULT[PRINT_DEFAULT_LENGTH] = "%+50.40Fe";
+char Parameter::YPRINT_DEFAULT[PRINT_DEFAULT_LENGTH] = "%+50.40Fe";
+char Parameter::infPRINT_DEFAULT[PRINT_DEFAULT_LENGTH] = "%+50.40Fe";
+
 void Parameter::readFile(FILE* parameterFile)
 {
   fscanf(parameterFile,"%d%*[^\n]",&maxIteration);
@@ -235,14 +245,39 @@ void Parameter::readFile(FILE* parameterFile)
   fscanf(parameterFile,"%lf%*[^\n]",&epsilonDash);
   fscanf(parameterFile,"%d%*[^\n]",&precision);
   mpf_set_default_prec(precision);
+  fscanf(parameterFile,"%s %*[^\n]",xPrint);
+  fscanf(parameterFile,"%s %*[^\n]",XPrint);
+  fscanf(parameterFile,"%s %*[^\n]",YPrint);
+  fscanf(parameterFile,"%s %*[^\n]",infPrint);
+  if (strcmp(xPrint,NO_P_FORMAT)!=0 && xPrint[0]!='%') {
+    rMessage("Strange xPrint[" << xPrint << "]"
+             " might cause trouble when printing x");
+   }
+   if (strcmp(XPrint,NO_P_FORMAT)!=0 && XPrint[0]!='%') {
+     rMessage("Strange XPrint[" << XPrint << "]"
+              " might cause trouble when printing X.");
+   }
+   if (strcmp(YPrint,NO_P_FORMAT)!=0 && YPrint[0]!='%') {
+     rMessage("Strange YPrint[" << YPrint << "]"
+              " might cause trouble when printing Y.");
+   }
+   if (strcmp(infPrint,NO_P_FORMAT)!=0 && infPrint[0]!='%') {
+     rMessage("Strange infPrint[" << infPrint << "]"
+              " might cause trouble when printing information.");
+   }
 }
 
-void Parameter::display(FILE* fpout)
+void Parameter::display(FILE* fpout, const char* printFormat)
 {
   if (fpout == NULL) {
     return;
   }
 
+  if (strcmp(printFormat,NO_P_FORMAT) == 0) {
+    fprintf(fpout,"%s\n",NO_P_FORMAT);
+    return;
+  }
+  fprintf(fpout, "** Parameters **\n");
   fprintf(fpout, "maxIteration =    %d\n",maxIteration);
   fprintf(fpout, "epsilonStar  = %8.3e\n",epsilonStar );
   fprintf(fpout, "lambdaStar   = %8.3e\n",lambdaStar  );
@@ -254,6 +289,12 @@ void Parameter::display(FILE* fpout)
   fprintf(fpout, "gammaStar    = %8.3e\n",gammaStar   );
   fprintf(fpout, "epsilonDash  = %8.3e\n",epsilonDash );
   fprintf(fpout, "precision    =    %d\n",precision );
+  #if 1
+  fprintf(fpout, "xPrint       = %s \n", xPrint );
+  fprintf(fpout, "XPrint       = %s \n", XPrint );
+  fprintf(fpout, "YPrint       = %s \n", YPrint );
+  fprintf(fpout, "infPrint     = %s \n", infPrint );
+  #endif
   return;
 }
 

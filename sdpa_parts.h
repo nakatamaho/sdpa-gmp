@@ -102,13 +102,22 @@ public:
   double betaBar;
   double gammaStar;
   double epsilonDash;
+  #define PRINT_DEFAULT_LENGTH 30
+  static char xPRINT_DEFAULT[PRINT_DEFAULT_LENGTH];
+  static char XPRINT_DEFAULT[PRINT_DEFAULT_LENGTH];
+  static char YPRINT_DEFAULT[PRINT_DEFAULT_LENGTH];
+  static char infPRINT_DEFAULT[PRINT_DEFAULT_LENGTH];
+  char xPrint[PRINT_DEFAULT_LENGTH];
+  char XPrint[PRINT_DEFAULT_LENGTH];
+  char YPrint[PRINT_DEFAULT_LENGTH];
+  char infPrint[PRINT_DEFAULT_LENGTH];
   Parameter();
   Parameter(FILE* parameterFile);
   ~Parameter();
   void setDefaultParameter(parameterType type
 			   = PARAMETER_DEFAULT);
   void readFile(FILE* parameterFile);
-  void display(FILE* fpout=stdout);
+  void display(FILE* fpout=stdout, const char* printFormat=infPRINT_DEFAULT);
 };
 
 class StepLength

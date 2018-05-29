@@ -99,35 +99,48 @@ void Vector::setZero()
   initialize(zero);
 }
 
-void Vector::display(FILE* fpout)
+void Vector::display(FILE* fpout, const char* printFormat)
 {
   if (fpout == NULL) {
     return;
   }
+  if (strcmp(printFormat,NO_P_FORMAT) == 0) {
+    fprintf(fpout,"%s\n",NO_P_FORMAT);
+    return;
+  }
+
   fprintf(fpout,"{");
   for (int j=0; j<nDim-1; ++j) {
-    gmp_fprintf(fpout,P_FORMAT",",ele[j].get_mpf_t());
+    gmp_fprintf(fpout,printFormat,ele[j].get_mpf_t());
+    gmp_fprintf(fpout, ",");
   }
   if (nDim>0) {
-    gmp_fprintf(fpout,P_FORMAT"}\n",ele[nDim-1].get_mpf_t());
+    gmp_fprintf(fpout,printFormat,ele[nDim-1].get_mpf_t());
+    gmp_fprintf(fpout,"}\n");
   } else {
-    fprintf(fpout,"  }\n");
+    gmp_fprintf(fpout,"  }\n");
   }
 }
 
-void Vector::display(FILE* fpout,mpf_class scalar)
+void Vector::display(FILE* fpout,mpf_class scalar, const char* printFormat)
 {
   if (fpout == NULL) {
+    return;
+  }
+  if (strcmp(printFormat,NO_P_FORMAT) == 0) {
+    fprintf(fpout,"%s\n",NO_P_FORMAT);
     return;
   }
   fprintf(fpout,"{");
   for (int j=0; j<nDim-1; ++j) {
     mpf_class mtmp=ele[j]*scalar;
-    gmp_fprintf(fpout,P_FORMAT",",mtmp.get_mpf_t());
+    gmp_fprintf(fpout,printFormat,mtmp.get_mpf_t());
+    gmp_fprintf(fpout,",");    
   }
   if (nDim>0) {
     mpf_class mtmp=ele[nDim-1]*scalar;
-    gmp_fprintf(fpout,P_FORMAT"}\n",mtmp.get_mpf_t());
+    gmp_fprintf(fpout,printFormat,mtmp.get_mpf_t());
+    gmp_fprintf(fpout,"}\n");
   } else {
     fprintf(fpout,"  }\n");
   }
@@ -240,15 +253,19 @@ void BlockVector::setZero()
   }
 }
 
-void BlockVector::display(FILE* fpout)
+void BlockVector::display(FILE* fpout, const char* printFormat)
 {
   if (fpout == NULL) {
+    return;
+  }
+  if (strcmp(printFormat,NO_P_FORMAT) == 0) {
+    fprintf(fpout,"%s\n",NO_P_FORMAT);
     return;
   }
   fprintf(fpout,"{ ");
   if (nBlock>0 && blockStruct && ele) {
     for (int l=0; l<nBlock; ++l) {
-      ele[l].display(fpout);
+      ele[l].display(fpout,printFormat);
     }
   }
   fprintf(fpout,"} \n");
@@ -392,9 +409,13 @@ void SparseMatrix::terminate()
   }
 }
 
-void SparseMatrix::display(FILE* fpout)
+void SparseMatrix::display(FILE* fpout, const char* printFormat)
 {
   if (fpout == NULL) {
+    return;
+  }
+  if (strcmp(printFormat,NO_P_FORMAT) == 0) {
+    fprintf(fpout,"%s\n",NO_P_FORMAT);
     return;
   }
   switch(type) {
@@ -404,9 +425,11 @@ void SparseMatrix::display(FILE* fpout)
       int i        = row_index[index];
       int j        = column_index[index];
       mpf_class value = sp_ele[index];
-      gmp_fprintf(fpout,"val[%d,%d] = "P_FORMAT"\n", i,j,value.get_mpf_t());
+      gmp_fprintf(fpout,"val[%d,%d] = ", i,j);
+      gmp_fprintf(fpout,printFormat,value.get_mpf_t());
+      gmp_fprintf(fpout,"\n");		  
     }
-    fprintf(fpout,"}\n");
+    gmp_fprintf(fpout,"}\n");
     break;
   case DENSE:
     fprintf(fpout,"{\n");
@@ -418,17 +441,21 @@ void SparseMatrix::display(FILE* fpout)
       }
       fprintf(fpout,"{");
       for (int j=0; j<nCol-1; ++j) {
-        gmp_fprintf(fpout, P_FORMAT",",de_ele[i+nCol*j].get_mpf_t());
+        gmp_fprintf(fpout,printFormat,de_ele[i+nCol*j].get_mpf_t());
+	gmp_fprintf(fpout, ",");
       }
-       gmp_fprintf(fpout,P_FORMAT" },\n",de_ele[i+nCol*(nCol-1)].get_mpf_t());
+        gmp_fprintf(fpout,printFormat,de_ele[i+nCol*(nCol-1)].get_mpf_t());
+        gmp_fprintf(fpout, " },\n");
     }
     if (nRow>1) {
       fprintf(fpout,"  {");
     }
     for (int j=0; j<nCol-1; ++j) {
-      gmp_fprintf(fpout,P_FORMAT",",de_ele[(nRow-1)+nCol*j].get_mpf_t());
+      gmp_fprintf(fpout,printFormat,de_ele[(nRow-1)+nCol*j].get_mpf_t());
+      gmp_fprintf(fpout, ",");
     }
-    gmp_fprintf(fpout,P_FORMAT" }",de_ele[(nRow-1)+nCol*(nCol-1)].get_mpf_t());
+    gmp_fprintf(fpout,printFormat,de_ele[(nRow-1)+nCol*(nCol-1)].get_mpf_t());
+    gmp_fprintf(fpout, " }");
     if (nRow>1) {
       fprintf(fpout,"   }\n");
     } else {
@@ -734,7 +761,7 @@ void DenseMatrix::terminate()
   }
 }
 
-void DenseMatrix::display(FILE* fpout)
+void DenseMatrix::display(FILE* fpout, const char *printFormat)
 {
   if (fpout == NULL) {
     return;
@@ -750,17 +777,21 @@ void DenseMatrix::display(FILE* fpout)
       }
       fprintf(fpout,"{");
       for (int j=0; j<nCol-1; ++j) {
-        gmp_fprintf(fpout, P_FORMAT",",de_ele[i+nCol*j].get_mpf_t());
+        gmp_fprintf(fpout,printFormat,de_ele[i+nCol*j].get_mpf_t());
+	gmp_fprintf(fpout, ",");
       }
-      gmp_fprintf(fpout,P_FORMAT" },\n",de_ele[i+nCol*(nCol-1)].get_mpf_t());
+      gmp_fprintf(fpout,printFormat,de_ele[i+nCol*(nCol-1)].get_mpf_t());
+      gmp_fprintf(fpout, " },\n");
     }
     if (nRow>1) {
       fprintf(fpout,"  {");
     }
     for (int j=0; j<nCol-1; ++j) {
-      gmp_fprintf(fpout,P_FORMAT",",de_ele[(nRow-1)+nCol*j].get_mpf_t());
+      gmp_fprintf(fpout,printFormat,de_ele[(nRow-1)+nCol*j].get_mpf_t());
+      gmp_fprintf(fpout, ",");
     }
-    gmp_fprintf(fpout,P_FORMAT" }",de_ele[(nRow-1)+nCol*(nCol-1)].get_mpf_t());
+    gmp_fprintf(fpout,printFormat,de_ele[(nRow-1)+nCol*(nCol-1)].get_mpf_t());
+    gmp_fprintf(fpout, " }");
     if (nRow>1) {
       fprintf(fpout,"   }\n");
     } else {
@@ -1181,10 +1212,13 @@ void SparseLinearSpace::changeToDense(bool forceChange)
 #endif
 
 }
-
-void SparseLinearSpace::display(FILE* fpout)
+void SparseLinearSpace::display(FILE* fpout, const char* printFormat)
 {
   if (fpout == NULL) {
+    return;
+  }
+  if (strcmp(printFormat,NO_P_FORMAT) == 0) {
+    fprintf(fpout,"%s\n",NO_P_FORMAT);
     return;
   }
   // SDP
@@ -1211,8 +1245,9 @@ void SparseLinearSpace::display(FILE* fpout)
   if (LP_sp_nBlock>0 && LP_sp_index && LP_sp_block) {
     fprintf(fpout,"LP part{\n");
     for (int l=0; l<LP_sp_nBlock; ++l) {
-      gmp_fprintf(fpout,"index: %d, element %Fe\n",
-	      LP_sp_index[l] ,LP_sp_block[l].get_mpf_t());
+      gmp_fprintf(fpout,"index: %d, element ",LP_sp_index[l]);
+      gmp_fprintf(fpout,printFormat,LP_sp_block[l].get_mpf_t());
+      gmp_fprintf(fpout,"\n");
     }
     fprintf(fpout,"} \n");
   }
@@ -1606,7 +1641,7 @@ void DenseLinearSpace::terminate()
 
 }
 
-void DenseLinearSpace::display(FILE* fpout)
+void DenseLinearSpace::display(FILE* fpout, const char* printFormat)
 {
   if (fpout == NULL) {
     return;

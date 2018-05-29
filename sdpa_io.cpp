@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 ------------------------------------------------------------- */
 
 #define DIMACS_PRINT 0
+#define MESSAGEBUFFER 512
 
 #include <sdpa_io.h>
 #include <vector>
@@ -1260,13 +1261,18 @@ void IO::printLastInfo(int pIteration,
     #if 1
     #if REVERSE_PRIMAL_DUAL
     fprintf(fpout,"xVec = \n");
-    currentPt.yVec.display(fpout,-1.0);
+    currentPt.yVec.display(fpout,-1.0,param.xPrint);
     fprintf(fpout,"xMat = \n");
-    currentPt.zMat.display(fpout);
+    currentPt.zMat.display(fpout,param.XPrint);
     fprintf(fpout,"yMat = \n");
-    currentPt.xMat.display(fpout);
+    currentPt.xMat.display(fpout,param.YPrint);
     #else
-    currentPt.display(fpout);
+    fprintf(fpout,"xMat = \n");
+    currentPt.xMat.displaySolution(bs,fpout,param.XPrint);
+    fprintf(fpout,"yVec = \n");
+    currentPt.yVec.display(fpout,1.0,param.xPrint);
+    fprintf(fpout,"zMat = \n");
+    currentPt.zMat.displaySolution(bs,fpout,param.YPrint);
     #endif
     #endif
   }
@@ -1502,26 +1508,26 @@ void IO::printLastInfo(int pIteration,
     #if 1
     #if REVERSE_PRIMAL_DUAL
     fprintf(fpout,"xVec = \n");
-    currentPt.yVec.display(fpout,-1.0);
+    currentPt.yVec.display(fpout,-1.0,param.xPrint);
     fprintf(fpout,"xMat = \n");
     displayDenseLinarSpaceLast(currentPt.zMat,
 							   nBlock, blockStruct, blockType, blockNumber,
-							   fpout);
+							   param.XPrint, fpout);
     fprintf(fpout,"yMat = \n");
     displayDenseLinarSpaceLast(currentPt.xMat,
 							   nBlock, blockStruct, blockType, blockNumber,
-							   fpout);
+							   param.YPrint, fpout);
     #else
 	fprintf(fpout,"xMat = \n");
     displayDenseLinarSpaceLast(currentPt.xMat,
 							   nBlock, blockStruct, blockType, blockNumber,
-							   fpout);
+							   param.XPrint, fpout);
 	fprintf(fpout,"yVec = \n");
 	currentPt.yVec.display(fpout);
 	fprintf(fpout,"zMat = \n");
     displayDenseLinarSpaceLast(currentPt.zMat,
-							   nBlock, blockStruct, blockType, blockNumber,
-							   fpout);
+							   nBlock, blockStruct, blockType, blockNumber, 
+							   param.YPrint, fpout);
     #endif
     #endif
   }
@@ -1532,17 +1538,21 @@ void IO::displayDenseLinarSpaceLast(DenseLinearSpace& aMat,
 									int* blockStruct,
 									int* blockType,
 									int* blockNumber,
+		                                                        const char* printFormat,
 									FILE* fpout)
 {
   if (fpout == NULL) {
     return;
   }
-
+  if (strcmp(printFormat,NO_P_FORMAT) == 0) {
+    fprintf(fpout,"%s\n",NO_P_FORMAT);
+    return;
+  }
   fprintf(fpout,"{\n");
   for (int i=0; i<nBlock; i++){
 	if (blockType[i] == 1){
 	  int l = blockNumber[i];
-	  aMat.SDP_block[l].display(fpout);
+	  aMat.SDP_block[l].display(fpout,printFormat);
 	} else if (blockType[i] == 2){
 	  rError("io:: current version does not support SOCP");
 	  int l = blockNumber[i];
@@ -1550,12 +1560,15 @@ void IO::displayDenseLinarSpaceLast(DenseLinearSpace& aMat,
 	} else if (blockType[i] == 3){
 	  fprintf(fpout,"{");
 	  for (int l=0; l<blockStruct[i]-1; ++l) {
-		gmp_fprintf(fpout,P_FORMAT",",aMat.LP_block[blockNumber[i]+l].get_mpf_t());
+                gmp_fprintf(fpout,printFormat,aMat.LP_block[blockNumber[i]+l].get_mpf_t());
+                gmp_fprintf(fpout, ",");
+
 	  }
 	  if (blockStruct[i] > 0) {
-		gmp_fprintf(fpout,P_FORMAT"}\n",aMat.LP_block[blockNumber[i]+blockStruct[i]-1].get_mpf_t());
+		gmp_fprintf(fpout,printFormat,aMat.LP_block[blockNumber[i]+blockStruct[i]-1].get_mpf_t());
+ 		gmp_fprintf(fpout,"}\n");
 	  } else {
-		fprintf(fpout,"  }\n");
+		gmp_fprintf(fpout,"  }\n");
 	  }
 	} else {
 		rError("io::displayDenseLinarSpaceLast not valid blockType");
