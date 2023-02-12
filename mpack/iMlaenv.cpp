@@ -100,7 +100,7 @@ iMlaenv1(const char *Mlaname, const char *opts, mpackint n1, mpackint n2, mpacki
     return nb;
 }
 
-//*     ISPEC = 2: minimum block size
+//*     ISPEC = 2:  minimum block size
 mpackint
 iMlaenv2(const char *Mlaname, const char *opts, mpackint n1, mpackint n2, mpackint n3, mpackint n4)
 {

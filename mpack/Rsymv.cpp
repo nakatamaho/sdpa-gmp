@@ -75,9 +75,8 @@ where alpha and beta are scalars, x and y are n element vectors and
 #include <mblas_gmp.h>
 
 void
-Rsymv(const char *uplo, mpackint n, mpf_class alpha, mpf_class * A,
-    mpackint lda, mpf_class * x, mpackint incx, mpf_class beta, mpf_class * y,
-    mpackint incy)
+Rsymv(const char *uplo, mpackint n, mpf_class alpha, mpf_class * A, mpackint lda,
+    mpf_class * x, mpackint incx, mpf_class beta, mpf_class * y, mpackint incy)
 {
     mpackint ix, iy, jx, jy, kx, ky;
 

@@ -77,9 +77,8 @@ in the second case.
 #include <mblas_gmp.h>
 
 void
-Rsyrk(const char *uplo, const char *trans, mpackint n, mpackint k,
-    mpf_class alpha, mpf_class * A, mpackint lda, mpf_class beta,
-    mpf_class * C, mpackint ldc)
+Rsyrk(const char *uplo, const char *trans, mpackint n, mpackint k, mpf_class alpha,
+    mpf_class * A, mpackint lda, mpf_class beta, mpf_class * C, mpackint ldc)
 {
     mpackint nrowa, upper, info;
 

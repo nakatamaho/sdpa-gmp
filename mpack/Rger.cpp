@@ -75,8 +75,8 @@ vector and A is an m by n matrix.
 #include <mblas_gmp.h>
 
 void
-Rger(mpackint m, mpackint n, mpf_class alpha, mpf_class * x, mpackint incx,
-    mpf_class * y, mpackint incy, mpf_class * A, mpackint lda)
+Rger(mpackint m, mpackint n, mpf_class alpha, mpf_class * x, mpackint incx, mpf_class * y,
+    mpackint incy, mpf_class * A, mpackint lda)
 {
     mpackint ix, kx, jy;
     mpf_class Zero = 0.0, One = 1.0;

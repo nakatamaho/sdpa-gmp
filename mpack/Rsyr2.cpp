@@ -75,8 +75,8 @@ by n symmetric matrix.
 #include <mblas_gmp.h>
 
 void
-Rsyr2(const char *uplo, mpackint n, mpf_class alpha, mpf_class * x,
-    mpackint incx, mpf_class * y, mpackint incy, mpf_class * A, mpackint lda)
+Rsyr2(const char *uplo, mpackint n, mpf_class alpha, mpf_class * x, mpackint incx,
+    mpf_class * y, mpackint incy, mpf_class * A, mpackint lda)
 {
     mpf_class temp1, temp2;
 

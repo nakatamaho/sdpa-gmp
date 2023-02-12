@@ -78,9 +78,8 @@ matrices in the second case.
 #include <mblas_gmp.h>
 
 void
-Rsyr2k(const char *uplo, const char *trans, mpackint n, mpackint k,
-    mpf_class alpha, mpf_class * A, mpackint lda, mpf_class * B, mpackint ldb,
-    mpf_class beta, mpf_class * C, mpackint ldc)
+Rsyr2k(const char *uplo, const char *trans, mpackint n, mpackint k, mpf_class alpha,
+    mpf_class * A, mpackint lda, mpf_class * B, mpackint ldb, mpf_class beta, mpf_class * C, mpackint ldc)
 {
     mpackint nrowa, upper, info;
 

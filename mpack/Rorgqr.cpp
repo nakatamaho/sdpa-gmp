@@ -113,7 +113,7 @@ Rorgqr(mpackint m, mpackint n, mpackint k, mpf_class * A, mpackint lda, mpf_clas
     iws = n;
     if (nb > 1 && nb < k) {
 //Determine when to cross over from blocked to unblocked code.
-	nx = max((mpackint)0, iMlaenv_gmp(3, "Rorgqr", " ", m, n, k, -1));
+        nx = max((mpackint)0, iMlaenv_gmp(3, "Rorgqr", " ", m, n, k, -1));
 	if (nx < k) {
 //Determine if workspace is large enough for blocked code.
 	    ldwork = n;
@@ -122,7 +122,7 @@ Rorgqr(mpackint m, mpackint n, mpackint k, mpf_class * A, mpackint lda, mpf_clas
 //Not enough workspace to use optimal NB:  reduce NB and
 //determine the minimum value of NB.
 		nb = lwork / ldwork;
-		nbmin = max((mpackint)2, iMlaenv_gmp(2, "Rorgqr", " ", m, n, k, -1));
+	        nbmin = max((mpackint)2, iMlaenv_gmp(2, "Rorgqr", " ", m, n, k, -1));
 	    }
 	}
     }
@@ -130,7 +130,7 @@ Rorgqr(mpackint m, mpackint n, mpackint k, mpf_class * A, mpackint lda, mpf_clas
 //Use blocked code after the last block.
 //The first kk columns are handled by the block method.
 	ki = (k - nx - 1) / nb * nb;
-	kk = min(k, ki + nb);
+        kk = min(k, ki + nb);
 //Set A(1:kk,kk+1:n) to zero.
 	for (j = kk + 1; j <= n; j++) {
 	    for (i = 1; i <= kk; i++) {
