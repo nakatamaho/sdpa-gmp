@@ -195,7 +195,7 @@ Rlascl(const char *type, mpackint kl, mpackint ku, mpf_class cfrom, mpf_class ct
 	    k1 = ku + 2;
 	    k3 = ku + 1;
 	    for (j = 0; j < n; j++) {
-		for (i = max(k1 - j - 1, (mpackint)1) - 1; i < k3; i++) {
+ 	        for (i = max(k1 - j - 1, (mpackint)1) - 1; i < k3; i++) {
 		    A[i + j * lda] = A[i + j * lda] * mul;
 		}
 	    }
@@ -206,7 +206,7 @@ Rlascl(const char *type, mpackint kl, mpackint ku, mpf_class cfrom, mpf_class ct
 	    k3 = (kl << 1) + ku + 1;
 	    k4 = kl + ku + 1 + m;
 	    for (j = 0; j < n; j++) {
-		for (i = max(k1 - j - 1, k2) - 1; i < min(k3, k4 - j - 1); i++) {
+	        for (i = max(k1 - j - 1, k2) - 1; i < min(k3, k4 - j - 1); i++) {
 		    A[i + j * lda] = A[i + j * lda] * mul;
 		}
 	    }

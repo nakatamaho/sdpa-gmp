@@ -100,7 +100,7 @@ Rorgtr(const char *uplo, mpackint n, mpf_class * A, mpackint lda, mpf_class * ta
 	} else {
 	    nb = iMlaenv_gmp(1, "Rorgqr", " ", n - 1, n - 1, n - 1, -1);
 	}
-	lwkopt = max((mpackint)1, n - 1) * nb;
+        lwkopt = max((mpackint)1, n - 1) * nb;
 	work[0] = (double)lwkopt;	//needs cast from double to mpf
     }
     if (*info != 0) {

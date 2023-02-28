@@ -103,7 +103,7 @@ Rpotrf(const char *uplo, mpackint n, mpf_class * A, mpackint lda, mpackint *info
 	    for (j = 1; j <= n; j = j + nb) {
 //Update and factorize the current diagonal block and test
 //for non-positive-definiteness.
-		jb = min(nb, n - j + 1);
+	        jb = min(nb, n - j + 1);
 		Rsyrk("Upper", "Transpose", jb, j - 1, -One,
 		    &A[0 + (j - 1) * lda], lda, One,
 		    &A[(j - 1) + (j - 1) * lda], lda);
@@ -127,7 +127,7 @@ Rpotrf(const char *uplo, mpackint n, mpf_class * A, mpackint lda, mpackint *info
 	    for (j = 1; j <= n; j = j + nb) {
 //Update and factorize the current diagonal block and test
 //for non-positive-definiteness.
-		jb = min(nb, n - j + 1);
+	        jb = min(nb, n - j + 1);
 		Rsyrk("Lower", "No transpose", jb, j - 1, -One, &A[(j - 1) +
 			0 * lda], lda, One, &A[(j - 1) + (j - 1) * lda], lda);
 		Rpotf2("Lower", jb, &A[(j - 1) + (j - 1) * lda], lda, info);

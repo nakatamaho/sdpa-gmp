@@ -69,7 +69,7 @@ METIS_LIBDIR=$withval
 
 AC_ARG_ENABLE(openmp,
 [  --enable-openmp       Enables openmp
-],,)
+],WITH_OPENMP=yes)
 
 AC_ARG_WITH(openmplib,
 [  --with-openmplib    Gives openmplib],
@@ -267,10 +267,9 @@ AC_SUBST(MPACK_LIBDIR)
 AC_SUBST(MPACK_INCLUDEDIR)
 
 dnl openmp
-WITH_OPENMP=NO
-if test -n "$enable_openmp" && test "$enable_openmp" != "no"; then
-OPENMPFLAGS="$OPENMPFLAG -DENABLE_OPENMP -DNUM_OF_THREADS=$OPENMPTHREADS"
-WITH_OPENMP=YES
+if test -n "$enable_openmp" && test "$enable_openmp" != "no" && test "$WITH_OPENMP" = "yes"; then
+OPENMPFLAGS="-fopenmp -DENABLE_OPENMP -DNUM_OF_THREADS=$OPENMPTHREADS"
+OPENMPLIB=-lgomp
 fi
 AC_SUBST(OPENMPLIB)
 AC_SUBST(OPENMPFLAGS)

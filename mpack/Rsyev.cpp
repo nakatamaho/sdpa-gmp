@@ -99,7 +99,7 @@ Rsyev(const char *jobz, const char *uplo, mpackint n, mpf_class * A,
 
     if (*info == 0) {
 	nb = iMlaenv_gmp(1, "Rsytrd", uplo, n, -1, -1, -1);
-	lwkopt = max((mpackint)1, (nb + 2) * n);
+        lwkopt = max((mpackint)1, (nb + 2) * n);
 	work[0] = (double)lwkopt;	//needs cast mpackint to mpf
 	if (*lwork < max((mpackint)1, 3 * n - 1) && !lquery) {
 	    *info = -8;

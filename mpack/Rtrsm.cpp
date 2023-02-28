@@ -78,8 +78,7 @@ The matrix X is overwritten on B.
 
 void
 Rtrsm(const char *side, const char *uplo, const char *transa, const char *diag,
-    mpackint m, mpackint n, mpf_class alpha, mpf_class * A, mpackint lda,
-    mpf_class * B, mpackint ldb)
+    mpackint m, mpackint n, mpf_class alpha, mpf_class * A, mpackint lda, mpf_class * B, mpackint ldb)
 {
     mpackint info, lside, nrowa, nounit, upper;
 

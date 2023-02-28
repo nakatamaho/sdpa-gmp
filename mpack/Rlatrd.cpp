@@ -137,7 +137,7 @@ Rlatrd(const char *uplo, mpackint n, mpackint nb, mpf_class * A, mpackint lda, m
 	    if (i < n) {
 //Generate elementary reflector H(i) to annihilate 
 //A(i+2:n,i)
-		Rlarfg(n - i, &A[i + (i - 1) * lda], &A[min(i + 2,
+	        Rlarfg(n - i, &A[i + (i - 1) * lda], &A[min(i + 2,
 			    n) - 1 + (i - 1) * lda], 1, &tau[i - 1]);
 		e[i - 1] = A[i + (i - 1) * lda];
 		A[i + (i - 1) * lda] = One;

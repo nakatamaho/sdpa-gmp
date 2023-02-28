@@ -115,7 +115,7 @@ Rsytrd(const char *uplo, mpackint n, mpf_class * A, mpackint lda, mpf_class * d,
     if (nb > 1 && nb < n) {
 //Determine when to cross over from blocked to unblocked code
 //(last block is always handled by unblocked code).
-	nx = max(nb, iMlaenv_gmp(3, "Rsytrd", uplo, n, -1, -1, -1));
+        nx = max(nb, iMlaenv_gmp(3, "Rsytrd", uplo, n, -1, -1, -1));
 	if (nx < n) {
 //Determine if workspace is large enough for blocked code.
 	    ldwork = n;
@@ -124,7 +124,7 @@ Rsytrd(const char *uplo, mpackint n, mpf_class * A, mpackint lda, mpf_class * d,
 //Not enough workspace to use optimal NB:  determine the
 //minimum value of NB, and reduce NB or force use of
 //unblocked code by setting NX = N.
-		nb = max(lwork / ldwork, (mpackint)1);
+	        nb = max(lwork / ldwork, (mpackint)1);
 		nbmin = iMlaenv_gmp(2, "Rsytrd", uplo, n, -1, -1, -1);
 		if (nb < nbmin) {
 		    nx = n;

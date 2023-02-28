@@ -77,8 +77,7 @@ non-unit, upper or lower triangular matrix and op(A) is one  of
 
 void
 Rtrmm(const char *side, const char *uplo, const char *transa, const char *diag,
-    mpackint m, mpackint n, mpf_class alpha, mpf_class * A, mpackint lda,
-    mpf_class * B, mpackint ldb)
+    mpackint m, mpackint n, mpf_class alpha, mpf_class * A, mpackint lda, mpf_class * B, mpackint ldb)
 {
     mpackint info, lside, nrowa, nounit, upper;
 

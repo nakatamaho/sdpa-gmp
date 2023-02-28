@@ -75,9 +75,8 @@ m by n matrix.
 #include <mblas_gmp.h>
 
 void
-Rgemv(const char *trans, mpackint m, mpackint n, mpf_class alpha,
-    mpf_class * A, mpackint lda, mpf_class * x, mpackint incx, mpf_class beta,
-    mpf_class * y, mpackint incy)
+Rgemv(const char *trans, mpackint m, mpackint n, mpf_class alpha, mpf_class * A, mpackint lda,
+    mpf_class * x, mpackint incx, mpf_class beta, mpf_class * y, mpackint incy)
 {
     mpackint lenx, leny, ix, jx, kx, iy, jy, ky;
 
