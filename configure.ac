@@ -80,14 +80,14 @@ case "$host" in
 esac
 AM_CONDITIONAL(IS_MINGW, test x$IS_MINGW = x1)
 
-IS_MACOSX=0
+IS_MACOS=0
 case "$host" in
          *apple-darwin*) # MacOSX
-          IS_MACOSX=1
+          IS_MACOS=1
         ;;
         *)
 esac
-AM_CONDITIONAL(IS_MACOSX, test x$IS_MACOSX = x1)
+AM_CONDITIONAL(IS_MACOS, test x$IS_MACOS = x1)
 
 dnl How thread we link thread library esp. needed for spooles.
 case "$host" in
