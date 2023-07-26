@@ -1,94 +1,61 @@
-/*************************************************************************
+/*
+ * Copyright (c) 2008-2021
+ *	Nakata, Maho
+ * 	All rights reserved.
  *
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * 
- * Copyright 2009 by Nakata, Maho
- * 
- * $Id: mblas_gmp.h,v 1.8 2009/09/17 00:59:02 nakatamaho Exp $ 
+ * $Id: mpblas_dd.h,v 1.10 2010/08/07 03:15:46 nakatamaho Exp $
  *
- * MPACK - multiple precision arithmetic library
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
  *
- * This file is part of MPACK.
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
  *
- * MPACK is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License version 3
- * only, as published by the Free Software Foundation.
- *
- * MPACK is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License version 3 for more details
- * (a copy is included in the LICENSE file that accompanied this code).
- *
- * You should have received a copy of the GNU Lesser General Public License
- * version 3 along with MPACK.  If not, see
- * <http://www.gnu.org/licenses/lgpl.html>
- * for a copy of the LGPLv3 License.
- *
- ************************************************************************/
+ */
 
-/* this is a subset of mpack for SDPA-GMP only */
-/* http://mplapack.sourceforge.net/ */
+#ifndef _MPBLAS_GMP_H_
+#define _MPBLAS_GMP_H_
 
-#ifndef _MBLAS_GMP_H_
-#define _MBLAS_GMP_H_
+#define ___MPLAPACK_GMP_DEFAULT_PRECISION___ 512
 
-#include <mpack_config.h>
-#include <gmpxx.h>
-#include <mutils_gmp.h>
- 
-#if !defined __MPACK_ERRNO__
-#define _MPACK_EXTERN_ extern
-#else
-#define _MPACK_EXTERN_
+#include "gmpxx.h"
+#include "mplapack_config.h"
+#include "mplapack_utils_gmp.h"
+
+dd_real Rdot(mplapackint const n, dd_real *dx, mplapackint const incx, dd_real *dy, mplapackint const incy);
+void Rcopy(mplapackint const n, dd_real *dx, mplapackint const incx, dd_real *dy, mplapackint const incy);
+void Raxpy(mplapackint const n, dd_real const da, dd_real *dx, mplapackint const incx, dd_real *dy, mplapackint const incy);
+void Rscal(mplapackint const n, dd_real const da, dd_real *dx, mplapackint const incx);
+bool Mlsame_dd(const char *a, const char *b);
+void Mxerbla_dd(const char *srname, int info);
+void Rswap(mplapackint const n, dd_real *dx, mplapackint const incx, dd_real *dy, mplapackint const incy);
+dd_real Rnrm2(mplapackint const n, dd_real *x, mplapackint const incx);
+void Rtrmv(const char *uplo, const char *trans, const char *diag, mplapackint const n, dd_real *a, mplapackint const lda, dd_real *x, mplapackint const incx);
+void Rtrsv(const char *uplo, const char *trans, const char *diag, mplapackint const n, dd_real *a, mplapackint const lda, dd_real *x, mplapackint const incx);
+void Rgemv(const char *trans, mplapackint const m, mplapackint const n, dd_real const alpha, dd_real *a, mplapackint const lda, dd_real *x, mplapackint const incx, dd_real const beta, dd_real *y, mplapackint const incy);
+void Rsymv(const char *uplo, mplapackint const n, dd_real const alpha, dd_real *a, mplapackint const lda, dd_real *x, mplapackint const incx, dd_real const beta, dd_real *y, mplapackint const incy);
+void Rsyr2(const char *uplo, mplapackint const n, dd_real const alpha, dd_real *x, mplapackint const incx, dd_real *y, mplapackint const incy, dd_real *a, mplapackint const lda);
+void Rger(mplapackint const m, mplapackint const n, dd_real const alpha, dd_real *x, mplapackint const incx, dd_real *y, mplapackint const incy, dd_real *a, mplapackint const lda);
+void Rtrmm(const char *side, const char *uplo, const char *transa, const char *diag, mplapackint const m, mplapackint const n, dd_real const alpha, dd_real *a, mplapackint const lda, dd_real *b, mplapackint const ldb);
+void Rtrsm(const char *side, const char *uplo, const char *transa, const char *diag, mplapackint const m, mplapackint const n, dd_real const alpha, dd_real *a, mplapackint const lda, dd_real *b, mplapackint const ldb);
+void Rgemm(const char *transa, const char *transb, mplapackint const m, mplapackint const n, mplapackint const k, dd_real const alpha, dd_real *a, mplapackint const lda, dd_real *b, mplapackint const ldb, dd_real const beta, dd_real *c, mplapackint const ldc);
+void Rsyrk(const char *uplo, const char *trans, mplapackint const n, mplapackint const k, dd_real const alpha, dd_real *a, mplapackint const lda, dd_real const beta, dd_real *c, mplapackint const ldc);
+void Rsyr2k(const char *uplo, const char *trans, mplapackint const n, mplapackint const k, dd_real const alpha, dd_real *a, mplapackint const lda, dd_real *b, mplapackint const ldb, dd_real const beta, dd_real *c, mplapackint const ldc);
+
 #endif
 
-_MPACK_EXTERN_ int mpack_errno;
-
-/* LEVEL 1 MBLAS */
-mpf_class Rdot(mpackint n, mpf_class * dx, mpackint incx, mpf_class * dy,
-    mpackint incy);
-void Rcopy(mpackint n, mpf_class * dx, mpackint incx, mpf_class * dy,
-    mpackint incy);
-void Raxpy(mpackint n, mpf_class da, mpf_class * dx, mpackint incx, mpf_class * dy, mpackint incy);
-void Rscal(mpackint n, mpf_class ca, mpf_class * cx, mpackint incx);
-int Mlsame_gmp(const char *a, const char *b);
-void Mxerbla_gmp(const char *srname, int info);
-void Rswap(mpackint n, mpf_class * dx, mpackint incx, mpf_class * dy,
-    mpackint incy);
-mpf_class Rnrm2(mpackint n, mpf_class * x, mpackint incx);
-
-/* LEVEL 2 MBLAS */
-void Rtrmv(const char *uplo, const char *trans, const char *diag, mpackint n,
-    mpf_class * A, mpackint lda, mpf_class * x, mpackint incx);
-void Rtrsv(const char *uplo, const char *trans, const char *diag, mpackint n,
-    mpf_class * A, mpackint lda, mpf_class * x, mpackint incx);
-void Rgemv(const char *trans, mpackint m, mpackint n, mpf_class alpha,
-    mpf_class * A, mpackint lda, mpf_class * x, mpackint incx, mpf_class beta,
-    mpf_class * y, mpackint incy);
-void Rsymv(const char *uplo, mpackint n, mpf_class alpha, mpf_class * A,
-    mpackint lda, mpf_class * x, mpackint incx, mpf_class beta, mpf_class * y,
-    mpackint incy);
-void Rsyr2(const char *uplo, mpackint n, mpf_class alpha, mpf_class * x,
-    mpackint incx, mpf_class * y, mpackint incy, mpf_class * A, mpackint lda);
-void Rger(mpackint m, mpackint n, mpf_class alpha, mpf_class * x,
-    mpackint incx, mpf_class * y, mpackint incy, mpf_class * A, mpackint lda);
-
-/* LEVEL 3 MBLAS */
-void Rtrmm(const char *side, const char *uplo, const char *transa,
-    const char *diag, mpackint m, mpackint n, mpf_class alpha, mpf_class * A,
-    mpackint lda, mpf_class * B, mpackint ldb);
-void Rtrsm(const char *side, const char *uplo, const char *transa,
-    const char *diag, mpackint m, mpackint n, mpf_class alpha, mpf_class * A,
-    mpackint lda, mpf_class * B, mpackint ldb);
-void Rgemm(const char *transa, const char *transb, mpackint m, mpackint n,
-    mpackint k, mpf_class alpha, mpf_class * A, mpackint lda, mpf_class * B,
-    mpackint ldb, mpf_class beta, mpf_class * C, mpackint ldc);
-void Rsyr2k(const char *uplo, const char *trans, mpackint n, mpackint k,
-    mpf_class alpha, mpf_class * A, mpackint lda, mpf_class * B, mpackint ldb,
-    mpf_class beta, mpf_class * C, mpackint ldc);
-void Rsyrk(const char *uplo, const char *trans, mpackint n, mpackint k,
-    mpf_class alpha, mpf_class * A, mpackint lda, mpf_class beta,
-    mpf_class * C, mpackint ldc);
-
-#endif
