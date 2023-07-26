@@ -179,6 +179,7 @@ if test x$WITH_SYSTEM_GMP != xno; then
   else
     GMP_LIBDIR=$highest_abs_top_srcdir/external/i/GMP/lib
     GMP_INCLUDEDIR=$highest_abs_top_srcdir/external/i/GMP/include
+  fi
 fi
 AC_SUBST(GMP_LIBDIR)
 AC_SUBST(GMP_INCLUDEDIR)
