@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rlartg(mpf_class const f, mpf_class const g, mpf_class &cs, mpf_class &sn, mpf_class &r) {
     mpf_class safmin = 0.0;
@@ -43,9 +43,9 @@ void Rlartg(mpf_class const f, mpf_class const g, mpf_class &cs, mpf_class &sn, 
     mplapackint count = 0;
     mplapackint i = 0;
     //
-    safmin = Rlamch_dd("S");
-    eps = Rlamch_dd("E");
-    safmn2 = pow(Rlamch_dd("B"), castINTEGER_dd(log(safmin / eps) / log(Rlamch_dd("B")) / two));
+    safmin = Rlamch_gmp("S");
+    eps = Rlamch_gmp("E");
+    safmn2 = pow(Rlamch_gmp("B"), castINTEGER_gmp(log(safmin / eps) / log(Rlamch_gmp("B")) / two));
     safmx2 = one / safmn2;
     //        FIRST = .FALSE.
     //     END IF

@@ -26,7 +26,7 @@
  *
  */
 
-#include <mpblas_dd.h>
+#include <mpblas_gmp.h>
 
 void Rsymv(const char *uplo, mplapackint const n, mpf_class const alpha, mpf_class *a, mplapackint const lda, mpf_class *x, mplapackint const incx, mpf_class const beta, mpf_class *y, mplapackint const incy) {
     //
@@ -55,7 +55,7 @@ void Rsymv(const char *uplo, mplapackint const n, mpf_class const alpha, mpf_cla
     //     Test the input parameters.
     //
     mplapackint info = 0;
-    if (!Mlsame_dd(uplo, "U") && !Mlsame_dd(uplo, "L")) {
+    if (!Mlsame_gmp(uplo, "U") && !Mlsame_gmp(uplo, "L")) {
         info = 1;
     } else if (n < 0) {
         info = 2;
@@ -67,7 +67,7 @@ void Rsymv(const char *uplo, mplapackint const n, mpf_class const alpha, mpf_cla
         info = 10;
     }
     if (info != 0) {
-        Mxerbla_dd("Rsymv ", info);
+        Mxerbla_gmp("Rsymv ", info);
         return;
     }
     //
@@ -137,7 +137,7 @@ void Rsymv(const char *uplo, mplapackint const n, mpf_class const alpha, mpf_cla
     mplapackint jx = 0;
     mplapackint jy = 0;
     mplapackint ix = 0;
-    if (Mlsame_dd(uplo, "U")) {
+    if (Mlsame_gmp(uplo, "U")) {
         //
         //        Form  y  when A is stored in upper triangle.
         //

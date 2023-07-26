@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rsteqr(const char *compz, mplapackint const n, mpf_class *d, mpf_class *e, mpf_class *z, mplapackint const ldz, mpf_class *work, mplapackint &info) {
     mplapackint icompz = 0;
@@ -100,11 +100,11 @@ void Rsteqr(const char *compz, mplapackint const n, mpf_class *d, mpf_class *e, 
     //
     info = 0;
     //
-    if (Mlsame_dd(compz, "N")) {
+    if (Mlsame_gmp(compz, "N")) {
         icompz = 0;
-    } else if (Mlsame_dd(compz, "V")) {
+    } else if (Mlsame_gmp(compz, "V")) {
         icompz = 1;
-    } else if (Mlsame_dd(compz, "I")) {
+    } else if (Mlsame_gmp(compz, "I")) {
         icompz = 2;
     } else {
         icompz = -1;
@@ -117,7 +117,7 @@ void Rsteqr(const char *compz, mplapackint const n, mpf_class *d, mpf_class *e, 
         info = -6;
     }
     if (info != 0) {
-        Mxerbla_dd("Rsteqr", -info);
+        Mxerbla_gmp("Rsteqr", -info);
         return;
     }
     //
@@ -136,9 +136,9 @@ void Rsteqr(const char *compz, mplapackint const n, mpf_class *d, mpf_class *e, 
     //
     //     Determine the unit roundoff and over/underflow thresholds.
     //
-    eps = Rlamch_dd("E");
+    eps = Rlamch_gmp("E");
     eps2 = pow2(eps);
-    safmin = Rlamch_dd("S");
+    safmin = Rlamch_gmp("S");
     safmax = one / safmin;
     ssfmax = sqrt(safmax) / three;
     ssfmin = sqrt(safmin) / eps2;

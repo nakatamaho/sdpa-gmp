@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rsterf(mplapackint const n, mpf_class *d, mpf_class *e, mplapackint &info) {
     mpf_class eps = 0.0;
@@ -98,7 +98,7 @@ void Rsterf(mplapackint const n, mpf_class *d, mpf_class *e, mplapackint &info) 
     //
     if (n < 0) {
         info = -1;
-        Mxerbla_dd("Rsterf", -info);
+        Mxerbla_gmp("Rsterf", -info);
         return;
     }
     if (n <= 1) {
@@ -107,13 +107,13 @@ void Rsterf(mplapackint const n, mpf_class *d, mpf_class *e, mplapackint &info) 
     //
     //     Determine the unit roundoff for this environment.
     //
-    eps = Rlamch_dd("E");
+    eps = Rlamch_gmp("E");
     eps2 = pow2(eps);
-    safmin = Rlamch_dd("S");
+    safmin = Rlamch_gmp("S");
     safmax = one / safmin;
     ssfmax = sqrt(safmax) / three;
     ssfmin = sqrt(safmin) / eps2;
-    rmax = Rlamch_dd("O");
+    rmax = Rlamch_gmp("O");
     //
     //     Compute the eigenvalues of the tridiagonal matrix.
     //

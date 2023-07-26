@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rorgtr(const char *uplo, mplapackint const n, mpf_class *a, mplapackint const lda, mpf_class *tau, mpf_class *work, mplapackint const lwork, mplapackint &info) {
     //
@@ -58,8 +58,8 @@ void Rorgtr(const char *uplo, mplapackint const n, mpf_class *a, mplapackint con
     //
     info = 0;
     bool lquery = (lwork == -1);
-    bool upper = Mlsame_dd(uplo, "U");
-    if (!upper && !Mlsame_dd(uplo, "L")) {
+    bool upper = Mlsame_gmp(uplo, "U");
+    if (!upper && !Mlsame_gmp(uplo, "L")) {
         info = -1;
     } else if (n < 0) {
         info = -2;
@@ -73,16 +73,16 @@ void Rorgtr(const char *uplo, mplapackint const n, mpf_class *a, mplapackint con
     mplapackint lwkopt = 0;
     if (info == 0) {
         if (upper) {
-            nb = iMlaenv_dd(1, "Rorgql", " ", n - 1, n - 1, n - 1, -1);
+            nb = iMlaenv_gmp(1, "Rorgql", " ", n - 1, n - 1, n - 1, -1);
         } else {
-            nb = iMlaenv_dd(1, "Rorgqr", " ", n - 1, n - 1, n - 1, -1);
+            nb = iMlaenv_gmp(1, "Rorgqr", " ", n - 1, n - 1, n - 1, -1);
         }
         lwkopt = std::max((mplapackint)1, n - 1) * nb;
         work[1 - 1] = lwkopt;
     }
     //
     if (info != 0) {
-        Mxerbla_dd("Rorgtr", -info);
+        Mxerbla_gmp("Rorgtr", -info);
         return;
     } else if (lquery) {
         return;

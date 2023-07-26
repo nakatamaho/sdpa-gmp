@@ -3,7 +3,7 @@
  *	Nakata, Maho
  * 	All rights reserved.
  *
- * $Id: Mlsame_dd.cpp,v 1.4 2010/08/07 05:50:10 nakatamaho Exp $
+ * $Id: Mlsame_gmp.cpp,v 1.4 2010/08/07 05:50:10 nakatamaho Exp $
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -30,7 +30,7 @@
 /*
 Copyright (c) 1992-2007 The University of Tennessee.  All rights reserved.
  *
- * $Id: Mlsame_dd.cpp,v 1.4 2010/08/07 05:50:10 nakatamaho Exp $
+ * $Id: Mlsame_gmp.cpp,v 1.4 2010/08/07 05:50:10 nakatamaho Exp $
 
 $COPYRIGHT$
 
@@ -69,13 +69,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
 Based on http://www.netlib.org/blas/lsame.f
-Mlsame_dd returns 1 if CA is the same letter as CB regardless of case.
+Mlsame_gmp returns 1 if CA is the same letter as CB regardless of case.
 */
 
 #include <ctype.h>
-#include <mpblas_dd.h>
+#include <mpblas_gmp.h>
 
-bool Mlsame_dd(const char *a, const char *b) {
+bool Mlsame_gmp(const char *a, const char *b) {
     if (toupper(*a) == toupper(*b))
         return true;
     return false;

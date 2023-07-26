@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rlarfg(mplapackint const n, mpf_class &alpha, mpf_class *x, mplapackint const incx, mpf_class &tau) {
     const mpf_class zero = 0.0;
@@ -79,7 +79,7 @@ void Rlarfg(mplapackint const n, mpf_class &alpha, mpf_class *x, mplapackint con
         //        general case
         //
         beta = -sign(Rlapy2(alpha, xnorm), alpha);
-        safmin = Rlamch_dd("S") / Rlamch_dd("E");
+        safmin = Rlamch_gmp("S") / Rlamch_gmp("E");
         knt = 0;
         if (abs(beta) < safmin) {
             //

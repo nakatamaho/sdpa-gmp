@@ -26,7 +26,7 @@
  *
  */
 
-#include <mpblas_dd.h>
+#include <mpblas_gmp.h>
 
 void Rsyr2(const char *uplo, mplapackint const n, mpf_class const alpha, mpf_class *x, mplapackint const incx, mpf_class *y, mplapackint const incy, mpf_class *a, mplapackint const lda) {
     //
@@ -55,7 +55,7 @@ void Rsyr2(const char *uplo, mplapackint const n, mpf_class const alpha, mpf_cla
     //     Test the input parameters.
     //
     mplapackint info = 0;
-    if (!Mlsame_dd(uplo, "U") && !Mlsame_dd(uplo, "L")) {
+    if (!Mlsame_gmp(uplo, "U") && !Mlsame_gmp(uplo, "L")) {
         info = 1;
     } else if (n < 0) {
         info = 2;
@@ -67,7 +67,7 @@ void Rsyr2(const char *uplo, mplapackint const n, mpf_class const alpha, mpf_cla
         info = 9;
     }
     if (info != 0) {
-        Mxerbla_dd("Rsyr2 ", info);
+        Mxerbla_gmp("Rsyr2 ", info);
         return;
     }
     //
@@ -110,7 +110,7 @@ void Rsyr2(const char *uplo, mplapackint const n, mpf_class const alpha, mpf_cla
     mplapackint i = 0;
     mplapackint ix = 0;
     mplapackint iy = 0;
-    if (Mlsame_dd(uplo, "U")) {
+    if (Mlsame_gmp(uplo, "U")) {
         //
         //        Form  A  when A is stored in the upper triangle.
         //

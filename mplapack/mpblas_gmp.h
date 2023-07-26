@@ -3,7 +3,7 @@
  *	Nakata, Maho
  * 	All rights reserved.
  *
- * $Id: mpblas_dd.h,v 1.10 2010/08/07 03:15:46 nakatamaho Exp $
+ * $Id: mpblas_gmp.h,v 1.10 2010/08/07 03:15:46 nakatamaho Exp $
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -41,8 +41,8 @@ mpf_class Rdot(mplapackint const n, mpf_class *dx, mplapackint const incx, mpf_c
 void Rcopy(mplapackint const n, mpf_class *dx, mplapackint const incx, mpf_class *dy, mplapackint const incy);
 void Raxpy(mplapackint const n, mpf_class const da, mpf_class *dx, mplapackint const incx, mpf_class *dy, mplapackint const incy);
 void Rscal(mplapackint const n, mpf_class const da, mpf_class *dx, mplapackint const incx);
-bool Mlsame_dd(const char *a, const char *b);
-void Mxerbla_dd(const char *srname, int info);
+bool Mlsame_gmp(const char *a, const char *b);
+void Mxerbla_gmp(const char *srname, int info);
 void Rswap(mplapackint const n, mpf_class *dx, mplapackint const incx, mpf_class *dy, mplapackint const incy);
 mpf_class Rnrm2(mplapackint const n, mpf_class *x, mplapackint const incx);
 void Rtrmv(const char *uplo, const char *trans, const char *diag, mplapackint const n, mpf_class *a, mplapackint const lda, mpf_class *x, mplapackint const incx);

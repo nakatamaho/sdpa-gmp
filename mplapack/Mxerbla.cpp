@@ -3,7 +3,7 @@
  *	Nakata, Maho
  * 	All rights reserved.
  *
- * $Id: Mxerbla_dd.cpp,v 1.7 2010/08/07 05:50:10 nakatamaho Exp $
+ * $Id: Mxerbla_gmp.cpp,v 1.7 2010/08/07 05:50:10 nakatamaho Exp $
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,13 +29,13 @@
  */
 /*
 Based on http://www.netlib.org/blas/xerbla.f
-Mxerbla_dd is an error handler for the Mplapack routines.
+Mxerbla_gmp is an error handler for the Mplapack routines.
 */
 
-#include <mpblas_dd.h>
+#include <mpblas_gmp.h>
 #include <stdio.h>
 
-void Mxerbla_dd(const char *srname, int info) {
+void Mxerbla_gmp(const char *srname, int info) {
     fprintf(stderr, " ** On entry to %s parameter number %2d had an illegal value\n", srname, info);
     exit(info);
 }

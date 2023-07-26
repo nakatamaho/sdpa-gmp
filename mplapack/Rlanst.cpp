@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 mpf_class Rlanst(const char *norm, mplapackint const n, mpf_class *d, mpf_class *e) {
     mpf_class return_value = 0.0;
@@ -63,7 +63,7 @@ mpf_class Rlanst(const char *norm, mplapackint const n, mpf_class *d, mpf_class 
     const mpf_class one = 1.0;
     if (n <= 0) {
         anorm = zero;
-    } else if (Mlsame_dd(norm, "M")) {
+    } else if (Mlsame_gmp(norm, "M")) {
         //
         //        Find std::max(abs(A(i,j))).
         //
@@ -78,7 +78,7 @@ mpf_class Rlanst(const char *norm, mplapackint const n, mpf_class *d, mpf_class 
                 anorm = sum;
             }
         }
-    } else if (Mlsame_dd(norm, "O") || (Mlsame_dd(norm, "1")) || Mlsame_dd(norm, "I")) {
+    } else if (Mlsame_gmp(norm, "O") || (Mlsame_gmp(norm, "1")) || Mlsame_gmp(norm, "I")) {
         //
         //        Find norm1(A).
         //
@@ -97,7 +97,7 @@ mpf_class Rlanst(const char *norm, mplapackint const n, mpf_class *d, mpf_class 
                 }
             }
         }
-    } else if ((Mlsame_dd(norm, "F")) || (Mlsame_dd(norm, "E"))) {
+    } else if ((Mlsame_gmp(norm, "F")) || (Mlsame_gmp(norm, "E"))) {
         //
         //        Find normF(A).
         //

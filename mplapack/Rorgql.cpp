@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rorgql(mplapackint const m, mplapackint const n, mplapackint const k, mpf_class *a, mplapackint const lda, mpf_class *tau, mpf_class *work, mplapackint const lwork, mplapackint &info) {
     //
@@ -74,7 +74,7 @@ void Rorgql(mplapackint const m, mplapackint const n, mplapackint const k, mpf_c
         if (n == 0) {
             lwkopt = 1;
         } else {
-            nb = iMlaenv_dd(1, "Rorgql", " ", m, n, k, -1);
+            nb = iMlaenv_gmp(1, "Rorgql", " ", m, n, k, -1);
             lwkopt = n * nb;
         }
         work[1 - 1] = lwkopt;
@@ -85,7 +85,7 @@ void Rorgql(mplapackint const m, mplapackint const n, mplapackint const k, mpf_c
     }
     //
     if (info != 0) {
-        Mxerbla_dd("Rorgql", -info);
+        Mxerbla_gmp("Rorgql", -info);
         return;
     } else if (lquery) {
         return;
@@ -105,7 +105,7 @@ void Rorgql(mplapackint const m, mplapackint const n, mplapackint const k, mpf_c
         //
         //        Determine when to cross over from blocked to unblocked code.
         //
-        nx = std::max((mplapackint)0, iMlaenv_dd(3, "Rorgql", " ", m, n, k, -1));
+        nx = std::max((mplapackint)0, iMlaenv_gmp(3, "Rorgql", " ", m, n, k, -1));
         if (nx < k) {
             //
             //           Determine if workspace is large enough for blocked code.
@@ -118,7 +118,7 @@ void Rorgql(mplapackint const m, mplapackint const n, mplapackint const k, mpf_c
                 //              determine the minimum value of NB.
                 //
                 nb = lwork / ldwork;
-                nbmin = std::max((mplapackint)2, iMlaenv_dd(2, "Rorgql", " ", m, n, k, -1));
+                nbmin = std::max((mplapackint)2, iMlaenv_gmp(2, "Rorgql", " ", m, n, k, -1));
             }
         }
     }

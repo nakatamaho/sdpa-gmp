@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  *
  */
-#include <mpblas_dd.h>
+#include <mpblas_gmp.h>
 
 void Rgemm_NT_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class *A, mplapackint lda, mpf_class *B, mplapackint ldb, mpf_class beta,
 	      mpf_class *C, mplapackint ldc)

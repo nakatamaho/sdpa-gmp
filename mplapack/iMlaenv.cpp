@@ -26,13 +26,13 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 #include <string.h>
 
 #define subnamlen 17
 
-mplapackint iMlaenv_dd(mplapackint const ispec, const char *name, const char *opts, mplapackint const n1, mplapackint const n2, mplapackint const n3, mplapackint const n4) {
+mplapackint iMlaenv_gmp(mplapackint const ispec, const char *name, const char *opts, mplapackint const n1, mplapackint const n2, mplapackint const n3, mplapackint const n4) {
     mplapackint return_value = 0;
     char subnam[subnamlen];
     memset(subnam, '\0', sizeof(subnam));
@@ -493,7 +493,7 @@ L100:
     //
     //     ISPEC = 6:  crossover point for SVD (used by xGELSS and xGESVD)
     //
-    return_value = castINTEGER_dd(castREAL_dd(std::min(n1, n2)) * 1.6);
+    return_value = castINTEGER_gmp(castREAL_gmp(std::min(n1, n2)) * 1.6);
     return return_value;
     //
 L110:
@@ -523,10 +523,10 @@ L140:
     //
     //     ISPEC = 10: ieee and infinity NaN arithmetic can be trusted not to trap
     //
-    //     iMlaenv_dd = 0
+    //     iMlaenv_gmp = 0
     return_value = 1;
     if (return_value == 1) {
-        return_value = iMieeeck_dd(1, 0.0, 1.0);
+        return_value = iMieeeck_gmp(1, 0.0, 1.0);
     }
     return return_value;
     //
@@ -534,10 +534,10 @@ L150:
     //
     //     ISPEC = 11: ieee infinity arithmetic can be trusted not to trap
     //
-    //     iMlaenv_dd = 0
+    //     iMlaenv_gmp = 0
     return_value = 1;
     if (return_value == 1) {
-        return_value = iMieeeck_dd(0, 0.0, 1.0);
+        return_value = iMieeeck_gmp(0, 0.0, 1.0);
     }
     return return_value;
 //
@@ -545,9 +545,9 @@ L160:
     //
     //     12 <= ISPEC <= 16: xHSEQR or related subroutines.
     //
-    return_value = iMparmq_dd(ispec, name, opts, n1, n2, n3, n4);
+    return_value = iMparmq_gmp(ispec, name, opts, n1, n2, n3, n4);
     return return_value;
     //
-    //     End of iMlaenv_dd
+    //     End of iMlaenv_gmp
     //
 }

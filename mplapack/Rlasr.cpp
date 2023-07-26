@@ -26,19 +26,19 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rlasr(const char *side, const char *pivot, const char *direct, mplapackint const m, mplapackint const n, mpf_class *c, mpf_class *s, mpf_class *a, mplapackint const lda) {
     //
     //     Test the input parameters
     //
     mplapackint info = 0;
-    if (!(Mlsame_dd(side, "L") || Mlsame_dd(side, "R"))) {
+    if (!(Mlsame_gmp(side, "L") || Mlsame_gmp(side, "R"))) {
         info = 1;
-    } else if (!(Mlsame_dd(pivot, "V") || Mlsame_dd(pivot, "T") || Mlsame_dd(pivot, "B"))) {
+    } else if (!(Mlsame_gmp(pivot, "V") || Mlsame_gmp(pivot, "T") || Mlsame_gmp(pivot, "B"))) {
         info = 2;
-    } else if (!(Mlsame_dd(direct, "F") || Mlsame_dd(direct, "B"))) {
+    } else if (!(Mlsame_gmp(direct, "F") || Mlsame_gmp(direct, "B"))) {
         info = 3;
     } else if (m < 0) {
         info = 4;
@@ -48,7 +48,7 @@ void Rlasr(const char *side, const char *pivot, const char *direct, mplapackint 
         info = 9;
     }
     if (info != 0) {
-        Mxerbla_dd("Rlasr", info);
+        Mxerbla_gmp("Rlasr", info);
         return;
     }
     //
@@ -64,12 +64,12 @@ void Rlasr(const char *side, const char *pivot, const char *direct, mplapackint 
     const mpf_class zero = 0.0;
     mplapackint i = 0;
     mpf_class temp = 0.0;
-    if (Mlsame_dd(side, "L")) {
+    if (Mlsame_gmp(side, "L")) {
         //
         //        Form  P * A
         //
-        if (Mlsame_dd(pivot, "V")) {
-            if (Mlsame_dd(direct, "F")) {
+        if (Mlsame_gmp(pivot, "V")) {
+            if (Mlsame_gmp(direct, "F")) {
                 for (j = 1; j <= m - 1; j = j + 1) {
                     ctemp = c[j - 1];
                     stemp = s[j - 1];
@@ -81,7 +81,7 @@ void Rlasr(const char *side, const char *pivot, const char *direct, mplapackint 
                         }
                     }
                 }
-            } else if (Mlsame_dd(direct, "B")) {
+            } else if (Mlsame_gmp(direct, "B")) {
                 for (j = m - 1; j >= 1; j = j - 1) {
                     ctemp = c[j - 1];
                     stemp = s[j - 1];
@@ -94,8 +94,8 @@ void Rlasr(const char *side, const char *pivot, const char *direct, mplapackint 
                     }
                 }
             }
-        } else if (Mlsame_dd(pivot, "T")) {
-            if (Mlsame_dd(direct, "F")) {
+        } else if (Mlsame_gmp(pivot, "T")) {
+            if (Mlsame_gmp(direct, "F")) {
                 for (j = 2; j <= m; j = j + 1) {
                     ctemp = c[(j - 1) - 1];
                     stemp = s[(j - 1) - 1];
@@ -107,7 +107,7 @@ void Rlasr(const char *side, const char *pivot, const char *direct, mplapackint 
                         }
                     }
                 }
-            } else if (Mlsame_dd(direct, "B")) {
+            } else if (Mlsame_gmp(direct, "B")) {
                 for (j = m; j >= 2; j = j - 1) {
                     ctemp = c[(j - 1) - 1];
                     stemp = s[(j - 1) - 1];
@@ -120,8 +120,8 @@ void Rlasr(const char *side, const char *pivot, const char *direct, mplapackint 
                     }
                 }
             }
-        } else if (Mlsame_dd(pivot, "B")) {
-            if (Mlsame_dd(direct, "F")) {
+        } else if (Mlsame_gmp(pivot, "B")) {
+            if (Mlsame_gmp(direct, "F")) {
                 for (j = 1; j <= m - 1; j = j + 1) {
                     ctemp = c[j - 1];
                     stemp = s[j - 1];
@@ -133,7 +133,7 @@ void Rlasr(const char *side, const char *pivot, const char *direct, mplapackint 
                         }
                     }
                 }
-            } else if (Mlsame_dd(direct, "B")) {
+            } else if (Mlsame_gmp(direct, "B")) {
                 for (j = m - 1; j >= 1; j = j - 1) {
                     ctemp = c[j - 1];
                     stemp = s[j - 1];
@@ -147,12 +147,12 @@ void Rlasr(const char *side, const char *pivot, const char *direct, mplapackint 
                 }
             }
         }
-    } else if (Mlsame_dd(side, "R")) {
+    } else if (Mlsame_gmp(side, "R")) {
         //
         //        Form A * P**T
         //
-        if (Mlsame_dd(pivot, "V")) {
-            if (Mlsame_dd(direct, "F")) {
+        if (Mlsame_gmp(pivot, "V")) {
+            if (Mlsame_gmp(direct, "F")) {
                 for (j = 1; j <= n - 1; j = j + 1) {
                     ctemp = c[j - 1];
                     stemp = s[j - 1];
@@ -164,7 +164,7 @@ void Rlasr(const char *side, const char *pivot, const char *direct, mplapackint 
                         }
                     }
                 }
-            } else if (Mlsame_dd(direct, "B")) {
+            } else if (Mlsame_gmp(direct, "B")) {
                 for (j = n - 1; j >= 1; j = j - 1) {
                     ctemp = c[j - 1];
                     stemp = s[j - 1];
@@ -177,8 +177,8 @@ void Rlasr(const char *side, const char *pivot, const char *direct, mplapackint 
                     }
                 }
             }
-        } else if (Mlsame_dd(pivot, "T")) {
-            if (Mlsame_dd(direct, "F")) {
+        } else if (Mlsame_gmp(pivot, "T")) {
+            if (Mlsame_gmp(direct, "F")) {
                 for (j = 2; j <= n; j = j + 1) {
                     ctemp = c[(j - 1) - 1];
                     stemp = s[(j - 1) - 1];
@@ -190,7 +190,7 @@ void Rlasr(const char *side, const char *pivot, const char *direct, mplapackint 
                         }
                     }
                 }
-            } else if (Mlsame_dd(direct, "B")) {
+            } else if (Mlsame_gmp(direct, "B")) {
                 for (j = n; j >= 2; j = j - 1) {
                     ctemp = c[(j - 1) - 1];
                     stemp = s[(j - 1) - 1];
@@ -203,8 +203,8 @@ void Rlasr(const char *side, const char *pivot, const char *direct, mplapackint 
                     }
                 }
             }
-        } else if (Mlsame_dd(pivot, "B")) {
-            if (Mlsame_dd(direct, "F")) {
+        } else if (Mlsame_gmp(pivot, "B")) {
+            if (Mlsame_gmp(direct, "F")) {
                 for (j = 1; j <= n - 1; j = j + 1) {
                     ctemp = c[j - 1];
                     stemp = s[j - 1];
@@ -216,7 +216,7 @@ void Rlasr(const char *side, const char *pivot, const char *direct, mplapackint 
                         }
                     }
                 }
-            } else if (Mlsame_dd(direct, "B")) {
+            } else if (Mlsame_gmp(direct, "B")) {
                 for (j = n - 1; j >= 1; j = j - 1) {
                     ctemp = c[j - 1];
                     stemp = s[j - 1];

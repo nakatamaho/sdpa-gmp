@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rlarf(const char *side, mplapackint const m, mplapackint const n, mpf_class *v, mplapackint const incv, mpf_class const tau, mpf_class *c, mplapackint const ldc, mpf_class *work) {
     //
@@ -52,7 +52,7 @@ void Rlarf(const char *side, mplapackint const m, mplapackint const n, mpf_class
     //     ..
     //     .. Executable Statements ..
     //
-    bool applyleft = Mlsame_dd(side, "L");
+    bool applyleft = Mlsame_gmp(side, "L");
     mplapackint lastv = 0;
     mplapackint lastc = 0;
     const mpf_class zero = 0.0;

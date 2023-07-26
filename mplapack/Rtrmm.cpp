@@ -26,7 +26,7 @@
  *
  */
 
-#include <mpblas_dd.h>
+#include <mpblas_gmp.h>
 
 void Rtrmm(const char *side, const char *uplo, const char *transa, const char *diag, mplapackint const m, mplapackint const n, mpf_class const alpha, mpf_class *a, mplapackint const lda, mpf_class *b, mplapackint const ldb) {
     //
@@ -54,24 +54,24 @@ void Rtrmm(const char *side, const char *uplo, const char *transa, const char *d
     //
     //     Test the input parameters.
     //
-    bool lside = Mlsame_dd(side, "L");
+    bool lside = Mlsame_gmp(side, "L");
     mplapackint nrowa = 0;
     if (lside) {
         nrowa = m;
     } else {
         nrowa = n;
     }
-    bool nounit = Mlsame_dd(diag, "N");
-    bool upper = Mlsame_dd(uplo, "U");
+    bool nounit = Mlsame_gmp(diag, "N");
+    bool upper = Mlsame_gmp(uplo, "U");
     //
     mplapackint info = 0;
-    if ((!lside) && (!Mlsame_dd(side, "R"))) {
+    if ((!lside) && (!Mlsame_gmp(side, "R"))) {
         info = 1;
-    } else if ((!upper) && (!Mlsame_dd(uplo, "L"))) {
+    } else if ((!upper) && (!Mlsame_gmp(uplo, "L"))) {
         info = 2;
-    } else if ((!Mlsame_dd(transa, "N")) && (!Mlsame_dd(transa, "T")) && (!Mlsame_dd(transa, "C"))) {
+    } else if ((!Mlsame_gmp(transa, "N")) && (!Mlsame_gmp(transa, "T")) && (!Mlsame_gmp(transa, "C"))) {
         info = 3;
-    } else if ((!Mlsame_dd(diag, "U")) && (!Mlsame_dd(diag, "N"))) {
+    } else if ((!Mlsame_gmp(diag, "U")) && (!Mlsame_gmp(diag, "N"))) {
         info = 4;
     } else if (m < 0) {
         info = 5;
@@ -83,7 +83,7 @@ void Rtrmm(const char *side, const char *uplo, const char *transa, const char *d
         info = 11;
     }
     if (info != 0) {
-        Mxerbla_dd("Rtrmm ", info);
+        Mxerbla_gmp("Rtrmm ", info);
         return;
     }
     //
@@ -113,7 +113,7 @@ void Rtrmm(const char *side, const char *uplo, const char *transa, const char *d
     mpf_class temp = 0.0;
     const mpf_class one = 1.0;
     if (lside) {
-        if (Mlsame_dd(transa, "N")) {
+        if (Mlsame_gmp(transa, "N")) {
             //
             //           Form  B := alpha*A*B.
             //
@@ -181,7 +181,7 @@ void Rtrmm(const char *side, const char *uplo, const char *transa, const char *d
             }
         }
     } else {
-        if (Mlsame_dd(transa, "N")) {
+        if (Mlsame_gmp(transa, "N")) {
             //
             //           Form  B := alpha*B*A.
             //

@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rlatrd(const char *uplo, mplapackint const n, mplapackint const nb, mpf_class *a, mplapackint const lda, mpf_class *e, mpf_class *tau, mpf_class *w, mplapackint const ldw) {
     //
@@ -66,7 +66,7 @@ void Rlatrd(const char *uplo, mplapackint const n, mplapackint const nb, mpf_cla
     const mpf_class zero = 0.0;
     const mpf_class half = 0.5e+0;
     mpf_class alpha = 0.0;
-    if (Mlsame_dd(uplo, "U")) {
+    if (Mlsame_gmp(uplo, "U")) {
         //
         //        Reduce last NB columns of upper triangle
         //

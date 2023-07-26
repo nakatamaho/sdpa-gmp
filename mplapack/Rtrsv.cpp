@@ -26,7 +26,7 @@
  *
  */
 
-#include <mpblas_dd.h>
+#include <mpblas_gmp.h>
 
 void Rtrsv(const char *uplo, const char *trans, const char *diag, mplapackint const n, mpf_class *a, mplapackint const lda, mpf_class *x, mplapackint const incx) {
     //
@@ -55,11 +55,11 @@ void Rtrsv(const char *uplo, const char *trans, const char *diag, mplapackint co
     //     Test the input parameters.
     //
     mplapackint info = 0;
-    if (!Mlsame_dd(uplo, "U") && !Mlsame_dd(uplo, "L")) {
+    if (!Mlsame_gmp(uplo, "U") && !Mlsame_gmp(uplo, "L")) {
         info = 1;
-    } else if (!Mlsame_dd(trans, "N") && !Mlsame_dd(trans, "T") && !Mlsame_dd(trans, "C")) {
+    } else if (!Mlsame_gmp(trans, "N") && !Mlsame_gmp(trans, "T") && !Mlsame_gmp(trans, "C")) {
         info = 2;
-    } else if (!Mlsame_dd(diag, "U") && !Mlsame_dd(diag, "N")) {
+    } else if (!Mlsame_gmp(diag, "U") && !Mlsame_gmp(diag, "N")) {
         info = 3;
     } else if (n < 0) {
         info = 4;
@@ -69,7 +69,7 @@ void Rtrsv(const char *uplo, const char *trans, const char *diag, mplapackint co
         info = 8;
     }
     if (info != 0) {
-        Mxerbla_dd("Rtrsv ", info);
+        Mxerbla_gmp("Rtrsv ", info);
         return;
     }
     //
@@ -79,7 +79,7 @@ void Rtrsv(const char *uplo, const char *trans, const char *diag, mplapackint co
         return;
     }
     //
-    bool nounit = Mlsame_dd(diag, "N");
+    bool nounit = Mlsame_gmp(diag, "N");
     //
     //     Set up the start point in X if the increment is not unity. This
     //     will be  ( N - 1 )*INCX  too small for descending loops.
@@ -100,11 +100,11 @@ void Rtrsv(const char *uplo, const char *trans, const char *diag, mplapackint co
     mplapackint i = 0;
     mplapackint jx = 0;
     mplapackint ix = 0;
-    if (Mlsame_dd(trans, "N")) {
+    if (Mlsame_gmp(trans, "N")) {
         //
         //        Form  x := inv( A )*x.
         //
-        if (Mlsame_dd(uplo, "U")) {
+        if (Mlsame_gmp(uplo, "U")) {
             if (incx == 1) {
                 for (j = n; j >= 1; j = j - 1) {
                     if (x[j - 1] != zero) {
@@ -169,7 +169,7 @@ void Rtrsv(const char *uplo, const char *trans, const char *diag, mplapackint co
         //
         //        Form  x := inv( A**T )*x.
         //
-        if (Mlsame_dd(uplo, "U")) {
+        if (Mlsame_gmp(uplo, "U")) {
             if (incx == 1) {
                 for (j = 1; j <= n; j = j + 1) {
                     temp = x[j - 1];

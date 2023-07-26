@@ -26,7 +26,7 @@
  *
  */
 
-#include <mpblas_dd.h>
+#include <mpblas_gmp.h>
 
 void Rgemv(const char *trans, mplapackint const m, mplapackint const n, mpf_class const alpha, mpf_class *a, mplapackint const lda, mpf_class *x, mplapackint const incx, mpf_class const beta, mpf_class *y, mplapackint const incy) {
     //
@@ -55,7 +55,7 @@ void Rgemv(const char *trans, mplapackint const m, mplapackint const n, mpf_clas
     //     Test the input parameters.
     //
     mplapackint info = 0;
-    if (!Mlsame_dd(trans, "N") && !Mlsame_dd(trans, "T") && !Mlsame_dd(trans, "C")) {
+    if (!Mlsame_gmp(trans, "N") && !Mlsame_gmp(trans, "T") && !Mlsame_gmp(trans, "C")) {
         info = 1;
     } else if (m < 0) {
         info = 2;
@@ -69,7 +69,7 @@ void Rgemv(const char *trans, mplapackint const m, mplapackint const n, mpf_clas
         info = 11;
     }
     if (info != 0) {
-        Mxerbla_dd("Rgemv ", info);
+        Mxerbla_gmp("Rgemv ", info);
         return;
     }
     //
@@ -86,7 +86,7 @@ void Rgemv(const char *trans, mplapackint const m, mplapackint const n, mpf_clas
     //
     mplapackint lenx = 0;
     mplapackint leny = 0;
-    if (Mlsame_dd(trans, "N")) {
+    if (Mlsame_gmp(trans, "N")) {
         lenx = n;
         leny = m;
     } else {
@@ -147,7 +147,7 @@ void Rgemv(const char *trans, mplapackint const m, mplapackint const n, mpf_clas
     mpf_class temp = 0.0;
     mplapackint jy = 0;
     mplapackint ix = 0;
-    if (Mlsame_dd(trans, "N")) {
+    if (Mlsame_gmp(trans, "N")) {
         //
         //        Form  y := alpha*A*x + y.
         //

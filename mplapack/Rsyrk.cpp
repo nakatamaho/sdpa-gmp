@@ -26,7 +26,7 @@
  *
  */
 
-#include <mpblas_dd.h>
+#include <mpblas_gmp.h>
 
 void Rsyrk(const char *uplo, const char *trans, mplapackint const n, mplapackint const k, mpf_class const alpha, mpf_class *a, mplapackint const lda, mpf_class const beta, mpf_class *c, mplapackint const ldc) {
     //
@@ -55,17 +55,17 @@ void Rsyrk(const char *uplo, const char *trans, mplapackint const n, mplapackint
     //     Test the input parameters.
     //
     mplapackint nrowa = 0;
-    if (Mlsame_dd(trans, "N")) {
+    if (Mlsame_gmp(trans, "N")) {
         nrowa = n;
     } else {
         nrowa = k;
     }
-    bool upper = Mlsame_dd(uplo, "U");
+    bool upper = Mlsame_gmp(uplo, "U");
     //
     mplapackint info = 0;
-    if ((!upper) && (!Mlsame_dd(uplo, "L"))) {
+    if ((!upper) && (!Mlsame_gmp(uplo, "L"))) {
         info = 1;
-    } else if ((!Mlsame_dd(trans, "N")) && (!Mlsame_dd(trans, "T")) && (!Mlsame_dd(trans, "C"))) {
+    } else if ((!Mlsame_gmp(trans, "N")) && (!Mlsame_gmp(trans, "T")) && (!Mlsame_gmp(trans, "C"))) {
         info = 2;
     } else if (n < 0) {
         info = 3;
@@ -77,7 +77,7 @@ void Rsyrk(const char *uplo, const char *trans, mplapackint const n, mplapackint
         info = 10;
     }
     if (info != 0) {
-        Mxerbla_dd("Rsyrk ", info);
+        Mxerbla_gmp("Rsyrk ", info);
         return;
     }
     //
@@ -130,7 +130,7 @@ void Rsyrk(const char *uplo, const char *trans, mplapackint const n, mplapackint
     //
     mplapackint l = 0;
     mpf_class temp = 0.0;
-    if (Mlsame_dd(trans, "N")) {
+    if (Mlsame_gmp(trans, "N")) {
         //
         //        Form  C := alpha*A*A**T + beta*C.
         //

@@ -28,7 +28,7 @@
  *
  */
 
-#include <mpblas_dd.h>
+#include <mpblas_gmp.h>
 #ifdef _OPENMP
 #include <omp.h>
 #endif

@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 mpf_class Rlapy2(mpf_class const x, mpf_class const y) {
     mpf_class return_value = 0.0;

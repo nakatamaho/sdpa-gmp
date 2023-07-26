@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rlascl(const char *type, mplapackint const kl, mplapackint const ku, mpf_class const cfrom, mpf_class const cto, mplapackint const m, mplapackint const n, mpf_class *a, mplapackint const lda, mplapackint &info) {
     mplapackint itype = 0;
@@ -75,19 +75,19 @@ void Rlascl(const char *type, mplapackint const kl, mplapackint const ku, mpf_cl
     //
     info = 0;
     //
-    if (Mlsame_dd(type, "G")) {
+    if (Mlsame_gmp(type, "G")) {
         itype = 0;
-    } else if (Mlsame_dd(type, "L")) {
+    } else if (Mlsame_gmp(type, "L")) {
         itype = 1;
-    } else if (Mlsame_dd(type, "U")) {
+    } else if (Mlsame_gmp(type, "U")) {
         itype = 2;
-    } else if (Mlsame_dd(type, "H")) {
+    } else if (Mlsame_gmp(type, "H")) {
         itype = 3;
-    } else if (Mlsame_dd(type, "B")) {
+    } else if (Mlsame_gmp(type, "B")) {
         itype = 4;
-    } else if (Mlsame_dd(type, "Q")) {
+    } else if (Mlsame_gmp(type, "Q")) {
         itype = 5;
-    } else if (Mlsame_dd(type, "Z")) {
+    } else if (Mlsame_gmp(type, "Z")) {
         itype = 6;
     } else {
         itype = -1;
@@ -116,7 +116,7 @@ void Rlascl(const char *type, mplapackint const kl, mplapackint const ku, mpf_cl
     }
     //
     if (info != 0) {
-        Mxerbla_dd("Rlascl", -info);
+        Mxerbla_gmp("Rlascl", -info);
         return;
     }
     //
@@ -128,7 +128,7 @@ void Rlascl(const char *type, mplapackint const kl, mplapackint const ku, mpf_cl
     //
     //     Get machine parameters
     //
-    smlnum = Rlamch_dd("S");
+    smlnum = Rlamch_gmp("S");
     bignum = one / smlnum;
     //
     cfromc = cfrom;

@@ -26,7 +26,7 @@
  *
  */
 
-#include <mpblas_dd.h>
+#include <mpblas_gmp.h>
 
 void Rscal(mplapackint const n, mpf_class const da, mpf_class *dx, mplapackint const incx) {
     //

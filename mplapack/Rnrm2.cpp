@@ -26,7 +26,7 @@
  *
  */
 
-#include <mpblas_dd.h>
+#include <mpblas_gmp.h>
 
 mpf_class Rnrm2(mplapackint const n, mpf_class *x, mplapackint const incx) {
     mpf_class return_value = 0.0;

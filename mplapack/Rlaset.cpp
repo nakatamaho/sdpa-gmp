@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rlaset(const char *uplo, mplapackint const m, mplapackint const n, mpf_class const alpha, mpf_class const beta, mpf_class *a, mplapackint const lda) {
     //
@@ -52,7 +52,7 @@ void Rlaset(const char *uplo, mplapackint const m, mplapackint const n, mpf_clas
     //
     mplapackint j = 0;
     mplapackint i = 0;
-    if (Mlsame_dd(uplo, "U")) {
+    if (Mlsame_gmp(uplo, "U")) {
         //
         //        Set the strictly upper triangular or trapezoidal part of the
         //        array to ALPHA.
@@ -63,7 +63,7 @@ void Rlaset(const char *uplo, mplapackint const m, mplapackint const n, mpf_clas
             }
         }
         //
-    } else if (Mlsame_dd(uplo, "L")) {
+    } else if (Mlsame_gmp(uplo, "L")) {
         //
         //        Set the strictly lower triangular or trapezoidal part of the
         //        array to ALPHA.

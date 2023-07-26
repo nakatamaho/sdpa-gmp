@@ -28,7 +28,7 @@
  *
  */
 
-#include <mpblas_dd.h>
+#include <mpblas_gmp.h>
 
 mpf_class Rdot_ref(mplapackint n, mpf_class * dx, mplapackint incx, mpf_class * dy, mplapackint incy);
 mpf_class Rdot_omp(mplapackint n, mpf_class * dx, mplapackint incx, mpf_class * dy, mplapackint incy);

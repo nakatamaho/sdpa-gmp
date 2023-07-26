@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rsytd2(const char *uplo, mplapackint const n, mpf_class *a, mplapackint const lda, mpf_class *d, mpf_class *e, mpf_class *tau, mplapackint &info) {
     //
@@ -57,8 +57,8 @@ void Rsytd2(const char *uplo, mplapackint const n, mpf_class *a, mplapackint con
     //     Test the input parameters
     //
     info = 0;
-    bool upper = Mlsame_dd(uplo, "U");
-    if (!upper && !Mlsame_dd(uplo, "L")) {
+    bool upper = Mlsame_gmp(uplo, "U");
+    if (!upper && !Mlsame_gmp(uplo, "L")) {
         info = -1;
     } else if (n < 0) {
         info = -2;
@@ -66,7 +66,7 @@ void Rsytd2(const char *uplo, mplapackint const n, mpf_class *a, mplapackint con
         info = -4;
     }
     if (info != 0) {
-        Mxerbla_dd("Rsytd2", -info);
+        Mxerbla_gmp("Rsytd2", -info);
         return;
     }
     //

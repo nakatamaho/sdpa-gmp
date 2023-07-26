@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rlasrt(const char *id, mplapackint const n, mpf_class *d, mplapackint &info) {
     mplapackint dir = 0;
@@ -73,9 +73,9 @@ void Rlasrt(const char *id, mplapackint const n, mpf_class *d, mplapackint &info
     //
     info = 0;
     dir = -1;
-    if (Mlsame_dd(id, "D")) {
+    if (Mlsame_gmp(id, "D")) {
         dir = 0;
-    } else if (Mlsame_dd(id, "I")) {
+    } else if (Mlsame_gmp(id, "I")) {
         dir = 1;
     }
     if (dir == -1) {
@@ -84,7 +84,7 @@ void Rlasrt(const char *id, mplapackint const n, mpf_class *d, mplapackint &info
         info = -2;
     }
     if (info != 0) {
-        Mxerbla_dd("Rlasrt", -info);
+        Mxerbla_gmp("Rlasrt", -info);
         return;
     }
     //

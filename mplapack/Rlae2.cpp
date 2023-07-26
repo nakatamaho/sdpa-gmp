@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rlae2(mpf_class const a, mpf_class const b, mpf_class const c, mpf_class &rt1, mpf_class &rt2) {
     //

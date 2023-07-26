@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rpotf2(const char *uplo, mplapackint const n, mpf_class *a, mplapackint const lda, mplapackint &info) {
     bool upper = false;
@@ -62,8 +62,8 @@ void Rpotf2(const char *uplo, mplapackint const n, mpf_class *a, mplapackint con
     //     Test the input parameters.
     //
     info = 0;
-    upper = Mlsame_dd(uplo, "U");
-    if (!upper && !Mlsame_dd(uplo, "L")) {
+    upper = Mlsame_gmp(uplo, "U");
+    if (!upper && !Mlsame_gmp(uplo, "L")) {
         info = -1;
     } else if (n < 0) {
         info = -2;
@@ -71,7 +71,7 @@ void Rpotf2(const char *uplo, mplapackint const n, mpf_class *a, mplapackint con
         info = -4;
     }
     if (info != 0) {
-        Mxerbla_dd("Rpotf2", -info);
+        Mxerbla_gmp("Rpotf2", -info);
         return;
     }
     //

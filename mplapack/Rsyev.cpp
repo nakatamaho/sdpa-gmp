@@ -26,21 +26,21 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rsyev(const char *jobz, const char *uplo, mplapackint const n, mpf_class *a, mplapackint const lda, mpf_class *w, mpf_class *work, mplapackint const lwork, mplapackint &info) {
     //
     //     Test the input parameters.
     //
-    bool wantz = Mlsame_dd(jobz, "V");
-    bool lower = Mlsame_dd(uplo, "L");
+    bool wantz = Mlsame_gmp(jobz, "V");
+    bool lower = Mlsame_gmp(uplo, "L");
     bool lquery = (lwork == -1);
     //
     info = 0;
-    if (!(wantz || Mlsame_dd(jobz, "N"))) {
+    if (!(wantz || Mlsame_gmp(jobz, "N"))) {
         info = -1;
-    } else if (!(lower || Mlsame_dd(uplo, "U"))) {
+    } else if (!(lower || Mlsame_gmp(uplo, "U"))) {
         info = -2;
     } else if (n < 0) {
         info = -3;
@@ -51,7 +51,7 @@ void Rsyev(const char *jobz, const char *uplo, mplapackint const n, mpf_class *a
     mplapackint nb = 0;
     mplapackint lwkopt = 0;
     if (info == 0) {
-        nb = iMlaenv_dd(1, "Rsytrd", uplo, n, -1, -1, -1);
+        nb = iMlaenv_gmp(1, "Rsytrd", uplo, n, -1, -1, -1);
         lwkopt = std::max((mplapackint)1, (nb + 2) * n);
         work[1 - 1] = lwkopt;
         //
@@ -61,7 +61,7 @@ void Rsyev(const char *jobz, const char *uplo, mplapackint const n, mpf_class *a
     }
     //
     if (info != 0) {
-        Mxerbla_dd("Rsyev", -info);
+        Mxerbla_gmp("Rsyev", -info);
         return;
     } else if (lquery) {
         return;
@@ -85,8 +85,8 @@ void Rsyev(const char *jobz, const char *uplo, mplapackint const n, mpf_class *a
     //
     //     Get machine constants.
     //
-    mpf_class safmin = Rlamch_dd("Safe minimum");
-    mpf_class eps = Rlamch_dd("Precision");
+    mpf_class safmin = Rlamch_gmp("Safe minimum");
+    mpf_class eps = Rlamch_gmp("Precision");
     mpf_class smlnum = safmin / eps;
     mpf_class bignum = one / smlnum;
     mpf_class rmin = sqrt(smlnum);

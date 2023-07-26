@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rpotrf(const char *uplo, mplapackint const n, mpf_class *a, mplapackint const lda, mplapackint &info) {
     bool upper = false;
@@ -62,8 +62,8 @@ void Rpotrf(const char *uplo, mplapackint const n, mpf_class *a, mplapackint con
     //     Test the input parameters.
     //
     info = 0;
-    upper = Mlsame_dd(uplo, "U");
-    if (!upper && !Mlsame_dd(uplo, "L")) {
+    upper = Mlsame_gmp(uplo, "U");
+    if (!upper && !Mlsame_gmp(uplo, "L")) {
         info = -1;
     } else if (n < 0) {
         info = -2;
@@ -71,7 +71,7 @@ void Rpotrf(const char *uplo, mplapackint const n, mpf_class *a, mplapackint con
         info = -4;
     }
     if (info != 0) {
-        Mxerbla_dd("Rpotrf", -info);
+        Mxerbla_gmp("Rpotrf", -info);
         return;
     }
     //
@@ -83,7 +83,7 @@ void Rpotrf(const char *uplo, mplapackint const n, mpf_class *a, mplapackint con
     //
     //     Determine the block size for this environment.
     //
-    nb = iMlaenv_dd(1, "Rpotrf", uplo, n, -1, -1, -1);
+    nb = iMlaenv_gmp(1, "Rpotrf", uplo, n, -1, -1, -1);
     if (nb <= 1 || nb >= n) {
         //
         //        Use unblocked code.

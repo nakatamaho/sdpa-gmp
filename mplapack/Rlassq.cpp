@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rlassq(mplapackint const n, mpf_class *x, mplapackint const incx, mpf_class &scale, mpf_class &sumsq) {
     //

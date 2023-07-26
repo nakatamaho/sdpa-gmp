@@ -26,8 +26,8 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rlarfb(const char *side, const char *trans, const char *direct, const char *storev, mplapackint const m, mplapackint const n, mplapackint const k, mpf_class *v, mplapackint const ldv, mpf_class *t, mplapackint const ldt, mpf_class *c, mplapackint const ldc, mpf_class *work, mplapackint const ldwork) {
     //
@@ -59,7 +59,7 @@ void Rlarfb(const char *side, const char *trans, const char *direct, const char 
     }
     //
     char transt;
-    if (Mlsame_dd(trans, "N")) {
+    if (Mlsame_gmp(trans, "N")) {
         transt = 'T';
     } else {
         transt = 'N';
@@ -68,15 +68,15 @@ void Rlarfb(const char *side, const char *trans, const char *direct, const char 
     mplapackint j = 0;
     const mpf_class one = 1.0;
     mplapackint i = 0;
-    if (Mlsame_dd(storev, "C")) {
+    if (Mlsame_gmp(storev, "C")) {
         //
-        if (Mlsame_dd(direct, "F")) {
+        if (Mlsame_gmp(direct, "F")) {
             //
             //           Let  V =  ( V1 )    (first K rows)
             //                     ( V2 )
             //           where  V1  is unit lower triangular.
             //
-            if (Mlsame_dd(side, "L")) {
+            if (Mlsame_gmp(side, "L")) {
                 //
                 //              Form  H * C  or  H**T * C  where  C = ( C1 )
                 //                                                    ( C2 )
@@ -124,7 +124,7 @@ void Rlarfb(const char *side, const char *trans, const char *direct, const char 
                     }
                 }
                 //
-            } else if (Mlsame_dd(side, "R")) {
+            } else if (Mlsame_gmp(side, "R")) {
                 //
                 //              Form  C * H  or  C * H**T  where  C = ( C1  C2 )
                 //
@@ -178,7 +178,7 @@ void Rlarfb(const char *side, const char *trans, const char *direct, const char 
             //                     ( V2 )    (last K rows)
             //           where  V2  is unit upper triangular.
             //
-            if (Mlsame_dd(side, "L")) {
+            if (Mlsame_gmp(side, "L")) {
                 //
                 //              Form  H * C  or  H**T * C  where  C = ( C1 )
                 //                                                    ( C2 )
@@ -226,7 +226,7 @@ void Rlarfb(const char *side, const char *trans, const char *direct, const char 
                     }
                 }
                 //
-            } else if (Mlsame_dd(side, "R")) {
+            } else if (Mlsame_gmp(side, "R")) {
                 //
                 //              Form  C * H  or  C * H**T  where  C = ( C1  C2 )
                 //
@@ -275,14 +275,14 @@ void Rlarfb(const char *side, const char *trans, const char *direct, const char 
             }
         }
         //
-    } else if (Mlsame_dd(storev, "R")) {
+    } else if (Mlsame_gmp(storev, "R")) {
         //
-        if (Mlsame_dd(direct, "F")) {
+        if (Mlsame_gmp(direct, "F")) {
             //
             //           Let  V =  ( V1  V2 )    (V1: first K columns)
             //           where  V1  is unit upper triangular.
             //
-            if (Mlsame_dd(side, "L")) {
+            if (Mlsame_gmp(side, "L")) {
                 //
                 //              Form  H * C  or  H**T * C  where  C = ( C1 )
                 //                                                    ( C2 )
@@ -330,7 +330,7 @@ void Rlarfb(const char *side, const char *trans, const char *direct, const char 
                     }
                 }
                 //
-            } else if (Mlsame_dd(side, "R")) {
+            } else if (Mlsame_gmp(side, "R")) {
                 //
                 //              Form  C * H  or  C * H**T  where  C = ( C1  C2 )
                 //
@@ -384,7 +384,7 @@ void Rlarfb(const char *side, const char *trans, const char *direct, const char 
             //           Let  V =  ( V1  V2 )    (V2: last K columns)
             //           where  V2  is unit lower triangular.
             //
-            if (Mlsame_dd(side, "L")) {
+            if (Mlsame_gmp(side, "L")) {
                 //
                 //              Form  H * C  or  H**T * C  where  C = ( C1 )
                 //                                                    ( C2 )
@@ -432,7 +432,7 @@ void Rlarfb(const char *side, const char *trans, const char *direct, const char 
                     }
                 }
                 //
-            } else if (Mlsame_dd(side, "R")) {
+            } else if (Mlsame_gmp(side, "R")) {
                 //
                 //              Form  C * H  or  C * H'  where  C = ( C1  C2 )
                 //

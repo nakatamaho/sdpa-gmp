@@ -26,17 +26,17 @@
  *
  */
 
-#include <mpblas_dd.h>
-#include <mplapack_dd.h>
+#include <mpblas_gmp.h>
+#include <mplapack_gmp.h>
 
 void Rsytrd(const char *uplo, mplapackint const n, mpf_class *a, mplapackint const lda, mpf_class *d, mpf_class *e, mpf_class *tau, mpf_class *work, mplapackint const lwork, mplapackint &info) {
     //
     //     Test the input parameters
     //
     info = 0;
-    bool upper = Mlsame_dd(uplo, "U");
+    bool upper = Mlsame_gmp(uplo, "U");
     bool lquery = (lwork == -1);
-    if (!upper && !Mlsame_dd(uplo, "L")) {
+    if (!upper && !Mlsame_gmp(uplo, "L")) {
         info = -1;
     } else if (n < 0) {
         info = -2;
@@ -52,13 +52,13 @@ void Rsytrd(const char *uplo, mplapackint const n, mpf_class *a, mplapackint con
         //
         //        Determine the block size.
         //
-        nb = iMlaenv_dd(1, "Rsytrd", uplo, n, -1, -1, -1);
+        nb = iMlaenv_gmp(1, "Rsytrd", uplo, n, -1, -1, -1);
         lwkopt = n * nb;
         work[1 - 1] = lwkopt;
     }
     //
     if (info != 0) {
-        Mxerbla_dd("Rsytrd", -info);
+        Mxerbla_gmp("Rsytrd", -info);
         return;
     } else if (lquery) {
         return;
@@ -80,7 +80,7 @@ void Rsytrd(const char *uplo, mplapackint const n, mpf_class *a, mplapackint con
         //        Determine when to cross over from blocked to unblocked code
         //        (last block is always handled by unblocked code).
         //
-        nx = std::max(nb, iMlaenv_dd(3, "Rsytrd", uplo, n, -1, -1, -1));
+        nx = std::max(nb, iMlaenv_gmp(3, "Rsytrd", uplo, n, -1, -1, -1));
         if (nx < n) {
             //
             //           Determine if workspace is large enough for blocked code.
@@ -94,7 +94,7 @@ void Rsytrd(const char *uplo, mplapackint const n, mpf_class *a, mplapackint con
                 //              unblocked code by setting NX = N.
                 //
                 nb = std::max(lwork / ldwork, (mplapackint)1);
-                nbmin = iMlaenv_dd(2, "Rsytrd", uplo, n, -1, -1, -1);
+                nbmin = iMlaenv_gmp(2, "Rsytrd", uplo, n, -1, -1, -1);
                 if (nb < nbmin) {
                     nx = n;
                 }

@@ -28,7 +28,7 @@
  *
  */
 
-#include <mpblas_dd.h>
+#include <mpblas_gmp.h>
 
 void Rgemm_NN_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class * A, mplapackint lda, mpf_class * B, mplapackint ldb, mpf_class beta, mpf_class * C, mplapackint ldc);
 void Rgemm_TN_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class * A, mplapackint lda, mpf_class * B, mplapackint ldb, mpf_class beta, mpf_class * C, mplapackint ldc);
@@ -44,8 +44,8 @@ void Rgemm(const char *transa, const char *transb, mplapackint const m, mplapack
     mpf_class temp;
     mpf_class Zero = 0.0, One = 1.0;
 
-    nota = Mlsame_dd(transa, "N");
-    notb = Mlsame_dd(transb, "N");
+    nota = Mlsame_gmp(transa, "N");
+    notb = Mlsame_gmp(transb, "N");
     if (nota) {
 	nrowa = m;
 	ncola = k;
@@ -60,9 +60,9 @@ void Rgemm(const char *transa, const char *transb, mplapackint const m, mplapack
     }
 //Test the input parameters.
     info = 0;
-    if (!nota && (!Mlsame_dd(transa, "C")) && (!Mlsame_dd(transa, "T")))
+    if (!nota && (!Mlsame_gmp(transa, "C")) && (!Mlsame_gmp(transa, "T")))
 	info = 1;
-    else if (!notb && (!Mlsame_dd(transb, "C")) && (!Mlsame_dd(transb, "T")))
+    else if (!notb && (!Mlsame_gmp(transb, "C")) && (!Mlsame_gmp(transb, "T")))
 	info = 2;
     else if (m < 0)
 	info = 3;
@@ -77,7 +77,7 @@ void Rgemm(const char *transa, const char *transb, mplapackint const m, mplapack
     else if (ldc < std::max((mplapackint) 1, m))
 	info = 13;
     if (info != 0) {
-	Mxerbla_dd("Rgemm ", info);
+	Mxerbla_gmp("Rgemm ", info);
 	return;
     }
 //Quick return if possible.
