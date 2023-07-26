@@ -48,7 +48,7 @@ mpf_approx_log2(mpf_class x)
   return log10(x) / (qd_real::_log2/qd_real::_log10);
 #endif
 #if defined ___MPACK_BUILD_WITH_DD___
-  return log10(x) / (dd_real::_log2/dd_real::_log10);
+  return log10(x) / (mpf_class::_log2/mpf_class::_log10);
 #endif
 }
 
@@ -169,6 +169,6 @@ mpf_approx_pi()
     return qd_real::_pi;
 #endif
 #if defined ___MPACK_BUILD_WITH_DD___
-    return dd_real::_pi;
+    return mpf_class::_pi;
 #endif
 }

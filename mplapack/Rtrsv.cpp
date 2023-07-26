@@ -28,7 +28,7 @@
 
 #include <mpblas_dd.h>
 
-void Rtrsv(const char *uplo, const char *trans, const char *diag, mplapackint const n, dd_real *a, mplapackint const lda, dd_real *x, mplapackint const incx) {
+void Rtrsv(const char *uplo, const char *trans, const char *diag, mplapackint const n, mpf_class *a, mplapackint const lda, mpf_class *x, mplapackint const incx) {
     //
     //  -- Reference BLAS level1 routine --
     //  -- Reference BLAS is a software package provided by Univ. of Tennessee,    --
@@ -95,8 +95,8 @@ void Rtrsv(const char *uplo, const char *trans, const char *diag, mplapackint co
     //     accessed sequentially with one pass through A.
     //
     mplapackint j = 0;
-    const dd_real zero = 0.0;
-    dd_real temp = 0.0;
+    const mpf_class zero = 0.0;
+    mpf_class temp = 0.0;
     mplapackint i = 0;
     mplapackint jx = 0;
     mplapackint ix = 0;

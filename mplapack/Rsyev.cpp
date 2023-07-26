@@ -29,7 +29,7 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-void Rsyev(const char *jobz, const char *uplo, mplapackint const n, dd_real *a, mplapackint const lda, dd_real *w, dd_real *work, mplapackint const lwork, mplapackint &info) {
+void Rsyev(const char *jobz, const char *uplo, mplapackint const n, mpf_class *a, mplapackint const lda, mpf_class *w, mpf_class *work, mplapackint const lwork, mplapackint &info) {
     //
     //     Test the input parameters.
     //
@@ -73,7 +73,7 @@ void Rsyev(const char *jobz, const char *uplo, mplapackint const n, dd_real *a, 
         return;
     }
     //
-    const dd_real one = 1.0;
+    const mpf_class one = 1.0;
     if (n == 1) {
         w[1 - 1] = a[(1 - 1)];
         work[1 - 1] = 2;
@@ -85,19 +85,19 @@ void Rsyev(const char *jobz, const char *uplo, mplapackint const n, dd_real *a, 
     //
     //     Get machine constants.
     //
-    dd_real safmin = Rlamch_dd("Safe minimum");
-    dd_real eps = Rlamch_dd("Precision");
-    dd_real smlnum = safmin / eps;
-    dd_real bignum = one / smlnum;
-    dd_real rmin = sqrt(smlnum);
-    dd_real rmax = sqrt(bignum);
+    mpf_class safmin = Rlamch_dd("Safe minimum");
+    mpf_class eps = Rlamch_dd("Precision");
+    mpf_class smlnum = safmin / eps;
+    mpf_class bignum = one / smlnum;
+    mpf_class rmin = sqrt(smlnum);
+    mpf_class rmax = sqrt(bignum);
     //
     //     Scale matrix to allowable range, if necessary.
     //
-    dd_real anrm = Rlansy("M", uplo, n, a, lda, work);
+    mpf_class anrm = Rlansy("M", uplo, n, a, lda, work);
     mplapackint iscale = 0;
-    const dd_real zero = 0.0;
-    dd_real sigma = 0.0;
+    const mpf_class zero = 0.0;
+    mpf_class sigma = 0.0;
     if (anrm > zero && anrm < rmin) {
         iscale = 1;
         sigma = rmin / anrm;

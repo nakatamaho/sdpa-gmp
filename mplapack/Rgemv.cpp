@@ -28,7 +28,7 @@
 
 #include <mpblas_dd.h>
 
-void Rgemv(const char *trans, mplapackint const m, mplapackint const n, dd_real const alpha, dd_real *a, mplapackint const lda, dd_real *x, mplapackint const incx, dd_real const beta, dd_real *y, mplapackint const incy) {
+void Rgemv(const char *trans, mplapackint const m, mplapackint const n, mpf_class const alpha, mpf_class *a, mplapackint const lda, mpf_class *x, mplapackint const incx, mpf_class const beta, mpf_class *y, mplapackint const incy) {
     //
     //  -- Reference BLAS level2 routine --
     //  -- Reference BLAS is a software package provided by Univ. of Tennessee,    --
@@ -75,8 +75,8 @@ void Rgemv(const char *trans, mplapackint const m, mplapackint const n, dd_real 
     //
     //     Quick return if possible.
     //
-    const dd_real zero = 0.0;
-    const dd_real one = 1.0;
+    const mpf_class zero = 0.0;
+    const mpf_class one = 1.0;
     if ((m == 0) || (n == 0) || ((alpha == zero) && (beta == one))) {
         return;
     }
@@ -144,7 +144,7 @@ void Rgemv(const char *trans, mplapackint const m, mplapackint const n, dd_real 
     }
     mplapackint jx = 0;
     mplapackint j = 0;
-    dd_real temp = 0.0;
+    mpf_class temp = 0.0;
     mplapackint jy = 0;
     mplapackint ix = 0;
     if (Mlsame_dd(trans, "N")) {

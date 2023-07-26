@@ -30,19 +30,19 @@
 
 #include <mpblas_dd.h>
 
-void Rgemm_NN_omp(mplapackint m, mplapackint n, mplapackint k, dd_real alpha, dd_real * A, mplapackint lda, dd_real * B, mplapackint ldb, dd_real beta, dd_real * C, mplapackint ldc);
-void Rgemm_TN_omp(mplapackint m, mplapackint n, mplapackint k, dd_real alpha, dd_real * A, mplapackint lda, dd_real * B, mplapackint ldb, dd_real beta, dd_real * C, mplapackint ldc);
-void Rgemm_NT_omp(mplapackint m, mplapackint n, mplapackint k, dd_real alpha, dd_real * A, mplapackint lda, dd_real * B, mplapackint ldb, dd_real beta, dd_real * C, mplapackint ldc);
-void Rgemm_TT_omp(mplapackint m, mplapackint n, mplapackint k, dd_real alpha, dd_real * A, mplapackint lda, dd_real * B, mplapackint ldb, dd_real beta, dd_real * C, mplapackint ldc);
-void Rgemm_ref(const char *transa, const char *transb, mplapackint m, mplapackint n, mplapackint k, dd_real alpha, dd_real * A, mplapackint lda, dd_real * B, mplapackint ldb, dd_real beta, dd_real * C, mplapackint ldc);
+void Rgemm_NN_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class * A, mplapackint lda, mpf_class * B, mplapackint ldb, mpf_class beta, mpf_class * C, mplapackint ldc);
+void Rgemm_TN_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class * A, mplapackint lda, mpf_class * B, mplapackint ldb, mpf_class beta, mpf_class * C, mplapackint ldc);
+void Rgemm_NT_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class * A, mplapackint lda, mpf_class * B, mplapackint ldb, mpf_class beta, mpf_class * C, mplapackint ldc);
+void Rgemm_TT_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class * A, mplapackint lda, mpf_class * B, mplapackint ldb, mpf_class beta, mpf_class * C, mplapackint ldc);
+void Rgemm_ref(const char *transa, const char *transb, mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class * A, mplapackint lda, mpf_class * B, mplapackint ldb, mpf_class beta, mpf_class * C, mplapackint ldc);
 
 #define SINGLEOROMP 1000000
 
-void Rgemm(const char *transa, const char *transb, mplapackint const m, mplapackint const n, mplapackint const k, dd_real const alpha, dd_real *A, mplapackint const lda, dd_real *B, mplapackint const ldb, dd_real const beta, dd_real *C, mplapackint const ldc)
+void Rgemm(const char *transa, const char *transb, mplapackint const m, mplapackint const n, mplapackint const k, mpf_class const alpha, mpf_class *A, mplapackint const lda, mpf_class *B, mplapackint const ldb, mpf_class const beta, mpf_class *C, mplapackint const ldc)
 {
     mplapackint i, j, l, nota, notb, nrowa, ncola, nrowb, info;
-    dd_real temp;
-    dd_real Zero = 0.0, One = 1.0;
+    mpf_class temp;
+    mpf_class Zero = 0.0, One = 1.0;
 
     nota = Mlsame_dd(transa, "N");
     notb = Mlsame_dd(transb, "N");

@@ -29,18 +29,18 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-void Rlascl(const char *type, mplapackint const kl, mplapackint const ku, dd_real const cfrom, dd_real const cto, mplapackint const m, mplapackint const n, dd_real *a, mplapackint const lda, mplapackint &info) {
+void Rlascl(const char *type, mplapackint const kl, mplapackint const ku, mpf_class const cfrom, mpf_class const cto, mplapackint const m, mplapackint const n, mpf_class *a, mplapackint const lda, mplapackint &info) {
     mplapackint itype = 0;
-    const dd_real zero = 0.0;
-    dd_real smlnum = 0.0;
-    const dd_real one = 1.0;
-    dd_real bignum = 0.0;
-    dd_real cfromc = 0.0;
-    dd_real ctoc = 0.0;
-    dd_real cfrom1 = 0.0;
-    dd_real mul = 0.0;
+    const mpf_class zero = 0.0;
+    mpf_class smlnum = 0.0;
+    const mpf_class one = 1.0;
+    mpf_class bignum = 0.0;
+    mpf_class cfromc = 0.0;
+    mpf_class ctoc = 0.0;
+    mpf_class cfrom1 = 0.0;
+    mpf_class mul = 0.0;
     bool done = false;
-    dd_real cto1 = 0.0;
+    mpf_class cto1 = 0.0;
     mplapackint j = 0;
     mplapackint i = 0;
     mplapackint k3 = 0;

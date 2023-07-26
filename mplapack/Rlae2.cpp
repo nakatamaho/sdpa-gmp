@@ -29,17 +29,17 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-void Rlae2(dd_real const a, dd_real const b, dd_real const c, dd_real &rt1, dd_real &rt2) {
+void Rlae2(mpf_class const a, mpf_class const b, mpf_class const c, mpf_class &rt1, mpf_class &rt2) {
     //
     //     Compute the eigenvalues
     //
-    dd_real sm = a + c;
-    dd_real df = a - c;
-    dd_real adf = abs(df);
-    dd_real tb = b + b;
-    dd_real ab = abs(tb);
-    dd_real acmx = 0.0;
-    dd_real acmn = 0.0;
+    mpf_class sm = a + c;
+    mpf_class df = a - c;
+    mpf_class adf = abs(df);
+    mpf_class tb = b + b;
+    mpf_class ab = abs(tb);
+    mpf_class acmx = 0.0;
+    mpf_class acmn = 0.0;
     if (abs(a) > abs(c)) {
         acmx = a;
         acmn = c;
@@ -47,9 +47,9 @@ void Rlae2(dd_real const a, dd_real const b, dd_real const c, dd_real &rt1, dd_r
         acmx = c;
         acmn = a;
     }
-    const dd_real one = 1.0;
-    dd_real rt = 0.0;
-    const dd_real two = 2.0;
+    const mpf_class one = 1.0;
+    mpf_class rt = 0.0;
+    const mpf_class two = 2.0;
     if (adf > ab) {
         rt = adf * sqrt(one + pow2((ab / adf)));
     } else if (adf < ab) {
@@ -60,8 +60,8 @@ void Rlae2(dd_real const a, dd_real const b, dd_real const c, dd_real &rt1, dd_r
         //
         rt = ab * sqrt(two);
     }
-    const dd_real zero = 0.0;
-    const dd_real half = 0.5e0;
+    const mpf_class zero = 0.0;
+    const mpf_class half = 0.5e0;
     if (sm < zero) {
         rt1 = half * (sm - rt);
         //

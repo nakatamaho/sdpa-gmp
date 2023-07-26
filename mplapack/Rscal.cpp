@@ -28,7 +28,7 @@
 
 #include <mpblas_dd.h>
 
-void Rscal(mplapackint const n, dd_real const da, dd_real *dx, mplapackint const incx) {
+void Rscal(mplapackint const n, mpf_class const da, mpf_class *dx, mplapackint const incx) {
     //
     //  -- Reference BLAS level1 routine --
     //  -- Reference BLAS is a software package provided by Univ. of Tennessee,    --

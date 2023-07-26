@@ -29,7 +29,7 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-void Rlatrd(const char *uplo, mplapackint const n, mplapackint const nb, dd_real *a, mplapackint const lda, dd_real *e, dd_real *tau, dd_real *w, mplapackint const ldw) {
+void Rlatrd(const char *uplo, mplapackint const n, mplapackint const nb, mpf_class *a, mplapackint const lda, mpf_class *e, mpf_class *tau, mpf_class *w, mplapackint const ldw) {
     //
     //  -- LAPACK auxiliary routine --
     //  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -62,10 +62,10 @@ void Rlatrd(const char *uplo, mplapackint const n, mplapackint const nb, dd_real
     //
     mplapackint i = 0;
     mplapackint iw = 0;
-    const dd_real one = 1.0;
-    const dd_real zero = 0.0;
-    const dd_real half = 0.5e+0;
-    dd_real alpha = 0.0;
+    const mpf_class one = 1.0;
+    const mpf_class zero = 0.0;
+    const mpf_class half = 0.5e+0;
+    mpf_class alpha = 0.0;
     if (Mlsame_dd(uplo, "U")) {
         //
         //        Reduce last NB columns of upper triangle

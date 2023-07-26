@@ -29,7 +29,7 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-void Rorgtr(const char *uplo, mplapackint const n, dd_real *a, mplapackint const lda, dd_real *tau, dd_real *work, mplapackint const lwork, mplapackint &info) {
+void Rorgtr(const char *uplo, mplapackint const n, mpf_class *a, mplapackint const lda, mpf_class *tau, mpf_class *work, mplapackint const lwork, mplapackint &info) {
     //
     //  -- LAPACK computational routine --
     //  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -97,8 +97,8 @@ void Rorgtr(const char *uplo, mplapackint const n, dd_real *a, mplapackint const
     //
     mplapackint j = 0;
     mplapackint i = 0;
-    const dd_real zero = 0.0;
-    const dd_real one = 1.0;
+    const mpf_class zero = 0.0;
+    const mpf_class one = 1.0;
     mplapackint iinfo = 0;
     if (upper) {
         //

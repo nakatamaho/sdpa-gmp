@@ -28,7 +28,7 @@
 
 #include <mpblas_dd.h>
 
-void Rsyr2(const char *uplo, mplapackint const n, dd_real const alpha, dd_real *x, mplapackint const incx, dd_real *y, mplapackint const incy, dd_real *a, mplapackint const lda) {
+void Rsyr2(const char *uplo, mplapackint const n, mpf_class const alpha, mpf_class *x, mplapackint const incx, mpf_class *y, mplapackint const incy, mpf_class *a, mplapackint const lda) {
     //
     //  -- Reference BLAS level2 routine --
     //  -- Reference BLAS is a software package provided by Univ. of Tennessee,    --
@@ -73,7 +73,7 @@ void Rsyr2(const char *uplo, mplapackint const n, dd_real const alpha, dd_real *
     //
     //     Quick return if possible.
     //
-    const dd_real zero = 0.0;
+    const mpf_class zero = 0.0;
     if ((n == 0) || (alpha == zero)) {
         return;
     }
@@ -105,8 +105,8 @@ void Rsyr2(const char *uplo, mplapackint const n, dd_real const alpha, dd_real *
     //     of A.
     //
     mplapackint j = 0;
-    dd_real temp1 = 0.0;
-    dd_real temp2 = 0.0;
+    mpf_class temp1 = 0.0;
+    mpf_class temp2 = 0.0;
     mplapackint i = 0;
     mplapackint ix = 0;
     mplapackint iy = 0;

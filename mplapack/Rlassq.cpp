@@ -29,7 +29,7 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-void Rlassq(mplapackint const n, dd_real *x, mplapackint const incx, dd_real &scale, dd_real &sumsq) {
+void Rlassq(mplapackint const n, mpf_class *x, mplapackint const incx, mpf_class &scale, mpf_class &sumsq) {
     //
     //  -- LAPACK auxiliary routine --
     //  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -53,8 +53,8 @@ void Rlassq(mplapackint const n, dd_real *x, mplapackint const incx, dd_real &sc
     //     .. Executable Statements ..
     //
     mplapackint ix = 0;
-    dd_real absxi = 0.0;
-    const dd_real zero = 0.0;
+    mpf_class absxi = 0.0;
+    const mpf_class zero = 0.0;
     if (n > 0) {
         for (ix = 1; ix <= 1 + (n - 1) * incx; ix = ix + incx) {
             absxi = abs(x[ix - 1]);

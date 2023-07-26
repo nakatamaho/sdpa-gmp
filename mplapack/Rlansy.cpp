@@ -29,18 +29,18 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-dd_real Rlansy(const char *norm, const char *uplo, mplapackint const n, dd_real *a, mplapackint const lda, dd_real *work) {
-    dd_real return_value = 0.0;
+mpf_class Rlansy(const char *norm, const char *uplo, mplapackint const n, mpf_class *a, mplapackint const lda, mpf_class *work) {
+    mpf_class return_value = 0.0;
     //
-    const dd_real zero = 0.0;
-    dd_real value = 0.0;
+    const mpf_class zero = 0.0;
+    mpf_class value = 0.0;
     mplapackint j = 0;
     mplapackint i = 0;
-    dd_real sum = 0.0;
-    dd_real absa = 0.0;
-    dd_real ssq[2];
-    const dd_real one = 1.0;
-    dd_real colssq[2];
+    mpf_class sum = 0.0;
+    mpf_class absa = 0.0;
+    mpf_class ssq[2];
+    const mpf_class one = 1.0;
+    mpf_class colssq[2];
     if (n == 0) {
         value = zero;
     } else if (Mlsame_dd(norm, "M")) {

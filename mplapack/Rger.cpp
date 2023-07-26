@@ -28,7 +28,7 @@
 
 #include <mpblas_dd.h>
 
-void Rger(mplapackint const m, mplapackint const n, dd_real const alpha, dd_real *x, mplapackint const incx, dd_real *y, mplapackint const incy, dd_real *a, mplapackint const lda) {
+void Rger(mplapackint const m, mplapackint const n, mpf_class const alpha, mpf_class *x, mplapackint const incx, mpf_class *y, mplapackint const incy, mpf_class *a, mplapackint const lda) {
     //
     //  -- Reference BLAS level2 routine --
     //  -- Reference BLAS is a software package provided by Univ. of Tennessee,    --
@@ -71,7 +71,7 @@ void Rger(mplapackint const m, mplapackint const n, dd_real const alpha, dd_real
     //
     //     Quick return if possible.
     //
-    const dd_real zero = 0.0;
+    const mpf_class zero = 0.0;
     if ((m == 0) || (n == 0) || (alpha == zero)) {
         return;
     }
@@ -86,7 +86,7 @@ void Rger(mplapackint const m, mplapackint const n, dd_real const alpha, dd_real
         jy = 1 - (n - 1) * incy;
     }
     mplapackint j = 0;
-    dd_real temp = 0.0;
+    mpf_class temp = 0.0;
     mplapackint i = 0;
     mplapackint kx = 0;
     mplapackint ix = 0;

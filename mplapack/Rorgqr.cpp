@@ -29,7 +29,7 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-void Rorgqr(mplapackint const m, mplapackint const n, mplapackint const k, dd_real *a, mplapackint const lda, dd_real *tau, dd_real *work, mplapackint const lwork, mplapackint &info) {
+void Rorgqr(mplapackint const m, mplapackint const n, mplapackint const k, mpf_class *a, mplapackint const lda, mpf_class *tau, mpf_class *work, mplapackint const lwork, mplapackint &info) {
     //
     //     Test the input arguments
     //
@@ -93,7 +93,7 @@ void Rorgqr(mplapackint const m, mplapackint const n, mplapackint const k, dd_re
     mplapackint kk = 0;
     mplapackint j = 0;
     mplapackint i = 0;
-    const dd_real zero = 0.0;
+    const mpf_class zero = 0.0;
     if (nb >= nbmin && nb < k && nx < k) {
         //
         //        Use blocked code after the last block.

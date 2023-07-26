@@ -28,7 +28,7 @@
 
 #include <mpblas_dd.h>
 
-void Rsyr2k(const char *uplo, const char *trans, mplapackint const n, mplapackint const k, dd_real const alpha, dd_real *a, mplapackint const lda, dd_real *b, mplapackint const ldb, dd_real const beta, dd_real *c, mplapackint const ldc) {
+void Rsyr2k(const char *uplo, const char *trans, mplapackint const n, mplapackint const k, mpf_class const alpha, mpf_class *a, mplapackint const lda, mpf_class *b, mplapackint const ldb, mpf_class const beta, mpf_class *c, mplapackint const ldc) {
     //
     //  -- Reference BLAS level3 routine --
     //  -- Reference BLAS is a software package provided by Univ. of Tennessee,    --
@@ -85,8 +85,8 @@ void Rsyr2k(const char *uplo, const char *trans, mplapackint const n, mplapackin
     //
     //     Quick return if possible.
     //
-    const dd_real zero = 0.0;
-    const dd_real one = 1.0;
+    const mpf_class zero = 0.0;
+    const mpf_class one = 1.0;
     if ((n == 0) || (((alpha == zero) || (k == 0)) && (beta == one))) {
         return;
     }
@@ -131,8 +131,8 @@ void Rsyr2k(const char *uplo, const char *trans, mplapackint const n, mplapackin
     //     Start the operations.
     //
     mplapackint l = 0;
-    dd_real temp1 = 0.0;
-    dd_real temp2 = 0.0;
+    mpf_class temp1 = 0.0;
+    mpf_class temp2 = 0.0;
     if (Mlsame_dd(trans, "N")) {
         //
         //        Form  C := alpha*A*B**T + alpha*B*A**T + C.

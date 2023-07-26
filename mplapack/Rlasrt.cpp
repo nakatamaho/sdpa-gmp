@@ -29,7 +29,7 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-void Rlasrt(const char *id, mplapackint const n, dd_real *d, mplapackint &info) {
+void Rlasrt(const char *id, mplapackint const n, mpf_class *d, mplapackint &info) {
     mplapackint dir = 0;
     mplapackint stkpnt = 0;
     mplapackint stacklen = 32;
@@ -40,11 +40,11 @@ void Rlasrt(const char *id, mplapackint const n, dd_real *d, mplapackint &info) 
     const mplapackint select = 20;
     mplapackint i = 0;
     mplapackint j = 0;
-    dd_real dmnmx = 0.0;
-    dd_real d1 = 0.0;
-    dd_real d2 = 0.0;
-    dd_real d3 = 0.0;
-    dd_real tmp = 0.0;
+    mpf_class dmnmx = 0.0;
+    mpf_class d1 = 0.0;
+    mpf_class d2 = 0.0;
+    mpf_class d3 = 0.0;
+    mpf_class tmp = 0.0;
     //
     //  -- LAPACK computational routine --
     //  -- LAPACK is a software package provided by Univ. of Tennessee,    --

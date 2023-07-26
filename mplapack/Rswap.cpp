@@ -28,7 +28,7 @@
 
 #include <mpblas_dd.h>
 
-void Rswap(mplapackint const n, dd_real *dx, mplapackint const incx, dd_real *dy, mplapackint const incy) {
+void Rswap(mplapackint const n, mpf_class *dx, mplapackint const incx, mpf_class *dy, mplapackint const incy) {
     //
     //  -- Reference BLAS level1 routine --
     //  -- Reference BLAS is a software package provided by Univ. of Tennessee,    --
@@ -50,7 +50,7 @@ void Rswap(mplapackint const n, dd_real *dx, mplapackint const incx, dd_real *dy
     }
     mplapackint m = 0;
     mplapackint i = 0;
-    dd_real dtemp = 0.0;
+    mpf_class dtemp = 0.0;
     mplapackint mp1 = 0;
     mplapackint ix = 0;
     mplapackint iy = 0;

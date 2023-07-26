@@ -29,7 +29,7 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-void Rlarfb(const char *side, const char *trans, const char *direct, const char *storev, mplapackint const m, mplapackint const n, mplapackint const k, dd_real *v, mplapackint const ldv, dd_real *t, mplapackint const ldt, dd_real *c, mplapackint const ldc, dd_real *work, mplapackint const ldwork) {
+void Rlarfb(const char *side, const char *trans, const char *direct, const char *storev, mplapackint const m, mplapackint const n, mplapackint const k, mpf_class *v, mplapackint const ldv, mpf_class *t, mplapackint const ldt, mpf_class *c, mplapackint const ldc, mpf_class *work, mplapackint const ldwork) {
     //
     //  -- LAPACK auxiliary routine --
     //  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -66,7 +66,7 @@ void Rlarfb(const char *side, const char *trans, const char *direct, const char 
     }
     //
     mplapackint j = 0;
-    const dd_real one = 1.0;
+    const mpf_class one = 1.0;
     mplapackint i = 0;
     if (Mlsame_dd(storev, "C")) {
         //

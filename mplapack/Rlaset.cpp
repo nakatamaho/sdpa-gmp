@@ -29,7 +29,7 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-void Rlaset(const char *uplo, mplapackint const m, mplapackint const n, dd_real const alpha, dd_real const beta, dd_real *a, mplapackint const lda) {
+void Rlaset(const char *uplo, mplapackint const m, mplapackint const n, mpf_class const alpha, mpf_class const beta, mpf_class *a, mplapackint const lda) {
     //
     //  -- LAPACK auxiliary routine --
     //  -- LAPACK is a software package provided by Univ. of Tennessee,    --

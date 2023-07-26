@@ -29,12 +29,12 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-void Rpotrf(const char *uplo, mplapackint const n, dd_real *a, mplapackint const lda, mplapackint &info) {
+void Rpotrf(const char *uplo, mplapackint const n, mpf_class *a, mplapackint const lda, mplapackint &info) {
     bool upper = false;
     mplapackint nb = 0;
     mplapackint j = 0;
     mplapackint jb = 0;
-    const dd_real one = 1.0;
+    const mpf_class one = 1.0;
     //
     //  -- LAPACK computational routine --
     //  -- LAPACK is a software package provided by Univ. of Tennessee,    --

@@ -33,30 +33,30 @@
 
 //"E" denots we always calculate relative machine precision (e).
 // where 1+e = 1, minimum of e.
-dd_real RlamchE_dd(void) {
+mpf_class RlamchE_dd(void) {
     // 2^(-52-52) = 2^-104 = 4.93e-32
-    return dd_real::_eps;
+    return mpf_class::_eps;
 }
 
 //"S" denots we always calculate `safe minimum, such that 1/sfmin does not overflow'.
 // cf.http://www.netlib.org/blas/dlamch.f
-dd_real RlamchS_dd(void) {
+mpf_class RlamchS_dd(void) {
     // 2^(-1022+53) = 2.0042e-292
-    return dd_real::_min_normalized;
+    return mpf_class::_min_normalized;
 }
 
 //"B" base  = base of the machine
 // cf.http://www.netlib.org/blas/dlamch.f
-dd_real RlamchB_dd(void) {
-    dd_real two;
+mpf_class RlamchB_dd(void) {
+    mpf_class two;
     two = 2.0;
     return two;
 }
 
 //"P" prec = eps*base
 // cf.http://www.netlib.org/blas/dlamch.f
-dd_real RlamchP_dd(void) {
-    dd_real base, eps, prec;
+mpf_class RlamchP_dd(void) {
+    mpf_class base, eps, prec;
 
     base = RlamchB_dd();
     eps = RlamchE_dd();
@@ -66,47 +66,47 @@ dd_real RlamchP_dd(void) {
 
 //"N" t = number of digits in mantissa
 // cf.http://www.netlib.org/blas/dlamch.f
-dd_real RlamchN_dd(void) {
-    return (dd_real)106.0; // 53*2
+mpf_class RlamchN_dd(void) {
+    return (mpf_class)106.0; // 53*2
 }
 
 //"R" rnd   = 1.0 when rounding occurs in addition, 0.0 otherwise
 // cf.http://www.netlib.org/blas/dlamch.f
-dd_real RlamchR_dd(void) {
-    dd_real mtmp;
+mpf_class RlamchR_dd(void) {
+    mpf_class mtmp;
     mtmp = 1.0;
     return mtmp;
 }
 
 //"M"
 // cf.http://www.netlib.org/blas/dlamch.f
-dd_real RlamchM_dd(void) { return dd_real(-1021.0 + 53.0); }
+mpf_class RlamchM_dd(void) { return mpf_class(-1021.0 + 53.0); }
 
 //"U"
 // cf.http://www.netlib.org/blas/dlamch.f
-dd_real RlamchU_dd(void) { return dd_real::_min_normalized; }
+mpf_class RlamchU_dd(void) { return mpf_class::_min_normalized; }
 
 //"L"
 // cf.http://www.netlib.org/blas/dlamch.f
-dd_real RlamchL_dd(void) { return (dd_real)1024.0; }
+mpf_class RlamchL_dd(void) { return (mpf_class)1024.0; }
 
 //"O"
 // cf.http://www.netlib.org/blas/dlamch.f
-dd_real RlamchO_dd(void) {
-    // due to bug of dd_real, we cannot take some arithmetic for dd_real::_max; e.g. sqrt.
+mpf_class RlamchO_dd(void) {
+    // due to bug of mpf_class, we cannot take some arithmetic for mpf_class::_max; e.g. sqrt.
     // thus we use smaller values
-    dd_real a = dd_real::_max;
+    mpf_class a = mpf_class::_max;
     return a;
 }
 
 //"Z" :dummy
 // cf.http://www.netlib.org/blas/dlamch.f
-dd_real RlamchZ_dd(void) {
-    dd_real mtemp = 0.0;
+mpf_class RlamchZ_dd(void) {
+    mpf_class mtemp = 0.0;
     return mtemp;
 }
 
-dd_real Rlamch_dd(const char *cmach) {
+mpf_class Rlamch_dd(const char *cmach) {
     if (Mlsame_dd(cmach, "E"))
         return RlamchE_dd();
     if (Mlsame_dd(cmach, "S"))
@@ -132,4 +132,4 @@ dd_real Rlamch_dd(const char *cmach) {
     return RlamchZ_dd();
 }
 
-dd_real Rlamc3(dd_real a, dd_real b) { return a + b; }
+mpf_class Rlamc3(mpf_class a, mpf_class b) { return a + b; }

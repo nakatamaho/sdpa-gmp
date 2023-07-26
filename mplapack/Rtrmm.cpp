@@ -28,7 +28,7 @@
 
 #include <mpblas_dd.h>
 
-void Rtrmm(const char *side, const char *uplo, const char *transa, const char *diag, mplapackint const m, mplapackint const n, dd_real const alpha, dd_real *a, mplapackint const lda, dd_real *b, mplapackint const ldb) {
+void Rtrmm(const char *side, const char *uplo, const char *transa, const char *diag, mplapackint const m, mplapackint const n, mpf_class const alpha, mpf_class *a, mplapackint const lda, mpf_class *b, mplapackint const ldb) {
     //
     //  -- Reference BLAS level3 routine --
     //  -- Reference BLAS is a software package provided by Univ. of Tennessee,    --
@@ -95,7 +95,7 @@ void Rtrmm(const char *side, const char *uplo, const char *transa, const char *d
     //
     //     And when  alpha.eq.zero.
     //
-    const dd_real zero = 0.0;
+    const mpf_class zero = 0.0;
     mplapackint j = 0;
     mplapackint i = 0;
     if (alpha == zero) {
@@ -110,8 +110,8 @@ void Rtrmm(const char *side, const char *uplo, const char *transa, const char *d
     //     Start the operations.
     //
     mplapackint k = 0;
-    dd_real temp = 0.0;
-    const dd_real one = 1.0;
+    mpf_class temp = 0.0;
+    const mpf_class one = 1.0;
     if (lside) {
         if (Mlsame_dd(transa, "N")) {
             //

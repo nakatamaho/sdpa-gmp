@@ -29,14 +29,14 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-void Rlarfg(mplapackint const n, dd_real &alpha, dd_real *x, mplapackint const incx, dd_real &tau) {
-    const dd_real zero = 0.0;
-    dd_real xnorm = 0.0;
-    dd_real beta = 0.0;
-    dd_real safmin = 0.0;
+void Rlarfg(mplapackint const n, mpf_class &alpha, mpf_class *x, mplapackint const incx, mpf_class &tau) {
+    const mpf_class zero = 0.0;
+    mpf_class xnorm = 0.0;
+    mpf_class beta = 0.0;
+    mpf_class safmin = 0.0;
     mplapackint knt = 0;
-    const dd_real one = 1.0;
-    dd_real rsafmn = 0.0;
+    const mpf_class one = 1.0;
+    mpf_class rsafmn = 0.0;
     mplapackint j = 0;
     //
     //  -- LAPACK auxiliary routine --

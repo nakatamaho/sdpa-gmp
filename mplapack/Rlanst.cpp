@@ -29,8 +29,8 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-dd_real Rlanst(const char *norm, mplapackint const n, dd_real *d, dd_real *e) {
-    dd_real return_value = 0.0;
+mpf_class Rlanst(const char *norm, mplapackint const n, mpf_class *d, mpf_class *e) {
+    mpf_class return_value = 0.0;
     //
     //  -- LAPACK auxiliary routine --
     //  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -55,12 +55,12 @@ dd_real Rlanst(const char *norm, mplapackint const n, dd_real *d, dd_real *e) {
     //     ..
     //     .. Executable Statements ..
     //
-    const dd_real zero = 0.0;
-    dd_real anorm = 0.0;
+    const mpf_class zero = 0.0;
+    mpf_class anorm = 0.0;
     mplapackint i = 0;
-    dd_real sum = 0.0;
-    dd_real scale = 0.0;
-    const dd_real one = 1.0;
+    mpf_class sum = 0.0;
+    mpf_class scale = 0.0;
+    const mpf_class one = 1.0;
     if (n <= 0) {
         anorm = zero;
     } else if (Mlsame_dd(norm, "M")) {

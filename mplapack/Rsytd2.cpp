@@ -29,7 +29,7 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-void Rsytd2(const char *uplo, mplapackint const n, dd_real *a, mplapackint const lda, dd_real *d, dd_real *e, dd_real *tau, mplapackint &info) {
+void Rsytd2(const char *uplo, mplapackint const n, mpf_class *a, mplapackint const lda, mpf_class *d, mpf_class *e, mpf_class *tau, mplapackint &info) {
     //
     //  -- LAPACK computational routine --
     //  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -77,11 +77,11 @@ void Rsytd2(const char *uplo, mplapackint const n, dd_real *a, mplapackint const
     }
     //
     mplapackint i = 0;
-    dd_real taui = 0.0;
-    const dd_real zero = 0.0;
-    const dd_real one = 1.0;
-    const dd_real half = 1.0 / 2.0;
-    dd_real alpha = 0.0;
+    mpf_class taui = 0.0;
+    const mpf_class zero = 0.0;
+    const mpf_class one = 1.0;
+    const mpf_class half = 1.0 / 2.0;
+    mpf_class alpha = 0.0;
     if (upper) {
         //
         //        Reduce the upper triangle of A

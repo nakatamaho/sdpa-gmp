@@ -29,17 +29,17 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-void Rlartg(dd_real const f, dd_real const g, dd_real &cs, dd_real &sn, dd_real &r) {
-    dd_real safmin = 0.0;
-    dd_real eps = 0.0;
-    const dd_real two = 2.0;
-    dd_real safmn2 = 0.0;
-    const dd_real one = 1.0;
-    dd_real safmx2 = 0.0;
-    const dd_real zero = 0.0;
-    dd_real f1 = 0.0;
-    dd_real g1 = 0.0;
-    dd_real scale = 0.0;
+void Rlartg(mpf_class const f, mpf_class const g, mpf_class &cs, mpf_class &sn, mpf_class &r) {
+    mpf_class safmin = 0.0;
+    mpf_class eps = 0.0;
+    const mpf_class two = 2.0;
+    mpf_class safmn2 = 0.0;
+    const mpf_class one = 1.0;
+    mpf_class safmx2 = 0.0;
+    const mpf_class zero = 0.0;
+    mpf_class f1 = 0.0;
+    mpf_class g1 = 0.0;
+    mpf_class scale = 0.0;
     mplapackint count = 0;
     mplapackint i = 0;
     //

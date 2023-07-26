@@ -29,20 +29,20 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-void Rsterf(mplapackint const n, dd_real *d, dd_real *e, mplapackint &info) {
-    dd_real eps = 0.0;
-    dd_real eps2 = 0.0;
-    dd_real safmin = 0.0;
-    const dd_real one = 1.0;
-    dd_real safmax = 0.0;
-    const dd_real three = 3.0;
-    dd_real ssfmax = 0.0;
-    dd_real ssfmin = 0.0;
-    dd_real rmax = 0.0;
+void Rsterf(mplapackint const n, mpf_class *d, mpf_class *e, mplapackint &info) {
+    mpf_class eps = 0.0;
+    mpf_class eps2 = 0.0;
+    mpf_class safmin = 0.0;
+    const mpf_class one = 1.0;
+    mpf_class safmax = 0.0;
+    const mpf_class three = 3.0;
+    mpf_class ssfmax = 0.0;
+    mpf_class ssfmin = 0.0;
+    mpf_class rmax = 0.0;
     const mplapackint maxit = 30;
     mplapackint nmaxit = 0;
-    const dd_real zero = 0.0;
-    dd_real sigma = 0.0;
+    const mpf_class zero = 0.0;
+    mpf_class sigma = 0.0;
     mplapackint jtot = 0;
     mplapackint l1 = 0;
     mplapackint m = 0;
@@ -50,22 +50,22 @@ void Rsterf(mplapackint const n, dd_real *d, dd_real *e, mplapackint &info) {
     mplapackint lsv = 0;
     mplapackint lend = 0;
     mplapackint lendsv = 0;
-    dd_real anorm = 0.0;
+    mpf_class anorm = 0.0;
     mplapackint iscale = 0;
     mplapackint i = 0;
-    dd_real p = 0.0;
-    dd_real rte = 0.0;
-    dd_real rt1 = 0.0;
-    dd_real rt2 = 0.0;
-    const dd_real two = 2.0;
-    dd_real r = 0.0;
-    dd_real c = 0.0;
-    dd_real s = 0.0;
-    dd_real gamma = 0.0;
-    dd_real bb = 0.0;
-    dd_real oldc = 0.0;
-    dd_real oldgam = 0.0;
-    dd_real alpha = 0.0;
+    mpf_class p = 0.0;
+    mpf_class rte = 0.0;
+    mpf_class rt1 = 0.0;
+    mpf_class rt2 = 0.0;
+    const mpf_class two = 2.0;
+    mpf_class r = 0.0;
+    mpf_class c = 0.0;
+    mpf_class s = 0.0;
+    mpf_class gamma = 0.0;
+    mpf_class bb = 0.0;
+    mpf_class oldc = 0.0;
+    mpf_class oldgam = 0.0;
+    mpf_class alpha = 0.0;
     //
     //  -- LAPACK computational routine --
     //  -- LAPACK is a software package provided by Univ. of Tennessee,    --

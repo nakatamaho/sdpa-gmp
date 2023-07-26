@@ -33,11 +33,11 @@
 #include <omp.h>
 #endif
 
-void Rgemm_NN_omp(mplapackint m, mplapackint n, mplapackint k, dd_real alpha, dd_real *A, mplapackint lda, dd_real *B, mplapackint ldb, dd_real beta,
-	      dd_real *C, mplapackint ldc)
+void Rgemm_NN_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class *A, mplapackint lda, mpf_class *B, mplapackint ldb, mpf_class beta,
+	      mpf_class *C, mplapackint ldc)
 {
     mplapackint i, j, l;
-    dd_real temp;
+    mpf_class temp;
 
 //Form C := alpha*A*B + beta*C.
     for (j = 0; j < n; j++) {

@@ -30,12 +30,12 @@
 
 #include <mpblas_dd.h>
 
-dd_real Rdot_ref(mplapackint n, dd_real * dx, mplapackint incx, dd_real * dy, mplapackint incy);
-dd_real Rdot_omp(mplapackint n, dd_real * dx, mplapackint incx, dd_real * dy, mplapackint incy);
+mpf_class Rdot_ref(mplapackint n, mpf_class * dx, mplapackint incx, mpf_class * dy, mplapackint incy);
+mpf_class Rdot_omp(mplapackint n, mpf_class * dx, mplapackint incx, mpf_class * dy, mplapackint incy);
 
 #define SINGLEOROMP 1000
 
-dd_real Rdot(mplapackint const n, dd_real *dx, mplapackint const incx, dd_real *dy, mplapackint const incy)
+mpf_class Rdot(mplapackint const n, mpf_class *dx, mplapackint const incx, mpf_class *dy, mplapackint const incy)
 {
     mplapackint ix = 0;
     mplapackint iy = 0;

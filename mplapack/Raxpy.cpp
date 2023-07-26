@@ -30,14 +30,14 @@
 
 #include <mpblas_dd.h>
 
-void Raxpy_omp(mplapackint n, dd_real da, dd_real * dx, mplapackint incx, dd_real * dy, mplapackint incy);
-void Raxpy_ref(mplapackint n, dd_real da, dd_real * dx, mplapackint incx, dd_real * dy, mplapackint incy);
+void Raxpy_omp(mplapackint n, mpf_class da, mpf_class * dx, mplapackint incx, mpf_class * dy, mplapackint incy);
+void Raxpy_ref(mplapackint n, mpf_class da, mpf_class * dx, mplapackint incx, mpf_class * dy, mplapackint incy);
 
 #define SINGLEOROMP 1000
 
-void Raxpy(mplapackint const n, dd_real const da, dd_real *dx, mplapackint const incx, dd_real *dy, mplapackint const incy)
+void Raxpy(mplapackint const n, mpf_class const da, mpf_class *dx, mplapackint const incx, mpf_class *dy, mplapackint const incy)
 {
-    dd_real Zero = 0.0;
+    mpf_class Zero = 0.0;
     mplapackint i;
 
     if (n <= 0)	return;

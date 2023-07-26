@@ -29,7 +29,7 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-void Rlasr(const char *side, const char *pivot, const char *direct, mplapackint const m, mplapackint const n, dd_real *c, dd_real *s, dd_real *a, mplapackint const lda) {
+void Rlasr(const char *side, const char *pivot, const char *direct, mplapackint const m, mplapackint const n, mpf_class *c, mpf_class *s, mpf_class *a, mplapackint const lda) {
     //
     //     Test the input parameters
     //
@@ -58,12 +58,12 @@ void Rlasr(const char *side, const char *pivot, const char *direct, mplapackint 
         return;
     }
     mplapackint j = 0;
-    dd_real ctemp = 0.0;
-    dd_real stemp = 0.0;
-    const dd_real one = 1.0;
-    const dd_real zero = 0.0;
+    mpf_class ctemp = 0.0;
+    mpf_class stemp = 0.0;
+    const mpf_class one = 1.0;
+    const mpf_class zero = 0.0;
     mplapackint i = 0;
-    dd_real temp = 0.0;
+    mpf_class temp = 0.0;
     if (Mlsame_dd(side, "L")) {
         //
         //        Form  P * A

@@ -29,43 +29,43 @@
 #include <mpblas_dd.h>
 #include <mplapack_dd.h>
 
-void Rsteqr(const char *compz, mplapackint const n, dd_real *d, dd_real *e, dd_real *z, mplapackint const ldz, dd_real *work, mplapackint &info) {
+void Rsteqr(const char *compz, mplapackint const n, mpf_class *d, mpf_class *e, mpf_class *z, mplapackint const ldz, mpf_class *work, mplapackint &info) {
     mplapackint icompz = 0;
-    const dd_real one = 1.0;
-    dd_real eps = 0.0;
-    dd_real eps2 = 0.0;
-    dd_real safmin = 0.0;
-    dd_real safmax = 0.0;
-    const dd_real three = 3.0;
-    dd_real ssfmax = 0.0;
-    dd_real ssfmin = 0.0;
-    const dd_real zero = 0.0;
+    const mpf_class one = 1.0;
+    mpf_class eps = 0.0;
+    mpf_class eps2 = 0.0;
+    mpf_class safmin = 0.0;
+    mpf_class safmax = 0.0;
+    const mpf_class three = 3.0;
+    mpf_class ssfmax = 0.0;
+    mpf_class ssfmin = 0.0;
+    const mpf_class zero = 0.0;
     const mplapackint maxit = 30;
     mplapackint nmaxit = 0;
     mplapackint jtot = 0;
     mplapackint l1 = 0;
     mplapackint nm1 = 0;
     mplapackint m = 0;
-    dd_real tst = 0.0;
+    mpf_class tst = 0.0;
     mplapackint l = 0;
     mplapackint lsv = 0;
     mplapackint lend = 0;
     mplapackint lendsv = 0;
-    dd_real anorm = 0.0;
+    mpf_class anorm = 0.0;
     mplapackint iscale = 0;
     mplapackint lendm1 = 0;
-    dd_real p = 0.0;
-    dd_real rt1 = 0.0;
-    dd_real rt2 = 0.0;
-    dd_real c = 0.0;
-    dd_real s = 0.0;
-    const dd_real two = 2.0;
-    dd_real g = 0.0;
-    dd_real r = 0.0;
+    mpf_class p = 0.0;
+    mpf_class rt1 = 0.0;
+    mpf_class rt2 = 0.0;
+    mpf_class c = 0.0;
+    mpf_class s = 0.0;
+    const mpf_class two = 2.0;
+    mpf_class g = 0.0;
+    mpf_class r = 0.0;
     mplapackint mm1 = 0;
     mplapackint i = 0;
-    dd_real f = 0.0;
-    dd_real b = 0.0;
+    mpf_class f = 0.0;
+    mpf_class b = 0.0;
     mplapackint mm = 0;
     mplapackint lendp1 = 0;
     mplapackint lm1 = 0;
