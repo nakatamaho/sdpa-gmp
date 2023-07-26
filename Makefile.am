@@ -1,6 +1,6 @@
 bin_PROGRAMS = sdpa_gmp
 
-if SYSTEM_MPACK
+if SYSTEM_MPLAPACK
 sdpa_gmp_SOURCES = sdpa_chordal.cpp sdpa_dataset.cpp sdpa_io.cpp \
 sdpa_jordan.cpp sdpa_linear.cpp sdpa_main.cpp sdpa_newton.cpp sdpa_parts.cpp \
 sdpa_struct.cpp sdpa_tool.cpp sdpa_chordal.h sdpa_dataset.h \
