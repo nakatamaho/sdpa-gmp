@@ -47,11 +47,11 @@ endif
 AUTOMAKE_OPTIONS = subdir-objects
 
 if SYSTEM_MPLAPACK
-sdpa_gmp_LDADD = $(pthread_lib) -L$(SPOOLES_LIBDIR) -lspooles -L$(GMP_LIBDIR) -lgmp -lgmpxx $(OPENMPLIB) -L$(MPACK_LIBDIR) -lmlapack_gmp -lmblas_gmp
-sdpa_gmp_CXXFLAGS= $(pthread_cflags) -I$(SPOOLES_INCLUDEDIR) -DUseMETIS=0 -I$(GMP_INCLUDEDIR) $(OPENMPFLAGS) -I$(MPACK_INCLUDEDIR)
+sdpa_gmp_LDADD = $(pthread_lib) -L$(SPOOLES_LIBDIR) -lspooles -L$(GMP_LIBDIR) -lgmp -lgmpxx $(OPENMPLIB) -L$(MPLAPACK_LIBDIR)
+sdpa_gmp_CXXFLAGS= $(pthread_cflags) -I$(SPOOLES_INCLUDEDIR) -DUseMETIS=0 -I$(GMP_INCLUDEDIR) $(OPENMPFLAGS) -I$(MPLAPACK_INCLUDEDIR)
 else
 sdpa_gmp_LDADD = $(pthread_lib) -L$(SPOOLES_LIBDIR) -lspooles -L$(GMP_LIBDIR) -lgmp -lgmpxx $(OPENMPLIB)
-sdpa_gmp_CXXFLAGS= $(pthread_cflags) -I$(SPOOLES_INCLUDEDIR) -DUseMETIS=0 -I$(GMP_INCLUDEDIR) $(OPENMPFLAGS) -I./mpack
+sdpa_gmp_CXXFLAGS= $(pthread_cflags) -I$(SPOOLES_INCLUDEDIR) -DUseMETIS=0 -I$(GMP_INCLUDEDIR) $(OPENMPFLAGS)
 endif
 
 SUBDIRS = external

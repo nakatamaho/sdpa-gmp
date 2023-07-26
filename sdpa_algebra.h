@@ -1,5 +1,5 @@
 /*  sdpa_algebra.h
-  functions are taken from MPACK (mlapack, mblas)
+  functions are taken from MPACK (mlapack, mpblas)
  http://accc.riken.jp/maho/mpack/index.html
 */
 
@@ -8,8 +8,8 @@
 
 #include <gmpxx.h>
 
-#include "mblas_gmp.h"
-#include "mlapack_gmp.h"
+#include "mpblas_gmp.h"
+#include "mplapack_gmp.h"
 
 #endif // __sdpa_algebra_h__
 
