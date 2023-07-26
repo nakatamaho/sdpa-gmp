@@ -59,6 +59,24 @@ AC_ARG_WITH(mplapack-libdir,
 MPLAPACK_LIBDIR=$withval
 )
 
+AC_PROG_CXX
+IS_INTELCXX=0
+AC_COMPILE_IFELSE([
+    AC_LANG_SOURCE([[
+    #if !defined __INTEL_COMPILER
+    #error
+    #endif
+    #include <stdio.h>
+    int main() {
+        return 0;
+    }
+   ]])
+], [is_intelcxx=1])
+AM_CONDITIONAL(IS_INTELCXX, test x$is_intelcxx = x1)
+if test x"$is_intelcxx" = x"1"; then
+    AC_MSG_RESULT([Intel One API (icpc) detected])
+fi
+
 dnl spooles requires -lm when linking.
 LIBS="-lm"
 
