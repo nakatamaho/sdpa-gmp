@@ -3,7 +3,7 @@
  *	Nakata, Maho
  * 	All rights reserved.
  *
- * $Id: mplapack_dd.h,v 1.31 2010/08/07 03:15:46 nakatamaho Exp $
+ * $Id: mplapack_gmp.h,v 1.31 2010/08/07 03:15:46 nakatamaho Exp $
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -36,7 +36,7 @@
 
 /* this is a subset of mplapack only for SDPA-GMP */
 
-mpf_class Rlamch_dd(const char *cmach);
+mpf_class Rlamch_gmp(const char *cmach);
 void Rsyev(const char *jobz, const char *uplo, mplapackint const n, mpf_class *a, mplapackint const lda, mpf_class *w, mpf_class *work, mplapackint const lwork, mplapackint &info);
 void Rsteqr(const char *compz, mplapackint const n, mpf_class *d, mpf_class *e, mpf_class *z, mplapackint const ldz, mpf_class *work, mplapackint &info);
 void Rpotrf(const char *uplo, mplapackint const n, mpf_class *a, mplapackint const lda, mplapackint &info);
@@ -80,11 +80,11 @@ void Rlartgs(mpf_class const x, mpf_class const y, mpf_class const sigma, mpf_cl
 void Rlatrd(const char *uplo, mplapackint const n, mplapackint const nb, mpf_class *a, mplapackint const lda, mpf_class *e, mpf_class *tau, mpf_class *w, mplapackint const ldw);
 void Rsterf(mplapackint const n, mpf_class *d, mpf_class *e, mplapackint &info);
 void Rorgtr(const char *uplo, mplapackint const n, mpf_class *a, mplapackint const lda, mpf_class *tau, mpf_class *work, mplapackint const lwork, mplapackint &info);
-mplapackint iMparmq_dd(mplapackint const ispec, const char *name, const char *opts, mplapackint const n, mplapackint const ilo, mplapackint const ihi, mplapackint const lwork);
-mplapackint iMieeeck_dd(mplapackint const &ispec, mpf_class const &zero, mpf_class const &one);
+mplapackint iMparmq_gmp(mplapackint const ispec, const char *name, const char *opts, mplapackint const n, mplapackint const ilo, mplapackint const ihi, mplapackint const lwork);
+mplapackint iMieeeck_gmp(mplapackint const &ispec, mpf_class const &zero, mpf_class const &one);
 bool Rlaisnan(mpf_class const din1, mpf_class const din2);
 bool Risnan(mpf_class const din);
-mplapackint iMlaenv_dd(mplapackint ispec, const char *name, const char *opts, mplapackint n1, mplapackint n2, mplapackint n3, mplapackint n4);
+mplapackint iMlaenv_gmp(mplapackint ispec, const char *name, const char *opts, mplapackint n1, mplapackint n2, mplapackint n3, mplapackint n4);
 mpf_class Rlanst(const char *norm, mplapackint const n, mpf_class *d, mpf_class *e);
 mpf_class Rlapy2(mpf_class const x, mpf_class const y);
 mplapackint iMladlr(mplapackint const m, mplapackint const n, mpf_class *a, mplapackint const lda);
