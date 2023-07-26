@@ -163,17 +163,22 @@ CPPFLAGS="$CPPFLAGS -I$GMP_INCLUDEDIR"
 AC_CHECK_HEADER(gmp.h, HAVE_GMP_HEADER=yes)
 CPPFLAGS=$save_CPPFLAGS
 
-if test x$HAVE_GMP_HEADER = xyes; then
-  save_LDFLAGS="$LDFLAGS"
-  LDFLAGS="$LDFLAGS -L$GMP_LIBDIR"
-  AC_CHECK_LIB(gmp, __gmpf_init_set, [GMP_LIBS="-lgmpxx -lgmp"; HAVE_GMP=yes])
-  LDFLAGS=$save_LDFLAGS
-fi
+dnl Check for GMP include and library files
+if test x$WITH_SYSTEM_GMP != xno; then
+  if test x$HAVE_GMP_HEADER = xyes; then
+    save_LDFLAGS="$LDFLAGS"
+    LDFLAGS="$LDFLAGS -L$GMP_LIBDIR"
+    AC_CHECK_LIB(gmp, __gmpf_init_set, [GMP_LIBS="-lgmpxx -lgmp"; HAVE_GMP=yes])
+    LDFLAGS=$save_LDFLAGS
+  fi
 
-if test x$HAVE_GMP != xyes; then
-  echo "Please install GMP"
-  echo "GMP http://gmplib.org/"
-  AC_MSG_ERROR([No GMP found])
+  if test x$HAVE_GMP != xyes; then
+    echo "Please install GMP"
+    echo "GMP http://gmplib.org/"
+    AC_MSG_ERROR([No GMP found])
+  else
+    GMP_LIBDIR=$highest_abs_top_srcdir/external/i/GMP/lib
+    GMP_INCLUDEDIR=$highest_abs_top_srcdir/external/i/GMP/include
 fi
 AC_SUBST(GMP_LIBDIR)
 AC_SUBST(GMP_INCLUDEDIR)
