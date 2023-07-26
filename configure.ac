@@ -212,10 +212,10 @@ if test x$WITH_SYSTEM_GMP != xno; then
     echo "Please install GMP"
     echo "GMP http://gmplib.org/"
     AC_MSG_ERROR([No GMP found])
-  else
-    GMP_LIBDIR=$highest_abs_top_srcdir/external/i/GMP/lib
-    GMP_INCLUDEDIR=$highest_abs_top_srcdir/external/i/GMP/include
   fi
+else
+  GMP_LIBDIR=$highest_abs_top_srcdir/external/i/GMP/lib
+  GMP_INCLUDEDIR=$highest_abs_top_srcdir/external/i/GMP/include
 fi
 AC_SUBST(GMP_LIBDIR)
 AC_SUBST(GMP_INCLUDEDIR)
