@@ -12,6 +12,42 @@ AC_OPENMP
 AC_LANG([C++])
 AC_OPENMP
 
+AC_PROG_CC
+IS_INTELCC=0
+AC_COMPILE_IFELSE([
+    AC_LANG_SOURCE([[
+    #if !defined __INTEL_COMPILER
+    #error
+    #endif
+    #include <stdio.h>
+    int main() {
+        return 0;
+    }
+   ]])
+], [is_intelcc=1])
+AM_CONDITIONAL(IS_INTELCC, test x$is_intelcc = x1)
+if test x"$is_intelcc" = x"1"; then
+    AC_MSG_RESULT([Intel One API (icc) detected])
+fi
+
+AC_PROG_CXX
+IS_INTELCXX=0
+AC_COMPILE_IFELSE([
+    AC_LANG_SOURCE([[
+    #if !defined __INTEL_COMPILER
+    #error
+    #endif
+    #include <stdio.h>
+    int main() {
+        return 0;
+    }
+   ]])
+], [is_intelcxx=1])
+AM_CONDITIONAL(IS_INTELCXX, test x$is_intelcxx = x1)
+if test x"$is_intelcxx" = x"1"; then
+    AC_MSG_RESULT([Intel One API (icpc) detected])
+fi
+
 highest_abs_top_srcdir=`cd "$srcdir" && pwd`
 
 AC_ARG_WITH(system-spooles,
@@ -58,24 +94,6 @@ AC_ARG_WITH(mplapack-libdir,
 [  --with-mplapack-libdir    Gives mplapack lib dir you use(e.g., /usr/local/lib).],
 MPLAPACK_LIBDIR=$withval
 )
-
-AC_PROG_CXX
-IS_INTELCXX=0
-AC_COMPILE_IFELSE([
-    AC_LANG_SOURCE([[
-    #if !defined __INTEL_COMPILER
-    #error
-    #endif
-    #include <stdio.h>
-    int main() {
-        return 0;
-    }
-   ]])
-], [is_intelcxx=1])
-AM_CONDITIONAL(IS_INTELCXX, test x$is_intelcxx = x1)
-if test x"$is_intelcxx" = x"1"; then
-    AC_MSG_RESULT([Intel One API (icpc) detected])
-fi
 
 dnl spooles requires -lm when linking.
 LIBS="-lm"
