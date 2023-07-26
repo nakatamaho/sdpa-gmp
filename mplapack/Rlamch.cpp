@@ -213,28 +213,28 @@ mpf_class RlamchZ_gmp(void) {
 }
 
 mpf_class Rlamch_gmp(const char *cmach) {
-    if (Mlsame(cmach, "E"))
+    if (Mlsame_gmp(cmach, "E"))
         return RlamchE_gmp();
-    if (Mlsame(cmach, "S"))
+    if (Mlsame_gmp(cmach, "S"))
         return RlamchS_gmp();
-    if (Mlsame(cmach, "B"))
+    if (Mlsame_gmp(cmach, "B"))
         return RlamchB_gmp();
-    if (Mlsame(cmach, "P"))
+    if (Mlsame_gmp(cmach, "P"))
         return RlamchP_gmp();
-    if (Mlsame(cmach, "N"))
+    if (Mlsame_gmp(cmach, "N"))
         return RlamchN_gmp();
-    if (Mlsame(cmach, "R"))
+    if (Mlsame_gmp(cmach, "R"))
         return RlamchR_gmp();
-    if (Mlsame(cmach, "M"))
+    if (Mlsame_gmp(cmach, "M"))
         return RlamchM_gmp();
-    if (Mlsame(cmach, "U"))
+    if (Mlsame_gmp(cmach, "U"))
         return RlamchU_gmp();
-    if (Mlsame(cmach, "L"))
+    if (Mlsame_gmp(cmach, "L"))
         return RlamchL_gmp();
-    if (Mlsame(cmach, "O"))
+    if (Mlsame_gmp(cmach, "O"))
         return RlamchO_gmp();
 
-    Mxerbla("Rlamch", 1);
+    Mxerbla_gmp("Rlamch", 1);
     return RlamchZ_gmp();
 }
 

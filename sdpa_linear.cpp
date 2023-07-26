@@ -89,7 +89,7 @@ mpf_class Lal::getMinEigen(DenseMatrix& lMat,
 
       mplapackint info;
       int kp1 = k+1;
-      Rsteqr ("I_withEigenvalues", kp1, out.ele, b.ele, Q.de_ele, Q.nRow, workVec.ele, &info);
+      Rsteqr ("I_withEigenvalues", kp1, out.ele, b.ele, Q.de_ele, Q.nRow, workVec.ele, info);
 
       if (info < 0) {
 	rError(" rLanczos :: bad argument " << -info
@@ -152,7 +152,7 @@ mpf_class Lal::getMinEigenValue(DenseMatrix& aMat,
     LWORK = 3*N-1;
     // "N" means that we need not eigen vectors
     // "L" means that we refer only lower triangular.
-    Rsyev("NonVectors","Lower",N,aMat.de_ele,N, eigenVec.ele,workVec.ele,&LWORK,&info);
+    Rsyev("NonVectors","Lower",N,aMat.de_ele,N, eigenVec.ele,workVec.ele,LWORK,info);
     if (info!=0) {
       if (info < 0) {
 	rMessage("getMinEigenValue:: info is mistaken " << info);
@@ -345,7 +345,7 @@ bool Lal::getCholesky(DenseMatrix& retMat,DenseMatrix& aMat)
     length = retMat.nRow * retMat.nCol;
     Rcopy(length,aMat.de_ele,1,retMat.de_ele,1);
     #if 1
-    Rpotrf("Lower", retMat.nRow, retMat.de_ele, retMat.nRow, &info);
+    Rpotrf("Lower", retMat.nRow, retMat.de_ele, retMat.nRow, info);
     #else
     info = choleskyFactorWithAdjust(retMat);
     #endif
@@ -627,7 +627,7 @@ bool Lal::choleskyFactorWithAdjust(DenseMatrix& aMat)
 #if 1
   // aMat.display();
   TimeStart(START1);
-  Rpotrf("Lower", aMat.nRow, aMat.de_ele, aMat.nRow, &info);
+  Rpotrf("Lower", aMat.nRow, aMat.de_ele, aMat.nRow, info);
   TimeEnd(END1);
   // rMessage("Schur colesky  ::"  << TimeCal(START1,END1));
   // aMat.display();
