@@ -1,3 +1,7 @@
+2023-07-26 Nakata Maho maho.nakata@gmail.com
+        * mplapack 2.0.1 integration
+        * catch up to recent compilers and autotools.
+
 2015-03-20 Makoto Yamashita <Makoto.Yamashita@is.titech.ac.jp>
         * Modification for the latest gcc compilers.
 
