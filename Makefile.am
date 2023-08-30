@@ -3,12 +3,13 @@ bin_PROGRAMS = sdpa_gmp
 if SYSTEM_MPLAPACK
 sdpa_gmp_SOURCES = sdpa_chordal.cpp sdpa_dataset.cpp sdpa_io.cpp \
 sdpa_jordan.cpp sdpa_linear.cpp sdpa_main.cpp sdpa_newton.cpp sdpa_parts.cpp \
-sdpa_struct.cpp sdpa_tool.cpp sdpa_chordal.h sdpa_dataset.h \
+sdpa_struct.cpp sdpa_tool.cpp sdpa_chordal.h sdpa_dataset.h sdpa_algebra.h \
 sdpa_include.h sdpa_io.h sdpa_jordan.h sdpa_linear.h sdpa_newton.h \
 sdpa_parts.h sdpa_right.h sdpa_struct.h sdpa_tool.h
 else
 sdpa_gmp_SOURCES = sdpa_chordal.cpp sdpa_dataset.cpp sdpa_io.cpp \
 sdpa_jordan.cpp sdpa_linear.cpp sdpa_main.cpp sdpa_newton.cpp sdpa_parts.cpp \
+sdpa_struct.cpp sdpa_tool.cpp sdpa_chordal.h sdpa_dataset.h sdpa_algebra.h \
 sdpa_struct.cpp sdpa_tool.cpp sdpa_chordal.h sdpa_dataset.h \
 sdpa_include.h sdpa_io.h sdpa_jordan.h sdpa_linear.h sdpa_newton.h \
 sdpa_parts.h sdpa_right.h sdpa_struct.h sdpa_tool.h \
@@ -41,7 +42,13 @@ mplapack/Rgemm_omp.cpp\
 mplapack/Rgemm_NN_omp.cpp\
 mplapack/Rgemm_NT_omp.cpp\
 mplapack/Rgemm_TN_omp.cpp\
-mplapack/Rgemm_TT_omp.cpp
+mplapack/Rgemm_TT_omp.cpp\
+mplapack/mpblas_gmp.h\
+mplapack/mplapack_config.h\
+mplapack/mplapack_gmp.h\
+mplapack/mplapack_utils_gmp.h\
+mplapack/mplapack_utils.h\
+mplapack/mutils_gmp.h
 endif
 
 AUTOMAKE_OPTIONS = subdir-objects
@@ -52,6 +59,11 @@ sdpa_gmp_CXXFLAGS= $(pthread_cflags) -I$(SPOOLES_INCLUDEDIR) -DUseMETIS=0 -I$(GM
 SUBDIRS = external
 
 EXTRA_DIST = \
+example1.dat \
+example1.dat-s \
+example1.ini \
+example1.ini-s \
+example2.dat \
 param.sdpa \
 external/gmp/download/*.tar.bz2 \
 external/gmp/Makefile.am \
