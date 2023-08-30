@@ -45,7 +45,7 @@ mplapack/Rgemm_TT_omp.cpp\
 mplapack/mpblas_gmp.h\
 mplapack/mplapack_config.h\
 mplapack/mplapack_gmp.h\
-mplapack/mplapack_utils_gmp.h\
+mplapack/mplapack_utils_gmp.h
 endif
 
 AUTOMAKE_OPTIONS = subdir-objects
