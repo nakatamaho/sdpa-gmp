@@ -536,7 +536,7 @@ void IO::setBlockStruct(FILE* fpData, InputData& inputData, int m,
         if (i!=j){
           printf("invalid data file k:%d, l:%d, i:%d, j:%d, "
                  ,k,l,i,j);
-          printf("value:%9.1Felf\n",
+          gmp_printf("value:%9.1Felf\n",
                  value.get_mpf_t());
           rError("IO::initializeLinearSpace");
         }
@@ -924,7 +924,7 @@ void IO::printLastInfo(int pIteration,
   }
 
   mpf_class gap    = mu.current*nDim; 
-  mpf_class digits = -mpf_approx_log10(abs(PDgap/mean));
+  mpf_class digits = -log10(abs(PDgap/mean));
 
   #if DIMACS_PRINT
   mpf_class tmp = 0.0;
@@ -1169,7 +1169,7 @@ void IO::printLastInfo(int pIteration,
   mpf_class gap    = mu.current*nDim;
   mpf_class digits = 0.0;
   if (PDgap != 0.0 && mean != 0.0) {
-    digits = -mpf_approx_log10(abs(PDgap/mean));
+    digits = -log10(abs(PDgap/mean));
   }
 
   #if DIMACS_PRINT
