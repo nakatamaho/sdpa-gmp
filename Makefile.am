@@ -10,7 +10,6 @@ else
 sdpa_gmp_SOURCES = sdpa_chordal.cpp sdpa_dataset.cpp sdpa_io.cpp \
 sdpa_jordan.cpp sdpa_linear.cpp sdpa_main.cpp sdpa_newton.cpp sdpa_parts.cpp \
 sdpa_struct.cpp sdpa_tool.cpp sdpa_chordal.h sdpa_dataset.h sdpa_algebra.h \
-sdpa_struct.cpp sdpa_tool.cpp sdpa_chordal.h sdpa_dataset.h \
 sdpa_include.h sdpa_io.h sdpa_jordan.h sdpa_linear.h sdpa_newton.h \
 sdpa_parts.h sdpa_right.h sdpa_struct.h sdpa_tool.h \
 mplapack/Rtrsm.cpp mplapack/Rsyrk.cpp\
@@ -53,7 +52,7 @@ endif
 
 AUTOMAKE_OPTIONS = subdir-objects
 
-sdpa_gmp_LDADD = $(pthread_lib) -L$(SPOOLES_LIBDIR) -lspooles -L$(GMP_LIBDIR) -lgmp -lgmpxx $(OPENMPLIB) -L$(MPLAPACK_LIBDIR)
+sdpa_gmp_LDADD = $(pthread_lib) -L$(SPOOLES_LIBDIR) -lspooles -L$(GMP_LIBDIR) $(OPENMPLIB) -L$(MPLAPACK_LIBDIR) -lgmp -lgmpxx
 sdpa_gmp_CXXFLAGS= $(pthread_cflags) -I$(SPOOLES_INCLUDEDIR) -DUseMETIS=0 -I$(GMP_INCLUDEDIR) $(OPENMPFLAGS) -I$(MPLAPACK_INCLUDEDIR)
 
 SUBDIRS = external
