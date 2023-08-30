@@ -30,7 +30,7 @@ USER ${DOCKER_USER}
 
 RUN cd /home/$DOCKER_USER && echo "cd /home/$DOCKER_USER" >> .bashrc
 RUN cd /home/$DOCKER_USER && git clone https://github.com/nakatamaho/sdpa-gmp.git
-RUN cd /home/$DOCKER_USER && cd sdpa-gmp; aclocal ; autoconf ; automake --add-missing ; ./configure ; make dist ; mv sdpa-dd-${SDPA_GMP_VER}.tar.gz ~
+RUN cd /home/$DOCKER_USER && cd sdpa-gmp; aclocal ; autoconf ; automake --add-missing ; ./configure ; make dist ; mv sdpa-gmp-${SDPA_GMP_VER}.tar.gz ~
 RUN cd /home/$DOCKER_USER && rm -rf sdpa-gmp
 RUN cd /home/$DOCKER_USER && mkdir /home/$DOCKER_USER/tmp
 RUN cd /home/$DOCKER_USER/tmp && tar xvf ~/sdpa-gmp-${SDPA_GMP_VER}.tar.gz
