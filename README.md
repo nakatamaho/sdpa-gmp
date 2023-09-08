@@ -25,6 +25,10 @@ doi={10.1109/CACSD.2010.5612693}
 }
 ```
 # SDPLIB
+binary64 optimals are taken from
+https://github.com/vsdp/SDPLIB/blob/master/README.md
+.
+
 | Problem   |    m |    n | Optimal (binary64)      | Optimal (GMP) |
 | --------- | ---: | ---: | ----------------------: | :---: |
 | arch0     |  174 |  335 |  5.66517e-01            | 5.6651727321592959e-01 |
@@ -119,3 +123,6 @@ doi={10.1109/CACSD.2010.5612693}
 | truss6    |  172 |  451 | -9.01001e+02            |    13 |
 | truss7    |   86 |  301 | -9.00001e+02            |    13 |
 | truss8    |  496 |  628 | -1.331146e+02           |    13 |
+
+
+
