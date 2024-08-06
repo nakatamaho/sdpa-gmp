@@ -40,9 +40,6 @@ namespace sdpa {
 int IZERO =  0;
 int IONE  =  1;
 int IMONE = -1;
-mpf_class MZERO =  0.0;
-mpf_class MONE  =  1.0;
-mpf_class MMONE = -1.0;
 
 double Time::rGetUseTime()
 {

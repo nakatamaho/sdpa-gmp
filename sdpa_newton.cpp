@@ -842,6 +842,7 @@ void Newton::compute_rMat(Newton::WHICH_DIRECTION direction,
 			  WorkVariables& work)
 {
 
+  mpf_class MMONE = -1.0;
   //     CORRECTOR ::  r_zinv = (-XZ -dXdZ + mu I)Z^{-1}
   // not CORRECTOR ::  r_zinv = (-XZ + mu I)Z^{-1}
   mpf_class target = beta.value*mu.current;
@@ -872,6 +873,7 @@ void Newton::Make_gVec(Newton::WHICH_DIRECTION direction,
   TimeStart(START1);
   // rMessage("mu = " << mu.current);
   // rMessage("beta = " << beta.value);
+  mpf_class MMONE = -1.0;
   compute_rMat(direction,mu,beta,currentPt,work);
 
   TimeEnd(END1);
@@ -1399,6 +1401,7 @@ void Newton::compute_DzMat(InputData& inputData,
 			   ComputeTime& com)
 {
   TimeStart(START_SUMDZ);
+  mpf_class MMONE = -1.0;
   inputData.multi_plusToA(DyVec, DzMat);
   Lal::let(DzMat,'=',DzMat,'*',&MMONE);
   if (phase.value == SolveInfo:: pFEAS
@@ -1414,6 +1417,7 @@ void Newton::compute_DxMat(Solutions& currentPt,
 			   ComputeTime& com)
 {
   TimeStart(START_DX);
+  mpf_class MMONE = -1.0;
   // work.DLS1 = dX dZ Z^{-1}
   Jal::ns_jordan_triple_product(work.DLS1,currentPt.xMat,DzMat,
 				currentPt.invzMat,work.DLS2);

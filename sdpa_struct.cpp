@@ -346,6 +346,7 @@ initialize(int nRow, int nCol,
 {
   // rMessage("SparseMatrix initialize");
 
+  mpf_class MZERO = 0.0;
   SparseMatrix();
   if (nRow<=0 || nCol<=0) {
     rError("SparseMatrix:: Dimensions are nonpositive");
@@ -540,6 +541,7 @@ void SparseMatrix::changeToDense(bool forceChange)
     // we don't change to Dense.
     return;
   }
+  mpf_class MZERO = 0.0;
   // rMessage("change");
   type = DENSE;
   de_ele = NULL;
@@ -573,6 +575,7 @@ void SparseMatrix::changeToDense(bool forceChange)
 void SparseMatrix::setZero()
 {
   int length;
+  mpf_class MZERO = 0.0;
   switch(type) {
   case SPARSE:
     NonZeroCount  = 0;
@@ -592,6 +595,7 @@ void SparseMatrix::setIdentity(mpf_class scalar)
     rError("SparseMatrix:: Identity matrix must be square matrix");
   }
   int length,step;
+  mpf_class MZERO = 0.0;
   switch(type) {
   case SPARSE:
     if (nCol > NonZeroNumber) {
@@ -726,6 +730,7 @@ initialize(int nRow, int nCol,
   if (nRow<=0 || nCol<=0) {
     rError("DenseMatrix:: Dimensions are nonpositive");
   }
+  mpf_class MZERO = 0.0;
   int old_length = this->nRow*this->nCol;
   this->nRow  = nRow;
   this->nCol  = nCol;
@@ -807,6 +812,7 @@ void DenseMatrix::display(FILE* fpout, const char *printFormat)
 bool DenseMatrix::copyFrom(SparseMatrix& other)
 {
   int length;
+  mpf_class MZERO = 0.0;
   switch(other.type) {
   case SparseMatrix::SPARSE:
     type = DENSE;
@@ -886,6 +892,7 @@ bool DenseMatrix::copyFrom(DenseMatrix& other)
 void DenseMatrix::setZero()
 {
   int length;
+  mpf_class MZERO = 0.0;
   switch(type) {
   case DENSE:
     length = nRow*nCol;
@@ -903,6 +910,7 @@ void DenseMatrix::setIdentity(mpf_class scalar)
     rError("SparseMatrix:: Identity matrix must be square matrix");
   }
   int length,step;
+  mpf_class MZERO = 0.0;
   switch(type) {
   case DENSE:
     length = nRow*nCol;
