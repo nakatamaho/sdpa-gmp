@@ -757,6 +757,7 @@ void Residuals::compute(int m,
 			Solutions& currentPt)
 {
   // p[k] = b[k] - A[k].X;
+  mpf_class MMONE = -1.0;
   inputData.multi_InnerProductToA(currentPt.xMat,primalVec);
   Lal::let(primalVec,'=',primalVec,'*',&MMONE);
   Lal::let(primalVec,'=',primalVec,'+',inputData.b);

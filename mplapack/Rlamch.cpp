@@ -34,16 +34,12 @@
 //"E" denots we always calculate relative machine precision (e).
 // where 1+e = 1, minimum of e.
 mpf_class RlamchE_gmp(void) {
-    static mpf_class eps;
-    static int called = 0;
-    if (called)
-        return eps;
+    mpf_class eps;
     mpf_class one;
     unsigned long exp2;
     one = 1.0;
     exp2 = mpf_get_prec(one.get_mpf_t());
     mpf_div_2exp(eps.get_mpf_t(), one.get_mpf_t(), exp2);
-    called = 1;
     return eps;
 }
 

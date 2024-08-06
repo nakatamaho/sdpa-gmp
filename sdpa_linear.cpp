@@ -37,6 +37,7 @@ mpf_class Lal::getMinEigen(DenseMatrix& lMat,
   mpf_class alpha,beta,value;
   mpf_class min = 1.0e+51, min_old = 1.0e+52, min_min= 1.0e+50;
   mpf_class error = 1.0e+10;
+  mpf_class MONE = 1.0;
 
   int nDim = xMat.nRow;
   int k = 0, kk = 0;
@@ -435,6 +436,7 @@ bool Lal::getCholesky(SparseMatrix& aMat, int* diagonalIndex)
 bool Lal::getInvLowTriangularMatrix(DenseMatrix& retMat,
 				    DenseMatrix& aMat)
 {
+  mpf_class MONE = 1.0;
   // Make inverse with refference only to lower triangular.
   if (retMat.nRow!=aMat.nRow || retMat.nCol!=aMat.nCol
       || retMat.type!=aMat.type) {
@@ -456,6 +458,7 @@ bool Lal::getInvLowTriangularMatrix(DenseMatrix& retMat,
 
 bool Lal::getSymmetrize(DenseMatrix& aMat)
 {
+  mpf_class MONE = 1.0;
   switch (aMat.type) {
   case DenseMatrix::DENSE:
     if (aMat.nRow != aMat.nCol) {
@@ -882,6 +885,7 @@ bool Lal::multiply(DenseMatrix& retMat,
 		   DenseMatrix& aMat, DenseMatrix& bMat,
 		   mpf_class* scalar)
 {
+  mpf_class MONE = 1.0;
   if (retMat.nRow!=aMat.nRow || aMat.nCol!=bMat.nRow
       || bMat.nCol!=retMat.nCol
       || retMat.type!=aMat.type || retMat.type!=bMat.type) {
@@ -907,6 +911,7 @@ bool Lal::multiply(DenseMatrix& retMat,
 		   SparseMatrix& aMat, DenseMatrix& bMat,
 		   mpf_class* scalar)
 {
+  mpf_class MONE = 1.0;
   if (retMat.nRow!=aMat.nRow || aMat.nCol!=bMat.nRow
       || bMat.nCol!=retMat.nCol) {
     rError("multiply :: different matrix size");
@@ -998,6 +1003,7 @@ bool Lal::multiply(DenseMatrix& retMat,
 		   DenseMatrix& aMat, SparseMatrix& bMat,
 		   mpf_class* scalar)
 {
+  mpf_class MONE = 1.0;
   if (retMat.nRow!=aMat.nRow || aMat.nCol!=bMat.nRow
       || bMat.nCol!=retMat.nCol) {
     rError("multiply :: different matrix size");
@@ -1090,6 +1096,7 @@ bool Lal::multiply(DenseMatrix& retMat,
 bool Lal::multiply(DenseMatrix& retMat,
 		   DenseMatrix& aMat, mpf_class* scalar)
 {
+  mpf_class MONE = 1.0;
   if (retMat.nRow!=aMat.nRow || retMat.nCol!=retMat.nCol
       || retMat.type!=aMat.type) {
     rError("multiply :: different matrix size");
@@ -1114,6 +1121,7 @@ bool Lal::multiply(DenseMatrix& retMat,
 bool Lal::multiply(Vector& retVec,
 		   Vector& aVec, mpf_class* scalar)
 {
+  mpf_class MONE = 1.0;
   if (retVec.nDim!=aVec.nDim) {
     rError("multiply :: different vector size");
   }
@@ -1146,6 +1154,7 @@ bool Lal::multiply(Vector& retVec,
 		   DenseMatrix& aMat, Vector& bVec,
 		   mpf_class* scalar)
 {
+  mpf_class MONE = 1.0;
   if (retVec.nDim!=aMat.nRow || aMat.nCol!=bVec.nDim
       || bVec.nDim!=retVec.nDim) {
     rError("multiply :: different matrix size");
@@ -1170,6 +1179,7 @@ bool Lal::tran_multiply(DenseMatrix& retMat,
 			DenseMatrix& aMat, DenseMatrix& bMat,
 			mpf_class* scalar)
 {
+  mpf_class MONE = 1.0;
   if (retMat.nRow!=aMat.nCol || aMat.nRow!=bMat.nRow
       || bMat.nCol!=retMat.nCol
       || retMat.type!=aMat.type || retMat.type!=bMat.type) {
@@ -1198,6 +1208,7 @@ bool Lal::multiply_tran(DenseMatrix& retMat,
 			DenseMatrix& aMat, DenseMatrix& bMat,
 			mpf_class* scalar)
 {
+  mpf_class MONE = 1.0;
   if (retMat.nRow!=aMat.nRow || aMat.nCol!=bMat.nCol
       || bMat.nRow!=retMat.nRow
       || retMat.type!=aMat.type || retMat.type!=bMat.type) {
@@ -1224,6 +1235,7 @@ bool Lal::multiply_tran(DenseMatrix& retMat,
 bool Lal::plus(Vector& retVec, Vector& aVec,
 	       Vector& bVec, mpf_class* scalar)
 {
+  mpf_class MONE = 1.0;
   if (retVec.nDim!=aVec.nDim || aVec.nDim!=bVec.nDim) {
     rError("plus :: different matrix size");
   }
@@ -1241,6 +1253,7 @@ bool Lal::plus(DenseMatrix& retMat,
 	       DenseMatrix& aMat, DenseMatrix& bMat,
 	       mpf_class* scalar)
 {
+  mpf_class MONE = 1.0;
   if (retMat.nRow!=aMat.nRow || retMat.nCol!=aMat.nCol
       || retMat.nRow!=bMat.nRow || retMat.nCol!=bMat.nCol
       || retMat.type!=aMat.type || retMat.type!=bMat.type) {
@@ -1369,6 +1382,7 @@ bool Lal::plus(DenseMatrix& retMat,
 	       DenseMatrix& aMat, SparseMatrix& bMat,
 	       mpf_class* scalar)
 {
+  mpf_class MONE = 1.0;
   if (retMat.nRow!=aMat.nRow || retMat.nCol!=aMat.nCol
       || retMat.nRow!=bMat.nRow || retMat.nCol!=bMat.nCol) {
     rError("plus :: different matrix size");
@@ -1522,6 +1536,7 @@ bool Lal::let(Vector& retVec, const char eq,
 	      Vector& aVec, const char op,
 	      Vector& bVec, mpf_class* scalar)
 {
+  mpf_class MMONE = -1.0;
   mpf_class minus_scalar;
   switch (op) {
   case '+':
@@ -1548,6 +1563,7 @@ bool Lal::let(DenseMatrix& retMat, const char eq,
 	      DenseMatrix& aMat, const char op,
 	      DenseMatrix& bMat, mpf_class* scalar)
 {
+  mpf_class MMONE = -1.0;
   mpf_class minus_scalar;
   switch (op) {
   case '+':
@@ -1586,6 +1602,7 @@ bool Lal::let(DenseMatrix& retMat, const char eq,
 	      DenseMatrix& bMat, mpf_class* scalar)
 {
   mpf_class minus_scalar;
+  mpf_class MMONE = -1.0;
   switch (op) {
   case '+':
     return plus(retMat,aMat,bMat,scalar);
@@ -1615,6 +1632,7 @@ bool Lal::let(DenseMatrix& retMat, const char eq,
 	      SparseMatrix& bMat, mpf_class* scalar)
 {
   mpf_class minus_scalar;
+  mpf_class MMONE = -1.0;
   switch (op) {
   case '+':
     return plus(retMat,aMat,bMat,scalar);
@@ -2089,6 +2107,7 @@ bool Lal::let(DenseLinearSpace& retMat, const char eq,
 	      DenseLinearSpace& aMat, const char op,
 	      DenseLinearSpace& bMat, mpf_class* scalar)
 {
+  mpf_class MMONE = -1.0;
   mpf_class minus_scalar;
   switch (op) {
   case '+':
@@ -2115,6 +2134,7 @@ bool Lal::let(DenseLinearSpace& retMat, const char eq,
 	      SparseLinearSpace& aMat, const char op,
 	      DenseLinearSpace& bMat, mpf_class* scalar)
 {
+  mpf_class MMONE = -1.0;
   mpf_class minus_scalar;
   switch (op) {
   case '+':
@@ -2143,6 +2163,7 @@ bool Lal::let(DenseLinearSpace& retMat, const char eq,
 	      SparseLinearSpace& bMat, mpf_class* scalar)
 {
   mpf_class minus_scalar;
+  mpf_class MMONE = -1.0;
   switch (op) {
   case '+':
     return plus(retMat,aMat,bMat,scalar);

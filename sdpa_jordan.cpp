@@ -181,6 +181,7 @@ bool Jal::getInvCholAndInv(DenseLinearSpace& invCholMat,
 			   DenseLinearSpace& aMat,
 			   DenseLinearSpace& workMat)
 {
+  mpf_class MONE = 1.0;
   if (getInvChol(invCholMat, aMat, workMat)== false) {
     return FAILURE;
   }
