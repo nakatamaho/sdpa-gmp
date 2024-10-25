@@ -33,7 +33,8 @@
 
 #define ___MPLAPACK_GMP_DEFAULT_PRECISION___ 512
 
-#include "gmpxx.h"
+#include "gmpxx_mkII.h"
+using namespace gmpxx;
 #include "mplapack_config.h"
 #include "mplapack_utils_gmp.h"
 

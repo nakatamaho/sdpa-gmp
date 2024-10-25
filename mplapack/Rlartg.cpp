@@ -45,7 +45,7 @@ void Rlartg(mpf_class const f, mpf_class const g, mpf_class &cs, mpf_class &sn, 
     //
     safmin = Rlamch_gmp("S");
     eps = Rlamch_gmp("E");
-    safmn2 = pow(Rlamch_gmp("B"), castINTEGER_gmp(log(safmin / eps) / log(Rlamch_gmp("B")) / two));
+    safmn2 = gmpxx::pow(Rlamch_gmp("B"), castINTEGER_gmp(gmpxx::log(safmin / eps) / gmpxx::log(Rlamch_gmp("B")) / two));
     safmx2 = one / safmn2;
     //        FIRST = .FALSE.
     //     END IF

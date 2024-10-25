@@ -32,7 +32,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #include <sys/time.h>
 #include <string>
 
-#include <gmpxx.h>
+#include "gmpxx_mkII.h"
+using namespace gmpxx;
 
 namespace sdpa {
 

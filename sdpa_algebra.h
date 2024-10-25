@@ -6,7 +6,8 @@
 #ifndef __sdpa_algebra_h__
 #define __sdpa_algebra_h__
 
-#include <gmpxx.h>
+#include "gmpxx_mkII.h"
+using namespace gmpxx;
 
 #include "mpblas_gmp.h"
 #include "mplapack_gmp.h"

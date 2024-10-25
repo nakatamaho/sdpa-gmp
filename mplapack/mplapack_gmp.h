@@ -32,7 +32,8 @@
 #define _MPLAPACK_GMP_H_
 
 #include "mplapack_config.h"
-#include "gmpxx.h"
+#include "gmpxx_mkII.h"
+using namespace gmpxx;
 
 /* this is a subset of mplapack only for SDPA-GMP */
 
