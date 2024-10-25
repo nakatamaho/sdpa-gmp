@@ -888,6 +888,17 @@ void IO::printOneIteration(int pIteration,
   #endif
 }
 
+mpf_class fast_approx_log10(const mpf_class& value) {
+    // Get the mantissa (a) and exponent (b) such that value = a * 2^b
+    mp_exp_t exponent;
+    double mantissa = mpf_get_d_2exp(&exponent, value.get_mpf_t());
+
+    // Calculate log10(a) + b * log10(2)
+    double log10_mantissa = std::log10(mantissa);
+    double log10_2 = std::log10(2.0);
+    return log10_mantissa + exponent * log10_2;
+}
+
 void IO::printLastInfo(int pIteration,
 		       AverageComplementarity& mu,
 		       RatioInitResCurrentRes& theta,
@@ -924,7 +935,7 @@ void IO::printLastInfo(int pIteration,
   }
 
   mpf_class gap    = mu.current*nDim; 
-  mpf_class digits = -log10(abs(PDgap/mean));
+  mpf_class digits = -fast_approx_log10(abs(PDgap/mean));
 
   #if DIMACS_PRINT
   mpf_class tmp = 0.0;
@@ -1169,7 +1180,7 @@ void IO::printLastInfo(int pIteration,
   mpf_class gap    = mu.current*nDim;
   mpf_class digits = 0.0;
   if (PDgap != 0.0 && mean != 0.0) {
-    digits = -log10(abs(PDgap/mean));
+    digits = -fast_approx_log10(abs(PDgap/mean));
   }
 
   #if DIMACS_PRINT
