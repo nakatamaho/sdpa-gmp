@@ -52,8 +52,8 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 sdpa_gmp_LDFLAGS = -Wl,-rpath,$(GMP_LIBDIR)
 sdpa_gmp_LDADD = $(pthread_lib) -L$(SPOOLES_LIBDIR) -lspooles -L$(GMP_LIBDIR) $(OPENMPLIB) -L$(MPLAPACK_LIBDIR) -lgmp -lgmpxx
-#sdpa_gmp_CXXFLAGS= -O2 -march=native -fno-omit-frame-pointer $(pthread_cflags) -I$(SPOOLES_INCLUDEDIR) -DUseMETIS=0 -I$(GMP_INCLUDEDIR) $(OPENMPFLAGS) -I$(MPLAPACK_INCLUDEDIR)
-sdpa_gmp_CXXFLAGS= -g -O2 -march=native -fno-omit-frame-pointer $(pthread_cflags) -I$(SPOOLES_INCLUDEDIR) -DUseMETIS=0 -I$(GMP_INCLUDEDIR) $(OPENMPFLAGS) -I$(MPLAPACK_INCLUDEDIR)
+sdpa_gmp_CXXFLAGS= -O2 -march=native -fno-omit-frame-pointer $(pthread_cflags) -I$(SPOOLES_INCLUDEDIR) -DUseMETIS=0 -I$(GMP_INCLUDEDIR) $(OPENMPFLAGS) -I$(MPLAPACK_INCLUDEDIR)
+#sdpa_gmp_CXXFLAGS= -g -O2 -march=native -fno-omit-frame-pointer $(pthread_cflags) -I$(SPOOLES_INCLUDEDIR) -DUseMETIS=0 -I$(GMP_INCLUDEDIR) $(OPENMPFLAGS) -I$(MPLAPACK_INCLUDEDIR)
 
 SUBDIRS = external
 
