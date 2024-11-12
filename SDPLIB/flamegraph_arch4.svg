@@ -1,0 +1,1834 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" width="1200" height="406" onload="init(evt)" viewBox="0 0 1200 406" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<!-- Flame graph stack visualization. See https://github.com/brendangregg/FlameGraph for latest version, and http://www.brendangregg.com/flamegraphs.html for examples. -->
+<!-- NOTES:  -->
+<defs>
+	<linearGradient id="background" y1="0" y2="1" x1="0" x2="0" >
+		<stop stop-color="#eeeeee" offset="5%" />
+		<stop stop-color="#eeeeb0" offset="95%" />
+	</linearGradient>
+</defs>
+<style type="text/css">
+	text { font-family:Verdana; font-size:12px; fill:rgb(0,0,0); }
+	#search, #ignorecase { opacity:0.1; cursor:pointer; }
+	#search:hover, #search.show, #ignorecase:hover, #ignorecase.show { opacity:1; }
+	#subtitle { text-anchor:middle; font-color:rgb(160,160,160); }
+	#title { text-anchor:middle; font-size:17px}
+	#unzoom { cursor:pointer; }
+	#frames > *:hover { stroke:black; stroke-width:0.5; cursor:pointer; }
+	.hide { display:none; }
+	.parent { opacity:0.5; }
+</style>
+<script type="text/ecmascript">
+<![CDATA[
+	"use strict";
+	var details, searchbtn, unzoombtn, matchedtxt, svg, searching, currentSearchTerm, ignorecase, ignorecaseBtn;
+	function init(evt) {
+		details = document.getElementById("details").firstChild;
+		searchbtn = document.getElementById("search");
+		ignorecaseBtn = document.getElementById("ignorecase");
+		unzoombtn = document.getElementById("unzoom");
+		matchedtxt = document.getElementById("matched");
+		svg = document.getElementsByTagName("svg")[0];
+		searching = 0;
+		currentSearchTerm = null;
+
+		// use GET parameters to restore a flamegraphs state.
+		var params = get_params();
+		if (params.x && params.y)
+			zoom(find_group(document.querySelector('[x="' + params.x + '"][y="' + params.y + '"]')));
+                if (params.s) search(params.s);
+	}
+
+	// event listeners
+	window.addEventListener("click", function(e) {
+		var target = find_group(e.target);
+		if (target) {
+			if (target.nodeName == "a") {
+				if (e.ctrlKey === false) return;
+				e.preventDefault();
+			}
+			if (target.classList.contains("parent")) unzoom(true);
+			zoom(target);
+			if (!document.querySelector('.parent')) {
+				// we have basically done a clearzoom so clear the url
+				var params = get_params();
+				if (params.x) delete params.x;
+				if (params.y) delete params.y;
+				history.replaceState(null, null, parse_params(params));
+				unzoombtn.classList.add("hide");
+				return;
+			}
+
+			// set parameters for zoom state
+			var el = target.querySelector("rect");
+			if (el && el.attributes && el.attributes.y && el.attributes._orig_x) {
+				var params = get_params()
+				params.x = el.attributes._orig_x.value;
+				params.y = el.attributes.y.value;
+				history.replaceState(null, null, parse_params(params));
+			}
+		}
+		else if (e.target.id == "unzoom") clearzoom();
+		else if (e.target.id == "search") search_prompt();
+		else if (e.target.id == "ignorecase") toggle_ignorecase();
+	}, false)
+
+	// mouse-over for info
+	// show
+	window.addEventListener("mouseover", function(e) {
+		var target = find_group(e.target);
+		if (target) details.nodeValue = "Function: " + g_to_text(target);
+	}, false)
+
+	// clear
+	window.addEventListener("mouseout", function(e) {
+		var target = find_group(e.target);
+		if (target) details.nodeValue = ' ';
+	}, false)
+
+	// ctrl-F for search
+	// ctrl-I to toggle case-sensitive search
+	window.addEventListener("keydown",function (e) {
+		if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) {
+			e.preventDefault();
+			search_prompt();
+		}
+		else if (e.ctrlKey && e.keyCode === 73) {
+			e.preventDefault();
+			toggle_ignorecase();
+		}
+	}, false)
+
+	// functions
+	function get_params() {
+		var params = {};
+		var paramsarr = window.location.search.substr(1).split('&');
+		for (var i = 0; i < paramsarr.length; ++i) {
+			var tmp = paramsarr[i].split("=");
+			if (!tmp[0] || !tmp[1]) continue;
+			params[tmp[0]]  = decodeURIComponent(tmp[1]);
+		}
+		return params;
+	}
+	function parse_params(params) {
+		var uri = "?";
+		for (var key in params) {
+			uri += key + '=' + encodeURIComponent(params[key]) + '&';
+		}
+		if (uri.slice(-1) == "&")
+			uri = uri.substring(0, uri.length - 1);
+		if (uri == '?')
+			uri = window.location.href.split('?')[0];
+		return uri;
+	}
+	function find_child(node, selector) {
+		var children = node.querySelectorAll(selector);
+		if (children.length) return children[0];
+	}
+	function find_group(node) {
+		var parent = node.parentElement;
+		if (!parent) return;
+		if (parent.id == "frames") return node;
+		return find_group(parent);
+	}
+	function orig_save(e, attr, val) {
+		if (e.attributes["_orig_" + attr] != undefined) return;
+		if (e.attributes[attr] == undefined) return;
+		if (val == undefined) val = e.attributes[attr].value;
+		e.setAttribute("_orig_" + attr, val);
+	}
+	function orig_load(e, attr) {
+		if (e.attributes["_orig_"+attr] == undefined) return;
+		e.attributes[attr].value = e.attributes["_orig_" + attr].value;
+		e.removeAttribute("_orig_"+attr);
+	}
+	function g_to_text(e) {
+		var text = find_child(e, "title").firstChild.nodeValue;
+		return (text)
+	}
+	function g_to_func(e) {
+		var func = g_to_text(e);
+		// if there's any manipulation we want to do to the function
+		// name before it's searched, do it here before returning.
+		return (func);
+	}
+	function update_text(e) {
+		var r = find_child(e, "rect");
+		var t = find_child(e, "text");
+		var w = parseFloat(r.attributes.width.value) -3;
+		var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
+		t.attributes.x.value = parseFloat(r.attributes.x.value) + 3;
+
+		// Smaller than this size won't fit anything
+		if (w < 2 * 12 * 0.59) {
+			t.textContent = "";
+			return;
+		}
+
+		t.textContent = txt;
+		var sl = t.getSubStringLength(0, txt.length);
+		// check if only whitespace or if we can fit the entire string into width w
+		if (/^ *$/.test(txt) || sl < w)
+			return;
+
+		// this isn't perfect, but gives a good starting point
+		// and avoids calling getSubStringLength too often
+		var start = Math.floor((w/sl) * txt.length);
+		for (var x = start; x > 0; x = x-2) {
+			if (t.getSubStringLength(0, x + 2) <= w) {
+				t.textContent = txt.substring(0, x) + "..";
+				return;
+			}
+		}
+		t.textContent = "";
+	}
+
+	// zoom
+	function zoom_reset(e) {
+		if (e.attributes != undefined) {
+			orig_load(e, "x");
+			orig_load(e, "width");
+		}
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_reset(c[i]);
+		}
+	}
+	function zoom_child(e, x, ratio) {
+		if (e.attributes != undefined) {
+			if (e.attributes.x != undefined) {
+				orig_save(e, "x");
+				e.attributes.x.value = (parseFloat(e.attributes.x.value) - x - 10) * ratio + 10;
+				if (e.tagName == "text")
+					e.attributes.x.value = find_child(e.parentNode, "rect[x]").attributes.x.value + 3;
+			}
+			if (e.attributes.width != undefined) {
+				orig_save(e, "width");
+				e.attributes.width.value = parseFloat(e.attributes.width.value) * ratio;
+			}
+		}
+
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_child(c[i], x - 10, ratio);
+		}
+	}
+	function zoom_parent(e) {
+		if (e.attributes) {
+			if (e.attributes.x != undefined) {
+				orig_save(e, "x");
+				e.attributes.x.value = 10;
+			}
+			if (e.attributes.width != undefined) {
+				orig_save(e, "width");
+				e.attributes.width.value = parseInt(svg.width.baseVal.value) - (10 * 2);
+			}
+		}
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_parent(c[i]);
+		}
+	}
+	function zoom(node) {
+		var attr = find_child(node, "rect").attributes;
+		var width = parseFloat(attr.width.value);
+		var xmin = parseFloat(attr.x.value);
+		var xmax = parseFloat(xmin + width);
+		var ymin = parseFloat(attr.y.value);
+		var ratio = (svg.width.baseVal.value - 2 * 10) / width;
+
+		// XXX: Workaround for JavaScript float issues (fix me)
+		var fudge = 0.0001;
+
+		unzoombtn.classList.remove("hide");
+
+		var el = document.getElementById("frames").children;
+		for (var i = 0; i < el.length; i++) {
+			var e = el[i];
+			var a = find_child(e, "rect").attributes;
+			var ex = parseFloat(a.x.value);
+			var ew = parseFloat(a.width.value);
+			var upstack;
+			// Is it an ancestor
+			if (0 == 0) {
+				upstack = parseFloat(a.y.value) > ymin;
+			} else {
+				upstack = parseFloat(a.y.value) < ymin;
+			}
+			if (upstack) {
+				// Direct ancestor
+				if (ex <= xmin && (ex+ew+fudge) >= xmax) {
+					e.classList.add("parent");
+					zoom_parent(e);
+					update_text(e);
+				}
+				// not in current path
+				else
+					e.classList.add("hide");
+			}
+			// Children maybe
+			else {
+				// no common path
+				if (ex < xmin || ex + fudge >= xmax) {
+					e.classList.add("hide");
+				}
+				else {
+					zoom_child(e, xmin, ratio);
+					update_text(e);
+				}
+			}
+		}
+		search();
+	}
+	function unzoom(dont_update_text) {
+		unzoombtn.classList.add("hide");
+		var el = document.getElementById("frames").children;
+		for(var i = 0; i < el.length; i++) {
+			el[i].classList.remove("parent");
+			el[i].classList.remove("hide");
+			zoom_reset(el[i]);
+			if(!dont_update_text) update_text(el[i]);
+		}
+		search();
+	}
+	function clearzoom() {
+		unzoom();
+
+		// remove zoom state
+		var params = get_params();
+		if (params.x) delete params.x;
+		if (params.y) delete params.y;
+		history.replaceState(null, null, parse_params(params));
+	}
+
+	// search
+	function toggle_ignorecase() {
+		ignorecase = !ignorecase;
+		if (ignorecase) {
+			ignorecaseBtn.classList.add("show");
+		} else {
+			ignorecaseBtn.classList.remove("show");
+		}
+		reset_search();
+		search();
+	}
+	function reset_search() {
+		var el = document.querySelectorAll("#frames rect");
+		for (var i = 0; i < el.length; i++) {
+			orig_load(el[i], "fill")
+		}
+		var params = get_params();
+		delete params.s;
+		history.replaceState(null, null, parse_params(params));
+	}
+	function search_prompt() {
+		if (!searching) {
+			var term = prompt("Enter a search term (regexp " +
+			    "allowed, eg: ^ext4_)"
+			    + (ignorecase ? ", ignoring case" : "")
+			    + "\nPress Ctrl-i to toggle case sensitivity", "");
+			if (term != null) search(term);
+		} else {
+			reset_search();
+			searching = 0;
+			currentSearchTerm = null;
+			searchbtn.classList.remove("show");
+			searchbtn.firstChild.nodeValue = "Search"
+			matchedtxt.classList.add("hide");
+			matchedtxt.firstChild.nodeValue = ""
+		}
+	}
+	function search(term) {
+		if (term) currentSearchTerm = term;
+		if (currentSearchTerm === null) return;
+
+		var re = new RegExp(currentSearchTerm, ignorecase ? 'i' : '');
+		var el = document.getElementById("frames").children;
+		var matches = new Object();
+		var maxwidth = 0;
+		for (var i = 0; i < el.length; i++) {
+			var e = el[i];
+			var func = g_to_func(e);
+			var rect = find_child(e, "rect");
+			if (func == null || rect == null)
+				continue;
+
+			// Save max width. Only works as we have a root frame
+			var w = parseFloat(rect.attributes.width.value);
+			if (w > maxwidth)
+				maxwidth = w;
+
+			if (func.match(re)) {
+				// highlight
+				var x = parseFloat(rect.attributes.x.value);
+				orig_save(rect, "fill");
+				rect.attributes.fill.value = "rgb(230,0,230)";
+
+				// remember matches
+				if (matches[x] == undefined) {
+					matches[x] = w;
+				} else {
+					if (w > matches[x]) {
+						// overwrite with parent
+						matches[x] = w;
+					}
+				}
+				searching = 1;
+			}
+		}
+		if (!searching)
+			return;
+		var params = get_params();
+		params.s = currentSearchTerm;
+		history.replaceState(null, null, parse_params(params));
+
+		searchbtn.classList.add("show");
+		searchbtn.firstChild.nodeValue = "Reset Search";
+
+		// calculate percent matched, excluding vertical overlap
+		var count = 0;
+		var lastx = -1;
+		var lastw = 0;
+		var keys = Array();
+		for (k in matches) {
+			if (matches.hasOwnProperty(k))
+				keys.push(k);
+		}
+		// sort the matched frames by their x location
+		// ascending, then width descending
+		keys.sort(function(a, b){
+			return a - b;
+		});
+		// Step through frames saving only the biggest bottom-up frames
+		// thanks to the sort order. This relies on the tree property
+		// where children are always smaller than their parents.
+		var fudge = 0.0001;	// JavaScript floating point
+		for (var k in keys) {
+			var x = parseFloat(keys[k]);
+			var w = matches[keys[k]];
+			if (x >= lastx + lastw - fudge) {
+				count += w;
+				lastx = x;
+				lastw = w;
+			}
+		}
+		// display matched percent
+		matchedtxt.classList.remove("hide");
+		var pct = 100 * count / maxwidth;
+		if (pct != 100) pct = pct.toFixed(1)
+		matchedtxt.firstChild.nodeValue = "Matched: " + pct + "%";
+	}
+]]>
+</script>
+<rect x="0.0" y="0" width="1200.0" height="406.0" fill="url(#background)"  />
+<text id="title" x="600.00" y="24" >Flame Graph</text>
+<text id="details" x="10.00" y="389" > </text>
+<text id="unzoom" x="10.00" y="24" class="hide">Reset Zoom</text>
+<text id="search" x="1090.00" y="24" >Search</text>
+<text id="ignorecase" x="1174.00" y="24" >ic</text>
+<text id="matched" x="1090.00" y="389" > </text>
+<g id="frames">
+<g >
+<title>__gmpf_set_si@plt (421,907,030 samples, 0.05%)</title><rect x="811.7" y="165" width="0.5" height="15.0" fill="rgb(207,9,2)" rx="2" ry="2" />
+<text  x="814.66" y="175.5" ></text>
+</g>
+<g >
+<title>sdpa::Jal::getMinEigen (36,816,162,589 samples, 4.14%)</title><rect x="1072.6" y="245" width="48.8" height="15.0" fill="rgb(217,58,13)" rx="2" ry="2" />
+<text  x="1075.57" y="255.5" >sdpa..</text>
+</g>
+<g >
+<title>[unknown]  (1,730,089,338 samples, 0.19%)</title><rect x="1005.0" y="181" width="2.3" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1008.00" y="191.5" ></text>
+</g>
+<g >
+<title>__gmpf_clear@plt (240,772,662 samples, 0.03%)</title><rect x="811.3" y="165" width="0.3" height="15.0" fill="rgb(233,133,31)" rx="2" ry="2" />
+<text  x="814.26" y="175.5" ></text>
+</g>
+<g >
+<title>[unknown]  (955,033,317 samples, 0.11%)</title><rect x="384.8" y="309" width="1.3" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="387.81" y="319.5" ></text>
+</g>
+<g >
+<title>Rpotrf2 (99,615,021 samples, 0.01%)</title><rect x="1054.9" y="149" width="0.1" height="15.0" fill="rgb(225,94,22)" rx="2" ry="2" />
+<text  x="1057.90" y="159.5" ></text>
+</g>
+<g >
+<title>Rlartg (22,926,778,154 samples, 2.58%)</title><rect x="1072.7" y="197" width="30.4" height="15.0" fill="rgb(208,15,3)" rx="2" ry="2" />
+<text  x="1075.67" y="207.5" >Rl..</text>
+</g>
+<g >
+<title>Rpotrf2 (1,378,841,136 samples, 0.16%)</title><rect x="1003.0" y="197" width="1.8" height="15.0" fill="rgb(225,94,22)" rx="2" ry="2" />
+<text  x="1005.96" y="207.5" ></text>
+</g>
+<g >
+<title>__gmpf_clear@plt (596,400,297 samples, 0.07%)</title><rect x="463.7" y="229" width="0.8" height="15.0" fill="rgb(233,133,31)" rx="2" ry="2" />
+<text  x="466.75" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown]  (83,536,606,804 samples, 9.40%)</title><rect x="825.4" y="165" width="110.9" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="828.39" y="175.5" >[unknown] </text>
+</g>
+<g >
+<title>sdpa::Lal::multiply (4,943,783,429 samples, 0.56%)</title><rect x="1114.9" y="213" width="6.5" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="1117.86" y="223.5" ></text>
+</g>
+<g >
+<title>[unknown]  (253,590,102 samples, 0.03%)</title><rect x="1102.7" y="117" width="0.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1105.72" y="127.5" ></text>
+</g>
+<g >
+<title>sysvec_apic_timer_interrupt (691,465,912 samples, 0.08%)</title><rect x="386.2" y="293" width="0.9" height="15.0" fill="rgb(220,69,16)" rx="2" ry="2" />
+<text  x="389.20" y="303.5" ></text>
+</g>
+<g >
+<title>Raxpy (487,875,621 samples, 0.05%)</title><rect x="1000.3" y="213" width="0.6" height="15.0" fill="rgb(226,100,24)" rx="2" ry="2" />
+<text  x="1003.29" y="223.5" ></text>
+</g>
+<g >
+<title>__sysvec_irq_work (83,321,345 samples, 0.01%)</title><rect x="387.1" y="277" width="0.2" height="15.0" fill="rgb(229,110,26)" rx="2" ry="2" />
+<text  x="390.14" y="287.5" ></text>
+</g>
+<g >
+<title>[unknown]  (78,010,355 samples, 0.01%)</title><rect x="981.0" y="197" width="0.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="984.02" y="207.5" ></text>
+</g>
+<g >
+<title>__gmpf_set_si@plt (971,077,489 samples, 0.11%)</title><rect x="466.3" y="229" width="1.3" height="15.0" fill="rgb(207,9,2)" rx="2" ry="2" />
+<text  x="469.28" y="239.5" ></text>
+</g>
+<g >
+<title>sdpa::Jal::ns_jordan_triple_product (125,821,339,221 samples, 14.15%)</title><rect x="813.6" y="245" width="167.0" height="15.0" fill="rgb(252,217,51)" rx="2" ry="2" />
+<text  x="816.60" y="255.5" >sdpa::Jal::ns_jordan_..</text>
+</g>
+<g >
+<title>Rdot_omp (228,864,312 samples, 0.03%)</title><rect x="387.6" y="213" width="0.3" height="15.0" fill="rgb(213,37,8)" rx="2" ry="2" />
+<text  x="390.58" y="223.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::plus (696,309,525 samples, 0.08%)</title><rect x="981.2" y="229" width="1.0" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="984.23" y="239.5" ></text>
+</g>
+<g >
+<title>sdpa::DirectionParameter::MehrotraCorrector (363,567,425 samples, 0.04%)</title><rect x="387.6" y="277" width="0.5" height="15.0" fill="rgb(218,61,14)" rx="2" ry="2" />
+<text  x="390.57" y="287.5" ></text>
+</g>
+<g >
+<title>update_load_avg (157,143,007 samples, 0.02%)</title><rect x="386.7" y="149" width="0.2" height="15.0" fill="rgb(240,165,39)" rx="2" ry="2" />
+<text  x="389.71" y="159.5" ></text>
+</g>
+<g >
+<title>main (552,960,625,285 samples, 62.21%)</title><rect x="387.4" y="309" width="734.1" height="15.0" fill="rgb(243,179,42)" rx="2" ry="2" />
+<text  x="390.41" y="319.5" >main</text>
+</g>
+<g >
+<title>[unknown]  (1,785,595,542 samples, 0.20%)</title><rect x="1010.6" y="197" width="2.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1013.64" y="207.5" ></text>
+</g>
+<g >
+<title>[unknown]  (3,220,704,102 samples, 0.36%)</title><rect x="723.1" y="165" width="4.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="726.07" y="175.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::let (698,410,425 samples, 0.08%)</title><rect x="981.2" y="245" width="1.0" height="15.0" fill="rgb(211,28,6)" rx="2" ry="2" />
+<text  x="984.23" y="255.5" ></text>
+</g>
+<g >
+<title>[unknown]  (4,462,625,730 samples, 0.50%)</title><rect x="1060.7" y="181" width="5.9" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1063.69" y="191.5" ></text>
+</g>
+<g >
+<title>[unknown]  (81,412,869 samples, 0.01%)</title><rect x="813.3" y="181" width="0.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="816.25" y="191.5" ></text>
+</g>
+<g >
+<title>[unknown]  (87,748,057 samples, 0.01%)</title><rect x="985.3" y="165" width="0.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="988.29" y="175.5" ></text>
+</g>
+<g >
+<title>hrtimer_interrupt (106,197,928 samples, 0.01%)</title><rect x="463.3" y="165" width="0.1" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="466.28" y="175.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::plus (487,875,621 samples, 0.05%)</title><rect x="1000.3" y="229" width="0.6" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="1003.29" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown]  (89,635,598 samples, 0.01%)</title><rect x="999.5" y="245" width="0.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1002.53" y="255.5" ></text>
+</g>
+<g >
+<title>[unknown]  (1,247,935,463 samples, 0.14%)</title><rect x="1112.8" y="213" width="1.7" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1115.84" y="223.5" ></text>
+</g>
+<g >
+<title>Rdot_omp (87,532,901 samples, 0.01%)</title><rect x="387.4" y="213" width="0.1" height="15.0" fill="rgb(213,37,8)" rx="2" ry="2" />
+<text  x="390.42" y="223.5" ></text>
+</g>
+<g >
+<title>[unknown]  (304,795,561 samples, 0.03%)</title><rect x="1004.0" y="165" width="0.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1006.99" y="175.5" ></text>
+</g>
+<g >
+<title>sdpa::Residuals::update (552,780,833 samples, 0.06%)</title><rect x="999.5" y="277" width="0.8" height="15.0" fill="rgb(249,206,49)" rx="2" ry="2" />
+<text  x="1002.53" y="287.5" ></text>
+</g>
+<g >
+<title>__gmpf_clear@plt (275,305,106 samples, 0.03%)</title><rect x="1053.3" y="229" width="0.4" height="15.0" fill="rgb(233,133,31)" rx="2" ry="2" />
+<text  x="1056.33" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown]  (160,963,733 samples, 0.02%)</title><rect x="813.4" y="197" width="0.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="816.36" y="207.5" ></text>
+</g>
+<g >
+<title>Rsyrk (195,259,673 samples, 0.02%)</title><rect x="1055.3" y="165" width="0.3" height="15.0" fill="rgb(231,122,29)" rx="2" ry="2" />
+<text  x="1058.30" y="175.5" ></text>
+</g>
+<g >
+<title>[unknown]  (1,759,908,477 samples, 0.20%)</title><rect x="1064.3" y="165" width="2.3" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1067.27" y="175.5" ></text>
+</g>
+<g >
+<title>sdpa::pinpal (552,960,625,285 samples, 62.21%)</title><rect x="387.4" y="293" width="734.1" height="15.0" fill="rgb(215,46,11)" rx="2" ry="2" />
+<text  x="390.41" y="303.5" >sdpa::pinpal</text>
+</g>
+<g >
+<title>task_tick_fair (216,782,817 samples, 0.02%)</title><rect x="386.6" y="165" width="0.3" height="15.0" fill="rgb(217,57,13)" rx="2" ry="2" />
+<text  x="389.64" y="175.5" ></text>
+</g>
+<g >
+<title>do_syscall_64 (75,633,430 samples, 0.01%)</title><rect x="463.5" y="197" width="0.1" height="15.0" fill="rgb(209,20,4)" rx="2" ry="2" />
+<text  x="466.51" y="207.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::getInnerProduct (115,775,794 samples, 0.01%)</title><rect x="387.4" y="245" width="0.2" height="15.0" fill="rgb(250,211,50)" rx="2" ry="2" />
+<text  x="390.42" y="255.5" ></text>
+</g>
+<g >
+<title>[unknown]  (197,302,128 samples, 0.02%)</title><rect x="1055.8" y="165" width="0.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1058.78" y="175.5" ></text>
+</g>
+<g >
+<title>[unknown]  (56,721,029,294 samples, 6.38%)</title><rect x="388.3" y="229" width="75.3" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="391.32" y="239.5" >[unknown] </text>
+</g>
+<g >
+<title>[unknown]  (321,861,488 samples, 0.04%)</title><rect x="981.5" y="149" width="0.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="984.51" y="159.5" ></text>
+</g>
+<g >
+<title>entry_SYSCALL_64_after_hwframe (81,770,679 samples, 0.01%)</title><rect x="463.5" y="213" width="0.1" height="15.0" fill="rgb(218,63,15)" rx="2" ry="2" />
+<text  x="466.50" y="223.5" ></text>
+</g>
+<g >
+<title>Rtrsv (692,213,744 samples, 0.08%)</title><rect x="997.5" y="229" width="0.9" height="15.0" fill="rgb(242,174,41)" rx="2" ry="2" />
+<text  x="1000.50" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown]  (936,405,823 samples, 0.11%)</title><rect x="1006.0" y="165" width="1.3" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1009.05" y="175.5" ></text>
+</g>
+<g >
+<title>[unknown]  (117,507,340 samples, 0.01%)</title><rect x="1189.5" y="277" width="0.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1192.49" y="287.5" ></text>
+</g>
+<g >
+<title>Raxpy_omp (211,253,384 samples, 0.02%)</title><rect x="980.6" y="197" width="0.3" height="15.0" fill="rgb(218,62,14)" rx="2" ry="2" />
+<text  x="983.63" y="207.5" ></text>
+</g>
+<g >
+<title>scheduler_tick (87,548,270 samples, 0.01%)</title><rect x="721.8" y="69" width="0.2" height="15.0" fill="rgb(246,190,45)" rx="2" ry="2" />
+<text  x="724.84" y="79.5" ></text>
+</g>
+<g >
+<title>__gmpf_get_prec@plt (401,678,142 samples, 0.05%)</title><rect x="464.5" y="229" width="0.6" height="15.0" fill="rgb(253,224,53)" rx="2" ry="2" />
+<text  x="467.54" y="239.5" ></text>
+</g>
+<g >
+<title>__gmpf_set_si@plt (81,152,271 samples, 0.01%)</title><rect x="1053.9" y="229" width="0.1" height="15.0" fill="rgb(207,9,2)" rx="2" ry="2" />
+<text  x="1056.89" y="239.5" ></text>
+</g>
+<g >
+<title>Rsyrk (103,486,104 samples, 0.01%)</title><rect x="985.1" y="181" width="0.2" height="15.0" fill="rgb(231,122,29)" rx="2" ry="2" />
+<text  x="988.14" y="191.5" ></text>
+</g>
+<g >
+<title>sdpa::Jal::getInvChol (21,897,272,462 samples, 2.46%)</title><rect x="1000.9" y="245" width="29.1" height="15.0" fill="rgb(242,172,41)" rx="2" ry="2" />
+<text  x="1003.94" y="255.5" >sd..</text>
+</g>
+<g >
+<title>__sysvec_apic_timer_interrupt (606,655,366 samples, 0.07%)</title><rect x="386.2" y="277" width="0.8" height="15.0" fill="rgb(242,173,41)" rx="2" ry="2" />
+<text  x="389.21" y="287.5" ></text>
+</g>
+<g >
+<title>asm_sysvec_apic_timer_interrupt (186,439,149 samples, 0.02%)</title><rect x="721.4" y="181" width="0.3" height="15.0" fill="rgb(232,127,30)" rx="2" ry="2" />
+<text  x="724.44" y="191.5" ></text>
+</g>
+<g >
+<title>[unknown]  (2,772,452,420 samples, 0.31%)</title><rect x="1020.4" y="181" width="3.7" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1023.37" y="191.5" ></text>
+</g>
+<g >
+<title>sdpa::Jal::getInvChol (13,864,800,263 samples, 1.56%)</title><rect x="1054.0" y="229" width="18.4" height="15.0" fill="rgb(242,172,41)" rx="2" ry="2" />
+<text  x="1057.04" y="239.5" ></text>
+</g>
+<g >
+<title>hrtimer_interrupt (97,348,539 samples, 0.01%)</title><rect x="1189.7" y="245" width="0.1" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="1192.68" y="255.5" ></text>
+</g>
+<g >
+<title>[unknown]  (573,805,451 samples, 0.06%)</title><rect x="1090.9" y="117" width="0.8" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1093.94" y="127.5" ></text>
+</g>
+<g >
+<title>[unknown]  (296,169,155 samples, 0.03%)</title><rect x="1002.5" y="181" width="0.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1005.53" y="191.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::multiply (5,134,753,246 samples, 0.58%)</title><rect x="722.5" y="213" width="6.8" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="725.53" y="223.5" ></text>
+</g>
+<g >
+<title>sdpa::Jal::multiply (62,364,267,859 samples, 7.02%)</title><rect x="729.4" y="213" width="82.8" height="15.0" fill="rgb(235,140,33)" rx="2" ry="2" />
+<text  x="732.43" y="223.5" >sdpa::Jal..</text>
+</g>
+<g >
+<title>tick_sched_handle (427,758,510 samples, 0.05%)</title><rect x="386.4" y="213" width="0.6" height="15.0" fill="rgb(219,68,16)" rx="2" ry="2" />
+<text  x="389.39" y="223.5" ></text>
+</g>
+<g >
+<title>[unknown]  (277,755,805 samples, 0.03%)</title><rect x="986.5" y="197" width="0.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="989.50" y="207.5" ></text>
+</g>
+<g >
+<title>Rgemm_NT_omp (1,184,910,784 samples, 0.13%)</title><rect x="1001.0" y="181" width="1.5" height="15.0" fill="rgb(239,157,37)" rx="2" ry="2" />
+<text  x="1003.96" y="191.5" ></text>
+</g>
+<g >
+<title>Rgemm (626,638,886 samples, 0.07%)</title><rect x="1054.1" y="181" width="0.8" height="15.0" fill="rgb(207,12,3)" rx="2" ry="2" />
+<text  x="1057.07" y="191.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::getInnerProduct (360,409,003 samples, 0.04%)</title><rect x="387.6" y="261" width="0.5" height="15.0" fill="rgb(250,211,50)" rx="2" ry="2" />
+<text  x="390.57" y="271.5" ></text>
+</g>
+<g >
+<title>Rpotrf (3,635,283,034 samples, 0.41%)</title><rect x="1054.1" y="197" width="4.8" height="15.0" fill="rgb(248,200,47)" rx="2" ry="2" />
+<text  x="1057.07" y="207.5" ></text>
+</g>
+<g >
+<title>sysvec_apic_timer_interrupt (136,854,180 samples, 0.02%)</title><rect x="936.0" y="133" width="0.2" height="15.0" fill="rgb(220,69,16)" rx="2" ry="2" />
+<text  x="939.05" y="143.5" ></text>
+</g>
+<g >
+<title>sdpa::Jal::multiply (5,134,753,246 samples, 0.58%)</title><rect x="722.5" y="229" width="6.8" height="15.0" fill="rgb(235,140,33)" rx="2" ry="2" />
+<text  x="725.53" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown]  (250,838,193 samples, 0.03%)</title><rect x="1054.2" y="149" width="0.3" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1057.21" y="159.5" ></text>
+</g>
+<g >
+<title>sdpa::Solutions::update (54,365,763,272 samples, 6.12%)</title><rect x="1000.3" y="277" width="72.1" height="15.0" fill="rgb(217,56,13)" rx="2" ry="2" />
+<text  x="1003.28" y="287.5" >sdpa::So..</text>
+</g>
+<g >
+<title>tick_nohz_highres_handler (134,305,328 samples, 0.02%)</title><rect x="721.8" y="117" width="0.2" height="15.0" fill="rgb(215,50,11)" rx="2" ry="2" />
+<text  x="724.79" y="127.5" ></text>
+</g>
+<g >
+<title>__gmpf_clear@plt (107,885,490 samples, 0.01%)</title><rect x="1071.9" y="197" width="0.2" height="15.0" fill="rgb(233,133,31)" rx="2" ry="2" />
+<text  x="1074.92" y="207.5" ></text>
+</g>
+<g >
+<title>tick_sched_handle (112,409,356 samples, 0.01%)</title><rect x="721.5" y="85" width="0.1" height="15.0" fill="rgb(219,68,16)" rx="2" ry="2" />
+<text  x="724.49" y="95.5" ></text>
+</g>
+<g >
+<title>[unknown]  (514,112,341 samples, 0.06%)</title><rect x="1082.5" y="133" width="0.7" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1085.53" y="143.5" ></text>
+</g>
+<g >
+<title>irqentry_exit (101,584,879 samples, 0.01%)</title><rect x="387.3" y="277" width="0.1" height="15.0" fill="rgb(219,66,15)" rx="2" ry="2" />
+<text  x="390.25" y="287.5" ></text>
+</g>
+<g >
+<title>Rtrsm (2,525,216,287 samples, 0.28%)</title><rect x="1007.3" y="197" width="3.3" height="15.0" fill="rgb(251,211,50)" rx="2" ry="2" />
+<text  x="1010.29" y="207.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::multiply (286,396,273 samples, 0.03%)</title><rect x="813.2" y="213" width="0.4" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="816.21" y="223.5" ></text>
+</g>
+<g >
+<title>[unknown]  (394,255,254 samples, 0.04%)</title><rect x="984.4" y="197" width="0.5" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="987.42" y="207.5" ></text>
+</g>
+<g >
+<title>Rgemm (5,134,753,246 samples, 0.58%)</title><rect x="722.5" y="197" width="6.8" height="15.0" fill="rgb(207,12,3)" rx="2" ry="2" />
+<text  x="725.53" y="207.5" ></text>
+</g>
+<g >
+<title>scheduler_tick (356,663,461 samples, 0.04%)</title><rect x="386.5" y="181" width="0.4" height="15.0" fill="rgb(246,190,45)" rx="2" ry="2" />
+<text  x="389.48" y="191.5" ></text>
+</g>
+<g >
+<title>Rsyrk (1,883,014,735 samples, 0.21%)</title><rect x="1004.8" y="197" width="2.5" height="15.0" fill="rgb(231,122,29)" rx="2" ry="2" />
+<text  x="1007.79" y="207.5" ></text>
+</g>
+<g >
+<title>tick_nohz_highres_handler (140,069,547 samples, 0.02%)</title><rect x="721.5" y="101" width="0.1" height="15.0" fill="rgb(215,50,11)" rx="2" ry="2" />
+<text  x="724.45" y="111.5" ></text>
+</g>
+<g >
+<title>[unknown]  (51,572,884,636 samples, 5.80%)</title><rect x="1121.5" y="309" width="68.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1124.47" y="319.5" >[unknow..</text>
+</g>
+<g >
+<title>__gmpf_set@plt (203,752,729 samples, 0.02%)</title><rect x="466.0" y="229" width="0.3" height="15.0" fill="rgb(241,169,40)" rx="2" ry="2" />
+<text  x="469.00" y="239.5" ></text>
+</g>
+<g >
+<title>sdpa::Newton::compute_rMat (63,397,133,056 samples, 7.13%)</title><rect x="729.4" y="245" width="84.2" height="15.0" fill="rgb(208,16,3)" rx="2" ry="2" />
+<text  x="732.43" y="255.5" >sdpa::New..</text>
+</g>
+<g >
+<title>sdpa::StepLength::computeStepLength (36,819,239,215 samples, 4.14%)</title><rect x="1072.6" y="261" width="48.8" height="15.0" fill="rgb(230,115,27)" rx="2" ry="2" />
+<text  x="1075.57" y="271.5" >sdpa..</text>
+</g>
+<g >
+<title>[unknown]  (2,237,646,508 samples, 0.25%)</title><rect x="994.3" y="213" width="3.0" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="997.34" y="223.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::multiply (289,536,158 samples, 0.03%)</title><rect x="813.2" y="229" width="0.4" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="816.21" y="239.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::getInnerProduct (81,707,389 samples, 0.01%)</title><rect x="999.7" y="229" width="0.1" height="15.0" fill="rgb(250,211,50)" rx="2" ry="2" />
+<text  x="1002.71" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown]  (98,502,669 samples, 0.01%)</title><rect x="985.1" y="165" width="0.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="988.14" y="175.5" ></text>
+</g>
+<g >
+<title>asm_sysvec_irq_work (206,745,383 samples, 0.02%)</title><rect x="387.1" y="309" width="0.3" height="15.0" fill="rgb(219,64,15)" rx="2" ry="2" />
+<text  x="390.12" y="319.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::getMinEigen (36,805,757,137 samples, 4.14%)</title><rect x="1072.6" y="229" width="48.8" height="15.0" fill="rgb(254,228,54)" rx="2" ry="2" />
+<text  x="1075.58" y="239.5" >sdpa..</text>
+</g>
+<g >
+<title>[unknown]  (236,465,581 samples, 0.03%)</title><rect x="1054.5" y="165" width="0.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1057.55" y="175.5" ></text>
+</g>
+<g >
+<title>schedule (99,501,019 samples, 0.01%)</title><rect x="387.3" y="245" width="0.1" height="15.0" fill="rgb(254,229,54)" rx="2" ry="2" />
+<text  x="390.25" y="255.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::let (78,331,591 samples, 0.01%)</title><rect x="1114.8" y="213" width="0.1" height="15.0" fill="rgb(211,28,6)" rx="2" ry="2" />
+<text  x="1117.75" y="223.5" ></text>
+</g>
+<g >
+<title>Rgemm (62,362,195,979 samples, 7.02%)</title><rect x="729.4" y="181" width="82.8" height="15.0" fill="rgb(207,12,3)" rx="2" ry="2" />
+<text  x="732.44" y="191.5" >Rgemm</text>
+</g>
+<g >
+<title>__sysvec_apic_timer_interrupt (159,265,384 samples, 0.02%)</title><rect x="721.8" y="165" width="0.2" height="15.0" fill="rgb(242,173,41)" rx="2" ry="2" />
+<text  x="724.77" y="175.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::multiply (237,290,407 samples, 0.03%)</title><rect x="999.2" y="229" width="0.3" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="1002.17" y="239.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::getInnerProduct (89,612,544 samples, 0.01%)</title><rect x="722.4" y="213" width="0.1" height="15.0" fill="rgb(250,211,50)" rx="2" ry="2" />
+<text  x="725.41" y="223.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::getSymmetrize (455,407,347 samples, 0.05%)</title><rect x="980.6" y="229" width="0.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="983.62" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown]  (4,114,431,200 samples, 0.46%)</title><rect x="1024.1" y="213" width="5.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1027.07" y="223.5" ></text>
+</g>
+<g >
+<title>__gmpf_add@plt (520,826,366 samples, 0.06%)</title><rect x="977.9" y="181" width="0.7" height="15.0" fill="rgb(218,59,14)" rx="2" ry="2" />
+<text  x="980.91" y="191.5" ></text>
+</g>
+<g >
+<title>[unknown]  (208,263,486 samples, 0.02%)</title><rect x="1056.1" y="165" width="0.3" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1059.10" y="175.5" ></text>
+</g>
+<g >
+<title>__sysvec_apic_timer_interrupt (124,476,385 samples, 0.01%)</title><rect x="936.0" y="117" width="0.2" height="15.0" fill="rgb(242,173,41)" rx="2" ry="2" />
+<text  x="939.05" y="127.5" ></text>
+</g>
+<g >
+<title>[unknown]  (41,407,989,939 samples, 4.66%)</title><rect x="735.4" y="149" width="54.9" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="738.37" y="159.5" >[unkn..</text>
+</g>
+<g >
+<title>__gmpf_set_si@plt (746,668,928 samples, 0.08%)</title><rect x="979.6" y="181" width="1.0" height="15.0" fill="rgb(207,9,2)" rx="2" ry="2" />
+<text  x="982.62" y="191.5" ></text>
+</g>
+<g >
+<title>sdpa::Newton::compute_DxMat (126,982,469,733 samples, 14.29%)</title><rect x="813.6" y="261" width="168.6" height="15.0" fill="rgb(230,117,28)" rx="2" ry="2" />
+<text  x="816.59" y="271.5" >sdpa::Newton::compute..</text>
+</g>
+<g >
+<title>[unknown]  (15,566,009,598 samples, 1.75%)</title><rect x="790.4" y="165" width="20.6" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="793.36" y="175.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::getInvLowTriangularMatrix (10,177,150,580 samples, 1.14%)</title><rect x="1058.9" y="213" width="13.5" height="15.0" fill="rgb(232,127,30)" rx="2" ry="2" />
+<text  x="1061.94" y="223.5" ></text>
+</g>
+<g >
+<title>sysvec_apic_timer_interrupt (182,141,797 samples, 0.02%)</title><rect x="721.8" y="181" width="0.2" height="15.0" fill="rgb(220,69,16)" rx="2" ry="2" />
+<text  x="724.77" y="191.5" ></text>
+</g>
+<g >
+<title>[unknown]  (2,305,162,280 samples, 0.26%)</title><rect x="987.2" y="197" width="3.0" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="990.16" y="207.5" ></text>
+</g>
+<g >
+<title>[unknown]  (84,427,242 samples, 0.01%)</title><rect x="981.9" y="181" width="0.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="984.93" y="191.5" ></text>
+</g>
+<g >
+<title>[unknown]  (131,438,842 samples, 0.01%)</title><rect x="813.0" y="165" width="0.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="816.02" y="175.5" ></text>
+</g>
+<g >
+<title>Rgemv (3,441,303,820 samples, 0.39%)</title><rect x="1114.9" y="197" width="4.5" height="15.0" fill="rgb(249,205,49)" rx="2" ry="2" />
+<text  x="1117.86" y="207.5" ></text>
+</g>
+<g >
+<title>[unknown]  (1,080,514,207 samples, 0.12%)</title><rect x="1001.1" y="165" width="1.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1004.09" y="175.5" ></text>
+</g>
+<g >
+<title>[unknown]  (16,640,431,230 samples, 1.87%)</title><rect x="768.1" y="133" width="22.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="771.12" y="143.5" >[..</text>
+</g>
+<g >
+<title>Raxpy_omp (522,803,231 samples, 0.06%)</title><rect x="981.2" y="181" width="0.7" height="15.0" fill="rgb(218,62,14)" rx="2" ry="2" />
+<text  x="984.24" y="191.5" ></text>
+</g>
+<g >
+<title>asm_sysvec_apic_timer_interrupt (146,196,377 samples, 0.02%)</title><rect x="936.0" y="149" width="0.2" height="15.0" fill="rgb(232,127,30)" rx="2" ry="2" />
+<text  x="939.03" y="159.5" ></text>
+</g>
+<g >
+<title>__hrtimer_run_queues (549,155,732 samples, 0.06%)</title><rect x="386.2" y="245" width="0.8" height="15.0" fill="rgb(237,150,35)" rx="2" ry="2" />
+<text  x="389.23" y="255.5" ></text>
+</g>
+<g >
+<title>[unknown]  (742,930,898 samples, 0.08%)</title><rect x="1102.1" y="133" width="1.0" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1105.08" y="143.5" ></text>
+</g>
+<g >
+<title>hrtimer_interrupt (591,253,169 samples, 0.07%)</title><rect x="386.2" y="261" width="0.8" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="389.22" y="271.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::getInvLowTriangularMatrix (12,640,394,604 samples, 1.42%)</title><rect x="1013.2" y="229" width="16.8" height="15.0" fill="rgb(232,127,30)" rx="2" ry="2" />
+<text  x="1016.23" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown]  (199,730,636 samples, 0.02%)</title><rect x="980.6" y="181" width="0.3" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="983.64" y="191.5" ></text>
+</g>
+<g >
+<title>__sysvec_apic_timer_interrupt (106,197,928 samples, 0.01%)</title><rect x="463.3" y="181" width="0.1" height="15.0" fill="rgb(242,173,41)" rx="2" ry="2" />
+<text  x="466.28" y="191.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::plus (177,274,053 samples, 0.02%)</title><rect x="999.8" y="213" width="0.3" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="1002.84" y="223.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::plus (77,276,059 samples, 0.01%)</title><rect x="1114.8" y="197" width="0.1" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="1117.75" y="207.5" ></text>
+</g>
+<g >
+<title>tick_sched_handle (77,252,300 samples, 0.01%)</title><rect x="463.3" y="117" width="0.1" height="15.0" fill="rgb(219,68,16)" rx="2" ry="2" />
+<text  x="466.31" y="127.5" ></text>
+</g>
+<g >
+<title>[unknown]  (670,503,515 samples, 0.08%)</title><rect x="1009.7" y="165" width="0.9" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1012.75" y="175.5" ></text>
+</g>
+<g >
+<title>[unknown]  (129,444,653 samples, 0.01%)</title><rect x="1055.6" y="149" width="0.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1058.60" y="159.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::getCholesky (3,678,253,530 samples, 0.41%)</title><rect x="1054.1" y="213" width="4.8" height="15.0" fill="rgb(205,4,1)" rx="2" ry="2" />
+<text  x="1057.06" y="223.5" ></text>
+</g>
+<g >
+<title>tick_nohz_highres_handler (112,962,208 samples, 0.01%)</title><rect x="936.0" y="69" width="0.2" height="15.0" fill="rgb(215,50,11)" rx="2" ry="2" />
+<text  x="939.05" y="79.5" ></text>
+</g>
+<g >
+<title>[unknown]  (2,400,314,103 samples, 0.27%)</title><rect x="1099.9" y="149" width="3.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1102.89" y="159.5" ></text>
+</g>
+<g >
+<title>[unknown]  (1,248,218,362 samples, 0.14%)</title><rect x="988.6" y="181" width="1.6" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="991.55" y="191.5" ></text>
+</g>
+<g >
+<title>[unknown]  (373,580,987 samples, 0.04%)</title><rect x="1056.7" y="165" width="0.5" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1059.69" y="175.5" ></text>
+</g>
+<g >
+<title>[unknown]  (318,212,244 samples, 0.04%)</title><rect x="986.1" y="181" width="0.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="989.08" y="191.5" ></text>
+</g>
+<g >
+<title>[unknown]  (574,403,699 samples, 0.06%)</title><rect x="1001.8" y="149" width="0.7" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1004.76" y="159.5" ></text>
+</g>
+<g >
+<title>Rpotrf (11,562,374,997 samples, 1.30%)</title><rect x="982.2" y="229" width="15.3" height="15.0" fill="rgb(248,200,47)" rx="2" ry="2" />
+<text  x="985.16" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown]  (837,216,550,687 samples, 94.18%)</title><rect x="10.1" y="325" width="1111.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="13.08" y="335.5" >[unknown] </text>
+</g>
+<g >
+<title>tick_nohz_highres_handler (92,715,054 samples, 0.01%)</title><rect x="463.3" y="133" width="0.1" height="15.0" fill="rgb(215,50,11)" rx="2" ry="2" />
+<text  x="466.29" y="143.5" ></text>
+</g>
+<g >
+<title>asm_sysvec_apic_timer_interrupt (135,850,811 samples, 0.02%)</title><rect x="1189.6" y="293" width="0.2" height="15.0" fill="rgb(232,127,30)" rx="2" ry="2" />
+<text  x="1192.65" y="303.5" ></text>
+</g>
+<g >
+<title>[unknown]  (4,717,932,755 samples, 0.53%)</title><rect x="1106.6" y="197" width="6.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1109.58" y="207.5" ></text>
+</g>
+<g >
+<title>Rtrsm (369,163,504 samples, 0.04%)</title><rect x="986.0" y="197" width="0.5" height="15.0" fill="rgb(251,211,50)" rx="2" ry="2" />
+<text  x="989.01" y="207.5" ></text>
+</g>
+<g >
+<title>[unknown]  (994,836,675 samples, 0.11%)</title><rect x="1104.6" y="197" width="1.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1107.64" y="207.5" ></text>
+</g>
+<g >
+<title>tick_sched_handle (83,202,686 samples, 0.01%)</title><rect x="936.1" y="53" width="0.1" height="15.0" fill="rgb(219,68,16)" rx="2" ry="2" />
+<text  x="939.09" y="63.5" ></text>
+</g>
+<g >
+<title>Rpotrf2 (389,975,419 samples, 0.04%)</title><rect x="1003.0" y="181" width="0.5" height="15.0" fill="rgb(225,94,22)" rx="2" ry="2" />
+<text  x="1005.96" y="191.5" ></text>
+</g>
+<g >
+<title>sdpa::Newton::Make_gVec (68,822,535,408 samples, 7.74%)</title><rect x="722.2" y="261" width="91.4" height="15.0" fill="rgb(229,113,27)" rx="2" ry="2" />
+<text  x="725.23" y="271.5" >sdpa::Newt..</text>
+</g>
+<g >
+<title>gmpxx::log (20,775,314,693 samples, 2.34%)</title><rect x="1075.5" y="181" width="27.6" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="1078.50" y="191.5" >g..</text>
+</g>
+<g >
+<title>[unknown]  (357,764,109 samples, 0.04%)</title><rect x="985.5" y="181" width="0.5" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="988.54" y="191.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::getCholesky (9,251,737,178 samples, 1.04%)</title><rect x="1000.9" y="229" width="12.3" height="15.0" fill="rgb(205,4,1)" rx="2" ry="2" />
+<text  x="1003.95" y="239.5" ></text>
+</g>
+<g >
+<title>__gmpf_get_prec@plt (82,497,869 samples, 0.01%)</title><rect x="1029.7" y="213" width="0.1" height="15.0" fill="rgb(253,224,53)" rx="2" ry="2" />
+<text  x="1032.67" y="223.5" ></text>
+</g>
+<g >
+<title>sdpa::InputData::multi_InnerProductToA (83,697,891 samples, 0.01%)</title><rect x="999.7" y="245" width="0.1" height="15.0" fill="rgb(252,216,51)" rx="2" ry="2" />
+<text  x="1002.70" y="255.5" ></text>
+</g>
+<g >
+<title>[unknown]  (871,765,882 samples, 0.10%)</title><rect x="993.2" y="181" width="1.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="996.17" y="191.5" ></text>
+</g>
+<g >
+<title>sdpa_gmp (888,908,145,007 samples, 100.00%)</title><rect x="10.0" y="341" width="1180.0" height="15.0" fill="rgb(217,59,14)" rx="2" ry="2" />
+<text  x="13.00" y="351.5" >sdpa_gmp</text>
+</g>
+<g >
+<title>sdpa::Lal::plus (740,164,968 samples, 0.08%)</title><rect x="812.2" y="213" width="1.0" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="815.22" y="223.5" ></text>
+</g>
+<g >
+<title>__hrtimer_run_queues (142,065,852 samples, 0.02%)</title><rect x="721.4" y="117" width="0.2" height="15.0" fill="rgb(237,150,35)" rx="2" ry="2" />
+<text  x="724.45" y="127.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::solveSystems (1,094,260,377 samples, 0.12%)</title><rect x="997.5" y="245" width="1.5" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="1000.50" y="255.5" ></text>
+</g>
+<g >
+<title>gmpxx::const_pi (5,458,149,733 samples, 0.61%)</title><rect x="1092.1" y="149" width="7.3" height="15.0" fill="rgb(245,188,45)" rx="2" ry="2" />
+<text  x="1095.12" y="159.5" ></text>
+</g>
+<g >
+<title>__gmpf_init2@plt (653,925,063 samples, 0.07%)</title><rect x="465.1" y="229" width="0.8" height="15.0" fill="rgb(247,193,46)" rx="2" ry="2" />
+<text  x="468.07" y="239.5" ></text>
+</g>
+<g >
+<title>sysvec_apic_timer_interrupt (182,292,264 samples, 0.02%)</title><rect x="721.4" y="165" width="0.3" height="15.0" fill="rgb(220,69,16)" rx="2" ry="2" />
+<text  x="724.45" y="175.5" ></text>
+</g>
+<g >
+<title>sdpa::Newton::Mehrotra (460,583,762,613 samples, 51.81%)</title><rect x="388.1" y="277" width="611.4" height="15.0" fill="rgb(236,143,34)" rx="2" ry="2" />
+<text  x="391.07" y="287.5" >sdpa::Newton::Mehrotra</text>
+</g>
+<g >
+<title>Rtrsm (351,291,189 samples, 0.04%)</title><rect x="1003.9" y="181" width="0.5" height="15.0" fill="rgb(251,211,50)" rx="2" ry="2" />
+<text  x="1006.93" y="191.5" ></text>
+</g>
+<g >
+<title>Rscal (110,746,113 samples, 0.01%)</title><rect x="813.2" y="197" width="0.2" height="15.0" fill="rgb(227,101,24)" rx="2" ry="2" />
+<text  x="816.21" y="207.5" ></text>
+</g>
+<g >
+<title>[unknown]  (497,783,056 samples, 0.06%)</title><rect x="981.3" y="165" width="0.6" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="984.27" y="175.5" ></text>
+</g>
+<g >
+<title>[unknown]  (178,551,295 samples, 0.02%)</title><rect x="985.8" y="165" width="0.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="988.78" y="175.5" ></text>
+</g>
+<g >
+<title>[unknown]  (6,953,784,468 samples, 0.78%)</title><rect x="1014.8" y="197" width="9.3" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1017.83" y="207.5" ></text>
+</g>
+<g >
+<title>update_process_times (415,452,524 samples, 0.05%)</title><rect x="386.4" y="197" width="0.6" height="15.0" fill="rgb(250,209,50)" rx="2" ry="2" />
+<text  x="389.41" y="207.5" ></text>
+</g>
+<g >
+<title>[unknown]  (190,739,650 samples, 0.02%)</title><rect x="387.6" y="197" width="0.3" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="390.63" y="207.5" ></text>
+</g>
+<g >
+<title>update_process_times (76,207,172 samples, 0.01%)</title><rect x="463.3" y="101" width="0.1" height="15.0" fill="rgb(250,209,50)" rx="2" ry="2" />
+<text  x="466.31" y="111.5" ></text>
+</g>
+<g >
+<title>__gmpf_add@plt (95,632,743 samples, 0.01%)</title><rect x="463.6" y="229" width="0.1" height="15.0" fill="rgb(218,59,14)" rx="2" ry="2" />
+<text  x="466.62" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown]  (100,852,910 samples, 0.01%)</title><rect x="1000.8" y="197" width="0.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1003.79" y="207.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::getInnerProduct (115,775,794 samples, 0.01%)</title><rect x="387.4" y="261" width="0.2" height="15.0" fill="rgb(250,211,50)" rx="2" ry="2" />
+<text  x="390.42" y="271.5" ></text>
+</g>
+<g >
+<title>sdpa::Newton::calF3 (191,840,887,097 samples, 21.58%)</title><rect x="467.6" y="229" width="254.6" height="15.0" fill="rgb(228,107,25)" rx="2" ry="2" />
+<text  x="470.57" y="239.5" >sdpa::Newton::calF3</text>
+</g>
+<g >
+<title>[unknown]  (446,749,206 samples, 0.05%)</title><rect x="1098.7" y="101" width="0.6" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1101.75" y="111.5" ></text>
+</g>
+<g >
+<title>tick_nohz_highres_handler (518,038,949 samples, 0.06%)</title><rect x="386.3" y="229" width="0.7" height="15.0" fill="rgb(215,50,11)" rx="2" ry="2" />
+<text  x="389.27" y="239.5" ></text>
+</g>
+<g >
+<title>Rgemm (2,125,838,792 samples, 0.24%)</title><rect x="982.2" y="213" width="2.8" height="15.0" fill="rgb(207,12,3)" rx="2" ry="2" />
+<text  x="985.16" y="223.5" ></text>
+</g>
+<g >
+<title>Rtrmm (13,611,464,277 samples, 1.53%)</title><rect x="1030.0" y="229" width="18.1" height="15.0" fill="rgb(239,160,38)" rx="2" ry="2" />
+<text  x="1033.01" y="239.5" ></text>
+</g>
+<g >
+<title>irq_work_run_list (82,295,069 samples, 0.01%)</title><rect x="387.1" y="245" width="0.2" height="15.0" fill="rgb(243,176,42)" rx="2" ry="2" />
+<text  x="390.14" y="255.5" ></text>
+</g>
+<g >
+<title>Raxpy (614,558,780 samples, 0.07%)</title><rect x="981.2" y="197" width="0.9" height="15.0" fill="rgb(226,100,24)" rx="2" ry="2" />
+<text  x="984.24" y="207.5" ></text>
+</g>
+<g >
+<title>Rgemm_NN_omp (92,446,873,758 samples, 10.40%)</title><rect x="813.6" y="181" width="122.7" height="15.0" fill="rgb(227,105,25)" rx="2" ry="2" />
+<text  x="816.60" y="191.5" >Rgemm_NN_omp</text>
+</g>
+<g >
+<title>sdpa::Lal::let (742,273,180 samples, 0.08%)</title><rect x="812.2" y="229" width="1.0" height="15.0" fill="rgb(211,28,6)" rx="2" ry="2" />
+<text  x="815.22" y="239.5" ></text>
+</g>
+<g >
+<title>Rtrsm (97,005,270 samples, 0.01%)</title><rect x="985.3" y="181" width="0.1" height="15.0" fill="rgb(251,211,50)" rx="2" ry="2" />
+<text  x="988.27" y="191.5" ></text>
+</g>
+<g >
+<title>Rtrsm (8,167,066,991 samples, 0.92%)</title><rect x="1013.2" y="213" width="10.9" height="15.0" fill="rgb(251,211,50)" rx="2" ry="2" />
+<text  x="1016.23" y="223.5" ></text>
+</g>
+<g >
+<title>sdpa::Jal::ns_jordan_triple_product (62,364,267,859 samples, 7.02%)</title><rect x="729.4" y="229" width="82.8" height="15.0" fill="rgb(252,217,51)" rx="2" ry="2" />
+<text  x="732.43" y="239.5" >sdpa::Jal..</text>
+</g>
+<g >
+<title>hrtimer_interrupt (155,078,711 samples, 0.02%)</title><rect x="721.8" y="149" width="0.2" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="724.77" y="159.5" ></text>
+</g>
+<g >
+<title>[unknown]  (1,436,975,797 samples, 0.16%)</title><rect x="727.3" y="181" width="1.9" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="730.34" y="191.5" ></text>
+</g>
+<g >
+<title>Rpotrf2 (864,408,549 samples, 0.10%)</title><rect x="1054.9" y="181" width="1.1" height="15.0" fill="rgb(225,94,22)" rx="2" ry="2" />
+<text  x="1057.90" y="191.5" ></text>
+</g>
+<g >
+<title>Rpotrf2 (392,072,962 samples, 0.04%)</title><rect x="985.0" y="197" width="0.5" height="15.0" fill="rgb(225,94,22)" rx="2" ry="2" />
+<text  x="987.98" y="207.5" ></text>
+</g>
+<g >
+<title>__schedule (94,281,166 samples, 0.01%)</title><rect x="387.3" y="229" width="0.1" height="15.0" fill="rgb(227,103,24)" rx="2" ry="2" />
+<text  x="390.25" y="239.5" ></text>
+</g>
+<g >
+<title>Raxpy_omp (377,873,651 samples, 0.04%)</title><rect x="1000.3" y="197" width="0.5" height="15.0" fill="rgb(218,62,14)" rx="2" ry="2" />
+<text  x="1003.29" y="207.5" ></text>
+</g>
+<g >
+<title>gmpxx::const_pi (2,790,887,977 samples, 0.31%)</title><rect x="1099.4" y="165" width="3.7" height="15.0" fill="rgb(245,188,45)" rx="2" ry="2" />
+<text  x="1102.37" y="175.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::let (88,584,019 samples, 0.01%)</title><rect x="999.0" y="229" width="0.1" height="15.0" fill="rgb(211,28,6)" rx="2" ry="2" />
+<text  x="1002.02" y="239.5" ></text>
+</g>
+<g >
+<title>sysvec_apic_timer_interrupt (80,456,898 samples, 0.01%)</title><rect x="977.8" y="149" width="0.1" height="15.0" fill="rgb(220,69,16)" rx="2" ry="2" />
+<text  x="980.78" y="159.5" ></text>
+</g>
+<g >
+<title>sdpa::Newton::compute_DzMat (397,682,951 samples, 0.04%)</title><rect x="999.0" y="261" width="0.5" height="15.0" fill="rgb(217,57,13)" rx="2" ry="2" />
+<text  x="1001.96" y="271.5" ></text>
+</g>
+<g >
+<title>[unknown]  (163,971,793,285 samples, 18.45%)</title><rect x="504.4" y="213" width="217.7" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="507.43" y="223.5" >[unknown] </text>
+</g>
+<g >
+<title>asm_sysvec_apic_timer_interrupt (83,531,840 samples, 0.01%)</title><rect x="977.8" y="165" width="0.1" height="15.0" fill="rgb(232,127,30)" rx="2" ry="2" />
+<text  x="980.77" y="175.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::plus (187,393,508 samples, 0.02%)</title><rect x="999.8" y="229" width="0.3" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="1002.82" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown]  (121,574,811 samples, 0.01%)</title><rect x="999.3" y="213" width="0.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1002.31" y="223.5" ></text>
+</g>
+<g >
+<title>sdpa::Residuals::compute (550,667,439 samples, 0.06%)</title><rect x="999.5" y="261" width="0.8" height="15.0" fill="rgb(211,31,7)" rx="2" ry="2" />
+<text  x="1002.53" y="271.5" ></text>
+</g>
+<g >
+<title>[unknown]  (31,329,902,949 samples, 3.52%)</title><rect x="936.3" y="181" width="41.6" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="939.32" y="191.5" >[un..</text>
+</g>
+<g >
+<title>Rpotrf (9,208,211,925 samples, 1.04%)</title><rect x="1001.0" y="213" width="12.2" height="15.0" fill="rgb(248,200,47)" rx="2" ry="2" />
+<text  x="1003.96" y="223.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::multiply (124,298,770 samples, 0.01%)</title><rect x="1000.1" y="245" width="0.1" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="1003.07" y="255.5" ></text>
+</g>
+<g >
+<title>irq_work_run (83,321,345 samples, 0.01%)</title><rect x="387.1" y="261" width="0.2" height="15.0" fill="rgb(225,93,22)" rx="2" ry="2" />
+<text  x="390.14" y="271.5" ></text>
+</g>
+<g >
+<title>[unknown]  (1,566,629,952 samples, 0.18%)</title><rect x="982.3" y="181" width="2.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="985.34" y="191.5" ></text>
+</g>
+<g >
+<title>__sysvec_apic_timer_interrupt (76,636,526 samples, 0.01%)</title><rect x="935.9" y="101" width="0.1" height="15.0" fill="rgb(242,173,41)" rx="2" ry="2" />
+<text  x="938.90" y="111.5" ></text>
+</g>
+<g >
+<title>[unknown]  (227,296,972 samples, 0.03%)</title><rect x="1099.0" y="85" width="0.3" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1102.04" y="95.5" ></text>
+</g>
+<g >
+<title>update_process_times (112,505,235 samples, 0.01%)</title><rect x="721.8" y="85" width="0.2" height="15.0" fill="rgb(250,209,50)" rx="2" ry="2" />
+<text  x="724.82" y="95.5" ></text>
+</g>
+<g >
+<title>Raxpy_omp (596,283,604 samples, 0.07%)</title><rect x="812.2" y="165" width="0.8" height="15.0" fill="rgb(218,62,14)" rx="2" ry="2" />
+<text  x="815.23" y="175.5" ></text>
+</g>
+<g >
+<title>[unknown]  (2,725,717,939 samples, 0.31%)</title><rect x="990.7" y="197" width="3.6" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="993.72" y="207.5" ></text>
+</g>
+<g >
+<title>[unknown]  (593,916,875 samples, 0.07%)</title><rect x="997.6" y="213" width="0.8" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1000.64" y="223.5" ></text>
+</g>
+<g >
+<title>[unknown]  (75,987,957 samples, 0.01%)</title><rect x="722.4" y="197" width="0.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="725.43" y="207.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::choleskyFactorWithAdjust (11,562,374,997 samples, 1.30%)</title><rect x="982.2" y="245" width="15.3" height="15.0" fill="rgb(235,138,33)" rx="2" ry="2" />
+<text  x="985.16" y="255.5" ></text>
+</g>
+<g >
+<title>[unknown]  (1,410,634,190 samples, 0.16%)</title><rect x="1097.5" y="117" width="1.9" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1100.48" y="127.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::getSymmetrize (458,541,377 samples, 0.05%)</title><rect x="980.6" y="245" width="0.6" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="983.62" y="255.5" ></text>
+</g>
+<g >
+<title>Rgemm (125,815,107,489 samples, 14.15%)</title><rect x="813.6" y="197" width="167.0" height="15.0" fill="rgb(207,12,3)" rx="2" ry="2" />
+<text  x="816.60" y="207.5" >Rgemm</text>
+</g>
+<g >
+<title>hrtimer_interrupt (75,625,635 samples, 0.01%)</title><rect x="935.9" y="85" width="0.1" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="938.90" y="95.5" ></text>
+</g>
+<g >
+<title>scheduler_tick (94,880,317 samples, 0.01%)</title><rect x="721.5" y="53" width="0.1" height="15.0" fill="rgb(246,190,45)" rx="2" ry="2" />
+<text  x="724.51" y="63.5" ></text>
+</g>
+<g >
+<title>__hrtimer_run_queues (93,753,108 samples, 0.01%)</title><rect x="463.3" y="149" width="0.1" height="15.0" fill="rgb(237,150,35)" rx="2" ry="2" />
+<text  x="466.29" y="159.5" ></text>
+</g>
+<g >
+<title>Rsyrk (385,939,017 samples, 0.04%)</title><rect x="985.5" y="197" width="0.5" height="15.0" fill="rgb(231,122,29)" rx="2" ry="2" />
+<text  x="988.50" y="207.5" ></text>
+</g>
+<g >
+<title>irq_work_single (78,104,079 samples, 0.01%)</title><rect x="387.1" y="229" width="0.2" height="15.0" fill="rgb(230,118,28)" rx="2" ry="2" />
+<text  x="390.15" y="239.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::multiply (123,254,437 samples, 0.01%)</title><rect x="1000.1" y="229" width="0.1" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="1003.07" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown]  (97,857,610 samples, 0.01%)</title><rect x="980.8" y="165" width="0.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="983.78" y="175.5" ></text>
+</g>
+<g >
+<title>[unknown]  (1,218,415,373 samples, 0.14%)</title><rect x="1057.2" y="181" width="1.6" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1060.18" y="191.5" ></text>
+</g>
+<g >
+<title>[unknown]  (314,167,619 samples, 0.04%)</title><rect x="812.6" y="133" width="0.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="815.61" y="143.5" ></text>
+</g>
+<g >
+<title>Raxpy_omp (80,981,423 samples, 0.01%)</title><rect x="999.8" y="181" width="0.1" height="15.0" fill="rgb(218,62,14)" rx="2" ry="2" />
+<text  x="1002.84" y="191.5" ></text>
+</g>
+<g >
+<title>Rtrsm (605,263,360 samples, 0.07%)</title><rect x="1056.4" y="181" width="0.8" height="15.0" fill="rgb(251,211,50)" rx="2" ry="2" />
+<text  x="1059.38" y="191.5" ></text>
+</g>
+<g >
+<title>__gmpf_add@plt (104,440,651 samples, 0.01%)</title><rect x="1053.2" y="229" width="0.1" height="15.0" fill="rgb(218,59,14)" rx="2" ry="2" />
+<text  x="1056.19" y="239.5" ></text>
+</g>
+<g >
+<title>Rsyrk (81,221,542 samples, 0.01%)</title><rect x="1003.2" y="165" width="0.1" height="15.0" fill="rgb(231,122,29)" rx="2" ry="2" />
+<text  x="1006.15" y="175.5" ></text>
+</g>
+<g >
+<title>Rlasr (1,151,535,343 samples, 0.13%)</title><rect x="1103.1" y="197" width="1.5" height="15.0" fill="rgb(230,116,27)" rx="2" ry="2" />
+<text  x="1106.11" y="207.5" ></text>
+</g>
+<g >
+<title>[unknown]  (1,828,591,702 samples, 0.21%)</title><rect x="1072.8" y="181" width="2.5" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1075.82" y="191.5" ></text>
+</g>
+<g >
+<title>[unknown]  (98,029,119 samples, 0.01%)</title><rect x="1104.5" y="165" width="0.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1107.50" y="175.5" ></text>
+</g>
+<g >
+<title>Rsyrk (340,149,065 samples, 0.04%)</title><rect x="1003.5" y="181" width="0.4" height="15.0" fill="rgb(231,122,29)" rx="2" ry="2" />
+<text  x="1006.48" y="191.5" ></text>
+</g>
+<g >
+<title>[unknown]  (282,663,800 samples, 0.03%)</title><rect x="1104.1" y="165" width="0.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1107.10" y="175.5" ></text>
+</g>
+<g >
+<title>hrtimer_interrupt (152,375,538 samples, 0.02%)</title><rect x="721.4" y="133" width="0.2" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="724.45" y="143.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::getInnerProduct (78,117,365 samples, 0.01%)</title><rect x="1072.5" y="261" width="0.1" height="15.0" fill="rgb(250,211,50)" rx="2" ry="2" />
+<text  x="1075.46" y="271.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::multiply (237,290,407 samples, 0.03%)</title><rect x="999.2" y="245" width="0.3" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="1002.17" y="255.5" ></text>
+</g>
+<g >
+<title>Rscal (98,682,348 samples, 0.01%)</title><rect x="981.0" y="213" width="0.1" height="15.0" fill="rgb(227,101,24)" rx="2" ry="2" />
+<text  x="983.99" y="223.5" ></text>
+</g>
+<g >
+<title>Rsyrk (2,505,265,818 samples, 0.28%)</title><rect x="986.9" y="213" width="3.3" height="15.0" fill="rgb(231,122,29)" rx="2" ry="2" />
+<text  x="989.89" y="223.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::plus (493,120,814 samples, 0.06%)</title><rect x="1000.3" y="245" width="0.6" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="1003.29" y="255.5" ></text>
+</g>
+<g >
+<title>[unknown]  (239,290,552 samples, 0.03%)</title><rect x="998.1" y="197" width="0.3" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1001.10" y="207.5" ></text>
+</g>
+<g >
+<title>Raxpy (144,370,564 samples, 0.02%)</title><rect x="999.8" y="197" width="0.2" height="15.0" fill="rgb(226,100,24)" rx="2" ry="2" />
+<text  x="1002.84" y="207.5" ></text>
+</g>
+<g >
+<title>__hrtimer_run_queues (139,563,631 samples, 0.02%)</title><rect x="721.8" y="133" width="0.2" height="15.0" fill="rgb(237,150,35)" rx="2" ry="2" />
+<text  x="724.78" y="143.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::let (497,272,196 samples, 0.06%)</title><rect x="1000.3" y="261" width="0.6" height="15.0" fill="rgb(211,28,6)" rx="2" ry="2" />
+<text  x="1003.28" y="271.5" ></text>
+</g>
+<g >
+<title>[unknown]  (107,419,822 samples, 0.01%)</title><rect x="986.4" y="165" width="0.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="989.36" y="175.5" ></text>
+</g>
+<g >
+<title>sdpa::InputData::multi_plusToA (135,243,772 samples, 0.02%)</title><rect x="999.0" y="245" width="0.1" height="15.0" fill="rgb(224,91,21)" rx="2" ry="2" />
+<text  x="1001.96" y="255.5" ></text>
+</g>
+<g >
+<title>sdpa::Newton::Make_bMat (251,724,439,147 samples, 28.32%)</title><rect x="388.1" y="261" width="334.1" height="15.0" fill="rgb(236,142,34)" rx="2" ry="2" />
+<text  x="391.07" y="271.5" >sdpa::Newton::Make_bMat</text>
+</g>
+<g >
+<title>sysvec_apic_timer_interrupt (118,116,422 samples, 0.01%)</title><rect x="1189.7" y="277" width="0.1" height="15.0" fill="rgb(220,69,16)" rx="2" ry="2" />
+<text  x="1192.67" y="287.5" ></text>
+</g>
+<g >
+<title>Rdot (115,775,794 samples, 0.01%)</title><rect x="387.4" y="229" width="0.2" height="15.0" fill="rgb(221,75,18)" rx="2" ry="2" />
+<text  x="390.42" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown]  (349,825,898 samples, 0.04%)</title><rect x="1000.3" y="181" width="0.5" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1003.33" y="191.5" ></text>
+</g>
+<g >
+<title>sdpa::InputData::multi_InnerProductToA (163,246,965 samples, 0.02%)</title><rect x="722.3" y="245" width="0.2" height="15.0" fill="rgb(252,216,51)" rx="2" ry="2" />
+<text  x="725.31" y="255.5" ></text>
+</g>
+<g >
+<title>[unknown]  (1,416,369,538 samples, 0.16%)</title><rect x="1119.4" y="197" width="1.9" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1122.45" y="207.5" ></text>
+</g>
+<g >
+<title>[unknown]  (100,152,111 samples, 0.01%)</title><rect x="1075.1" y="165" width="0.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1078.11" y="175.5" ></text>
+</g>
+<g >
+<title>__sysvec_apic_timer_interrupt (153,342,936 samples, 0.02%)</title><rect x="721.4" y="149" width="0.3" height="15.0" fill="rgb(242,173,41)" rx="2" ry="2" />
+<text  x="724.45" y="159.5" ></text>
+</g>
+<g >
+<title>sdpa::Jal::ns_jordan_triple_product (5,134,753,246 samples, 0.58%)</title><rect x="722.5" y="245" width="6.8" height="15.0" fill="rgb(252,217,51)" rx="2" ry="2" />
+<text  x="725.53" y="255.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::getInnerProduct (75,847,128 samples, 0.01%)</title><rect x="1114.7" y="213" width="0.1" height="15.0" fill="rgb(250,211,50)" rx="2" ry="2" />
+<text  x="1117.65" y="223.5" ></text>
+</g>
+<g >
+<title>Rtrmv (5,098,967,058 samples, 0.57%)</title><rect x="1106.1" y="213" width="6.7" height="15.0" fill="rgb(231,122,29)" rx="2" ry="2" />
+<text  x="1109.07" y="223.5" ></text>
+</g>
+<g >
+<title>asm_sysvec_apic_timer_interrupt (192,495,418 samples, 0.02%)</title><rect x="721.8" y="197" width="0.2" height="15.0" fill="rgb(232,127,30)" rx="2" ry="2" />
+<text  x="724.76" y="207.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::plus (691,237,369 samples, 0.08%)</title><rect x="981.2" y="213" width="1.0" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="984.24" y="223.5" ></text>
+</g>
+<g >
+<title>[unknown]  (910,752,368 samples, 0.10%)</title><rect x="1082.0" y="149" width="1.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1085.01" y="159.5" ></text>
+</g>
+<g >
+<title>__gmpf_add@plt (183,706,833 samples, 0.02%)</title><rect x="811.0" y="165" width="0.3" height="15.0" fill="rgb(218,59,14)" rx="2" ry="2" />
+<text  x="814.02" y="175.5" ></text>
+</g>
+<g >
+<title>sdpa::Jal::multiply (125,817,205,285 samples, 14.15%)</title><rect x="813.6" y="229" width="167.0" height="15.0" fill="rgb(235,140,33)" rx="2" ry="2" />
+<text  x="816.60" y="239.5" >sdpa::Jal::multiply</text>
+</g>
+<g >
+<title>asm_sysvec_apic_timer_interrupt (732,052,907 samples, 0.08%)</title><rect x="386.1" y="309" width="1.0" height="15.0" fill="rgb(232,127,30)" rx="2" ry="2" />
+<text  x="389.15" y="319.5" ></text>
+</g>
+<g >
+<title>[unknown]  (239,707,193 samples, 0.03%)</title><rect x="1082.9" y="117" width="0.3" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1085.89" y="127.5" ></text>
+</g>
+<g >
+<title>[unknown]  (2,201,114,441 samples, 0.25%)</title><rect x="1007.7" y="181" width="2.9" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1010.72" y="191.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::multiply (125,816,157,629 samples, 14.15%)</title><rect x="813.6" y="213" width="167.0" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="816.60" y="223.5" >sdpa::Lal::multiply</text>
+</g>
+<g >
+<title>[unknown]  (4,635,953,225 samples, 0.52%)</title><rect x="1093.2" y="133" width="6.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1096.21" y="143.5" ></text>
+</g>
+<g >
+<title>asm_sysvec_apic_timer_interrupt (84,987,434 samples, 0.01%)</title><rect x="935.9" y="133" width="0.1" height="15.0" fill="rgb(232,127,30)" rx="2" ry="2" />
+<text  x="938.89" y="143.5" ></text>
+</g>
+<g >
+<title>sdpa::Newton::compute_DyVec (12,656,635,374 samples, 1.42%)</title><rect x="982.2" y="261" width="16.8" height="15.0" fill="rgb(249,206,49)" rx="2" ry="2" />
+<text  x="985.16" y="271.5" ></text>
+</g>
+<g >
+<title>[unknown]  (5,855,089,133 samples, 0.66%)</title><rect x="1084.0" y="149" width="7.7" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1086.95" y="159.5" ></text>
+</g>
+<g >
+<title>[unknown]  (238,021,554 samples, 0.03%)</title><rect x="1091.4" y="101" width="0.3" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1094.38" y="111.5" ></text>
+</g>
+<g >
+<title>sysvec_irq_work (190,105,098 samples, 0.02%)</title><rect x="387.1" y="293" width="0.3" height="15.0" fill="rgb(206,6,1)" rx="2" ry="2" />
+<text  x="390.14" y="303.5" ></text>
+</g>
+<g >
+<title>[unknown]  (1,193,657,532 samples, 0.13%)</title><rect x="1117.8" y="165" width="1.6" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1120.83" y="175.5" ></text>
+</g>
+<g >
+<title>[unknown]  (112,126,597 samples, 0.01%)</title><rect x="1000.6" y="165" width="0.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1003.64" y="175.5" ></text>
+</g>
+<g >
+<title>Rpotrf2 (141,285,863 samples, 0.02%)</title><rect x="1003.0" y="165" width="0.2" height="15.0" fill="rgb(225,94,22)" rx="2" ry="2" />
+<text  x="1005.96" y="175.5" ></text>
+</g>
+<g >
+<title>[unknown]  (3,591,142,671 samples, 0.40%)</title><rect x="1043.3" y="197" width="4.7" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1046.27" y="207.5" ></text>
+</g>
+<g >
+<title>[unknown]  (3,169,714,374 samples, 0.36%)</title><rect x="1115.2" y="181" width="4.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1118.22" y="191.5" ></text>
+</g>
+<g >
+<title>tick_sched_handle (112,505,235 samples, 0.01%)</title><rect x="721.8" y="101" width="0.2" height="15.0" fill="rgb(219,68,16)" rx="2" ry="2" />
+<text  x="724.82" y="111.5" ></text>
+</g>
+<g >
+<title>sysvec_apic_timer_interrupt (82,908,135 samples, 0.01%)</title><rect x="935.9" y="117" width="0.1" height="15.0" fill="rgb(220,69,16)" rx="2" ry="2" />
+<text  x="938.90" y="127.5" ></text>
+</g>
+<g >
+<title>Raxpy (273,537,816 samples, 0.03%)</title><rect x="980.6" y="213" width="0.4" height="15.0" fill="rgb(226,100,24)" rx="2" ry="2" />
+<text  x="983.63" y="223.5" ></text>
+</g>
+<g >
+<title>[unknown]  (814,869,343 samples, 0.09%)</title><rect x="726.2" y="149" width="1.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="729.24" y="159.5" ></text>
+</g>
+<g >
+<title>update_process_times (81,125,871 samples, 0.01%)</title><rect x="936.1" y="37" width="0.1" height="15.0" fill="rgb(250,209,50)" rx="2" ry="2" />
+<text  x="939.09" y="47.5" ></text>
+</g>
+<g >
+<title>[unknown]  (12,341,584,136 samples, 1.39%)</title><rect x="1031.7" y="213" width="16.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1034.69" y="223.5" ></text>
+</g>
+<g >
+<title>Rgemm_NT_omp (1,704,612,559 samples, 0.19%)</title><rect x="982.2" y="197" width="2.2" height="15.0" fill="rgb(239,157,37)" rx="2" ry="2" />
+<text  x="985.16" y="207.5" ></text>
+</g>
+<g >
+<title>Rtrsm (3,104,306,762 samples, 0.35%)</title><rect x="990.2" y="213" width="4.1" height="15.0" fill="rgb(251,211,50)" rx="2" ry="2" />
+<text  x="993.22" y="223.5" ></text>
+</g>
+<g >
+<title>[unknown]  (540,041,823 samples, 0.06%)</title><rect x="812.3" y="149" width="0.7" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="815.31" y="159.5" ></text>
+</g>
+<g >
+<title>all (888,908,147,211 samples, 100%)</title><rect x="10.0" y="357" width="1180.0" height="15.0" fill="rgb(213,39,9)" rx="2" ry="2" />
+<text  x="13.00" y="367.5" ></text>
+</g>
+<g >
+<title>sysvec_apic_timer_interrupt (121,703,615 samples, 0.01%)</title><rect x="463.3" y="197" width="0.1" height="15.0" fill="rgb(220,69,16)" rx="2" ry="2" />
+<text  x="466.28" y="207.5" ></text>
+</g>
+<g >
+<title>Rgemm_NN_omp (3,623,535,013 samples, 0.41%)</title><rect x="722.5" y="181" width="4.8" height="15.0" fill="rgb(227,105,25)" rx="2" ry="2" />
+<text  x="725.53" y="191.5" ></text>
+</g>
+<g >
+<title>Rdot (357,288,594 samples, 0.04%)</title><rect x="387.6" y="229" width="0.5" height="15.0" fill="rgb(221,75,18)" rx="2" ry="2" />
+<text  x="390.58" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown]  (884,334,249 samples, 0.10%)</title><rect x="1103.3" y="181" width="1.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1106.31" y="191.5" ></text>
+</g>
+<g >
+<title>Rsyrk (249,116,856 samples, 0.03%)</title><rect x="1056.0" y="181" width="0.4" height="15.0" fill="rgb(231,122,29)" rx="2" ry="2" />
+<text  x="1059.05" y="191.5" ></text>
+</g>
+<g >
+<title>[unknown]  (917,243,064 samples, 0.10%)</title><rect x="1090.5" y="133" width="1.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1093.48" y="143.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::plus (86,490,010 samples, 0.01%)</title><rect x="999.0" y="213" width="0.1" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="1002.02" y="223.5" ></text>
+</g>
+<g >
+<title>[unknown]  (117,924,073 samples, 0.01%)</title><rect x="387.9" y="213" width="0.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="390.88" y="223.5" ></text>
+</g>
+<g >
+<title>[unknown]  (852,371,703 samples, 0.10%)</title><rect x="983.3" y="165" width="1.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="986.29" y="175.5" ></text>
+</g>
+<g >
+<title>[unknown]  (4,000,868,309 samples, 0.45%)</title><rect x="1066.6" y="197" width="5.3" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1069.61" y="207.5" ></text>
+</g>
+<g >
+<title>[unknown]  (306,748,883 samples, 0.03%)</title><rect x="1003.5" y="165" width="0.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1006.53" y="175.5" ></text>
+</g>
+<g >
+<title>sdpa::Jal::getInvCholAndInv (31,969,149,777 samples, 3.60%)</title><rect x="1030.0" y="245" width="42.4" height="15.0" fill="rgb(221,76,18)" rx="2" ry="2" />
+<text  x="1033.01" y="255.5" >sdp..</text>
+</g>
+<g >
+<title>Rgemm_NT_omp (357,637,007 samples, 0.04%)</title><rect x="1054.1" y="165" width="0.4" height="15.0" fill="rgb(239,157,37)" rx="2" ry="2" />
+<text  x="1057.07" y="175.5" ></text>
+</g>
+<g >
+<title>__sysvec_apic_timer_interrupt (101,458,192 samples, 0.01%)</title><rect x="1189.7" y="261" width="0.1" height="15.0" fill="rgb(242,173,41)" rx="2" ry="2" />
+<text  x="1192.67" y="271.5" ></text>
+</g>
+<g >
+<title>[unknown]  (124,398,753 samples, 0.01%)</title><rect x="1102.9" y="101" width="0.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1105.90" y="111.5" ></text>
+</g>
+<g >
+<title>Rsteqr (25,224,686,718 samples, 2.84%)</title><rect x="1072.6" y="213" width="33.5" height="15.0" fill="rgb(222,81,19)" rx="2" ry="2" />
+<text  x="1075.59" y="223.5" >Rs..</text>
+</g>
+<g >
+<title>[unknown]  (164,998,758 samples, 0.02%)</title><rect x="1003.7" y="149" width="0.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1006.71" y="159.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::plus (732,966,696 samples, 0.08%)</title><rect x="812.2" y="197" width="1.0" height="15.0" fill="rgb(240,164,39)" rx="2" ry="2" />
+<text  x="815.23" y="207.5" ></text>
+</g>
+<g >
+<title>[unknown]  (5,492,582,900 samples, 0.62%)</title><rect x="1076.0" y="165" width="7.2" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1078.96" y="175.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::let (193,638,049 samples, 0.02%)</title><rect x="999.8" y="245" width="0.3" height="15.0" fill="rgb(211,28,6)" rx="2" ry="2" />
+<text  x="1002.81" y="255.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::getInnerProduct (162,187,174 samples, 0.02%)</title><rect x="722.3" y="229" width="0.2" height="15.0" fill="rgb(250,211,50)" rx="2" ry="2" />
+<text  x="725.32" y="239.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::getInnerProduct (357,288,594 samples, 0.04%)</title><rect x="387.6" y="245" width="0.5" height="15.0" fill="rgb(250,211,50)" rx="2" ry="2" />
+<text  x="390.58" y="255.5" ></text>
+</g>
+<g >
+<title>__gmpf_clear@plt (99,213,186 samples, 0.01%)</title><rect x="1029.5" y="213" width="0.2" height="15.0" fill="rgb(233,133,31)" rx="2" ry="2" />
+<text  x="1032.53" y="223.5" ></text>
+</g>
+<g >
+<title>sdpa::AverageComplementarity::update (115,775,794 samples, 0.01%)</title><rect x="387.4" y="277" width="0.2" height="15.0" fill="rgb(240,162,38)" rx="2" ry="2" />
+<text  x="390.42" y="287.5" ></text>
+</g>
+<g >
+<title>Rgemm_NN_omp (45,892,243,971 samples, 5.16%)</title><rect x="729.4" y="165" width="61.0" height="15.0" fill="rgb(227,105,25)" rx="2" ry="2" />
+<text  x="732.44" y="175.5" >Rgemm_..</text>
+</g>
+<g >
+<title>sdpa::Solutions::computeInverse (53,867,450,830 samples, 6.06%)</title><rect x="1000.9" y="261" width="71.5" height="15.0" fill="rgb(250,209,50)" rx="2" ry="2" />
+<text  x="1003.94" y="271.5" >sdpa::So..</text>
+</g>
+<g >
+<title>Raxpy (732,966,696 samples, 0.08%)</title><rect x="812.2" y="181" width="1.0" height="15.0" fill="rgb(226,100,24)" rx="2" ry="2" />
+<text  x="815.23" y="191.5" ></text>
+</g>
+<g >
+<title>Rtrsm (89,478,137 samples, 0.01%)</title><rect x="1003.3" y="165" width="0.1" height="15.0" fill="rgb(251,211,50)" rx="2" ry="2" />
+<text  x="1006.26" y="175.5" ></text>
+</g>
+<g >
+<title>hrtimer_interrupt (123,429,416 samples, 0.01%)</title><rect x="936.0" y="101" width="0.2" height="15.0" fill="rgb(228,109,26)" rx="2" ry="2" />
+<text  x="939.05" y="111.5" ></text>
+</g>
+<g >
+<title>[unknown]  (1,968,633,782 samples, 0.22%)</title><rect x="1110.2" y="181" width="2.6" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1113.21" y="191.5" ></text>
+</g>
+<g >
+<title>Rgemm (1,511,774,715 samples, 0.17%)</title><rect x="1001.0" y="197" width="2.0" height="15.0" fill="rgb(207,12,3)" rx="2" ry="2" />
+<text  x="1003.96" y="207.5" ></text>
+</g>
+<g >
+<title>sdpa::Lal::multiply (62,363,217,243 samples, 7.02%)</title><rect x="729.4" y="197" width="82.8" height="15.0" fill="rgb(222,80,19)" rx="2" ry="2" />
+<text  x="732.44" y="207.5" >sdpa::Lal..</text>
+</g>
+<g >
+<title>Rpotrf2 (1,439,410,820 samples, 0.16%)</title><rect x="985.0" y="213" width="1.9" height="15.0" fill="rgb(225,94,22)" rx="2" ry="2" />
+<text  x="987.98" y="223.5" ></text>
+</g>
+<g >
+<title>Rpotrf2 (117,049,329 samples, 0.01%)</title><rect x="985.0" y="181" width="0.1" height="15.0" fill="rgb(225,94,22)" rx="2" ry="2" />
+<text  x="987.98" y="191.5" ></text>
+</g>
+<g >
+<title>Rscal (101,203,080 samples, 0.01%)</title><rect x="999.2" y="213" width="0.1" height="15.0" fill="rgb(227,101,24)" rx="2" ry="2" />
+<text  x="1002.18" y="223.5" ></text>
+</g>
+<g >
+<title>[unknown]  (32,416,056,976 samples, 3.65%)</title><rect x="893.0" y="149" width="43.0" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="896.00" y="159.5" >[unk..</text>
+</g>
+<g >
+<title>[unknown]  (371,751,294 samples, 0.04%)</title><rect x="998.4" y="229" width="0.5" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1001.42" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown]  (72,242,978,177 samples, 8.13%)</title><rect x="625.9" y="197" width="95.9" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="628.85" y="207.5" >[unknown] </text>
+</g>
+<g >
+<title>gmpxx::const_log2 (11,853,970,592 samples, 1.33%)</title><rect x="1083.6" y="165" width="15.8" height="15.0" fill="rgb(244,182,43)" rx="2" ry="2" />
+<text  x="1086.63" y="175.5" ></text>
+</g>
+<g >
+<title>tick_nohz_highres_handler (82,949,292 samples, 0.01%)</title><rect x="1189.7" y="213" width="0.1" height="15.0" fill="rgb(215,50,11)" rx="2" ry="2" />
+<text  x="1192.69" y="223.5" ></text>
+</g>
+<g >
+<title>[unknown]  (278,669,690 samples, 0.03%)</title><rect x="1004.4" y="181" width="0.4" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1007.40" y="191.5" ></text>
+</g>
+<g >
+<title>__hrtimer_run_queues (86,046,436 samples, 0.01%)</title><rect x="1189.7" y="229" width="0.1" height="15.0" fill="rgb(237,150,35)" rx="2" ry="2" />
+<text  x="1192.68" y="239.5" ></text>
+</g>
+<g >
+<title>[unknown] (51,617,604,181 samples, 5.81%)</title><rect x="1121.5" y="325" width="68.5" height="15.0" fill="rgb(210,24,5)" rx="2" ry="2" />
+<text  x="1124.46" y="335.5" >[unknown]</text>
+</g>
+<g >
+<title>update_process_times (111,399,032 samples, 0.01%)</title><rect x="721.5" y="69" width="0.1" height="15.0" fill="rgb(250,209,50)" rx="2" ry="2" />
+<text  x="724.49" y="79.5" ></text>
+</g>
+<g >
+<title>[unknown]  (167,058,239 samples, 0.02%)</title><rect x="1055.3" y="149" width="0.3" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1058.33" y="159.5" ></text>
+</g>
+<g >
+<title>__hrtimer_run_queues (119,220,355 samples, 0.01%)</title><rect x="936.0" y="85" width="0.2" height="15.0" fill="rgb(237,150,35)" rx="2" ry="2" />
+<text  x="939.05" y="95.5" ></text>
+</g>
+<g >
+<title>asm_sysvec_apic_timer_interrupt (129,062,660 samples, 0.01%)</title><rect x="463.3" y="213" width="0.1" height="15.0" fill="rgb(232,127,30)" rx="2" ry="2" />
+<text  x="466.28" y="223.5" ></text>
+</g>
+<g >
+<title>irqentry_exit_to_user_mode (100,558,408 samples, 0.01%)</title><rect x="387.3" y="261" width="0.1" height="15.0" fill="rgb(254,229,54)" rx="2" ry="2" />
+<text  x="390.25" y="271.5" ></text>
+</g>
+<g >
+<title>[unknown]  (424,158,718 samples, 0.05%)</title><rect x="1189.1" y="293" width="0.5" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1192.08" y="303.5" ></text>
+</g>
+<g >
+<title>Rpotrf2 (297,643,876 samples, 0.03%)</title><rect x="1054.9" y="165" width="0.4" height="15.0" fill="rgb(225,94,22)" rx="2" ry="2" />
+<text  x="1057.90" y="175.5" ></text>
+</g>
+<g >
+<title>[unknown]  (3,848,622,347 samples, 0.43%)</title><rect x="1048.1" y="229" width="5.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1051.08" y="239.5" ></text>
+</g>
+<g >
+<title>Rtrsm (5,781,987,939 samples, 0.65%)</title><rect x="1058.9" y="197" width="7.7" height="15.0" fill="rgb(251,211,50)" rx="2" ry="2" />
+<text  x="1061.94" y="207.5" ></text>
+</g>
+<g >
+<title>__gmpf_clear@plt (634,763,930 samples, 0.07%)</title><rect x="978.6" y="181" width="0.8" height="15.0" fill="rgb(233,133,31)" rx="2" ry="2" />
+<text  x="981.61" y="191.5" ></text>
+</g>
+<g >
+<title>[unknown]  (75,396,233 samples, 0.01%)</title><rect x="1000.1" y="213" width="0.1" height="15.0" fill="rgb(253,223,53)" rx="2" ry="2" />
+<text  x="1003.13" y="223.5" ></text>
+</g>
+<g >
+<title>gmpxx::operator- (113,587,042 samples, 0.01%)</title><rect x="1104.5" y="181" width="0.1" height="15.0" fill="rgb(221,74,17)" rx="2" ry="2" />
+<text  x="1107.48" y="191.5" ></text>
+</g>
+<g >
+<title>sdpa::Newton::compute_bMat_dense_SDP (251,656,640,583 samples, 28.31%)</title><rect x="388.2" y="245" width="334.0" height="15.0" fill="rgb(237,151,36)" rx="2" ry="2" />
+<text  x="391.16" y="255.5" >sdpa::Newton::compute_bMat_dense_SDP</text>
+</g>
+<g >
+<title>Rtrsm (164,795,787 samples, 0.02%)</title><rect x="1055.6" y="165" width="0.2" height="15.0" fill="rgb(251,211,50)" rx="2" ry="2" />
+<text  x="1058.56" y="175.5" ></text>
+</g>
+<g >
+<title>sdpa::StepLength::MehrotraCorrector (36,898,317,219 samples, 4.15%)</title><rect x="1072.5" y="277" width="48.9" height="15.0" fill="rgb(218,63,15)" rx="2" ry="2" />
+<text  x="1075.46" y="287.5" >sdpa..</text>
+</g>
+<g >
+<title>__gmpf_get_prec@plt (94,132,592 samples, 0.01%)</title><rect x="1072.1" y="197" width="0.1" height="15.0" fill="rgb(253,224,53)" rx="2" ry="2" />
+<text  x="1075.07" y="207.5" ></text>
+</g>
+</g>
+</svg>
