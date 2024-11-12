@@ -58,7 +58,7 @@ void Rscal(mplapackint const n, mpf_class const da, mpf_class *dx, mplapackint c
         //
         //        clean-up loop
         //
-	m = fmod(n, 5);
+        m = fmod(n, 5);
         if (m != 0) {
             for (i = 1; i <= m; i = i + 1) {
                 dx[i - 1] = da * dx[i - 1];

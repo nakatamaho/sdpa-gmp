@@ -129,7 +129,7 @@ void Rsytd2(const char *uplo, mplapackint const n, mpf_class *a, mplapackint con
             //           Generate elementary reflector H(i) = I - tau * v * v**T
             //           to annihilate A(i+2:n,i)
             //
-	    Rlarfg(n - i, a[((i + 1) - 1) + (i - 1) * lda], &a[(std::min(i + 2, n) - 1) + (i - 1) * lda], 1, taui);
+            Rlarfg(n - i, a[((i + 1) - 1) + (i - 1) * lda], &a[(std::min(i + 2, n) - 1) + (i - 1) * lda], 1, taui);
             e[i - 1] = a[((i + 1) - 1) + (i - 1) * lda];
             //
             if (taui != zero) {

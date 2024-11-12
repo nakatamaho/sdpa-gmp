@@ -29,8 +29,7 @@
 #include <mpblas_gmp.h>
 #include <mplapack_gmp.h>
 
-mplapackint
-iMladlr(mplapackint const m, mplapackint const n, mpf_class *a, mplapackint const lda) {
+mplapackint iMladlr(mplapackint const m, mplapackint const n, mpf_class *a, mplapackint const lda) {
     mplapackint return_value = 0;
     //
     //  -- LAPACK auxiliary routine --
@@ -63,10 +62,10 @@ iMladlr(mplapackint const m, mplapackint const n, mpf_class *a, mplapackint cons
         return_value = 0;
         for (j = 1; j <= n; j = j + 1) {
             i = m;
-	    while ((a[(std::max(i, (mplapackint)1) - 1) + (j - 1) * lda] == zero) && (i >= 1)) {
+            while ((a[(std::max(i, (mplapackint)1) - 1) + (j - 1) * lda] == zero) && (i >= 1)) {
                 i = i - 1;
             }
-  	    return_value = std::max(return_value, i);
+            return_value = std::max(return_value, i);
         }
     }
     return return_value;

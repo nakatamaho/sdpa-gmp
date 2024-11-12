@@ -55,57 +55,53 @@ extern "C" {
 
 //#define min(a,b) (a < b ? a : b)
 
-
 namespace sdpa {
 
 class Chordal {
-public:
+  public:
+    // condition of sparse computation
+    // m_threshold < mDim,
+    // b_threshold < nBlock,
+    // aggregate_threshold >= aggrigated sparsity ratio
+    // extend_threshold    >= extended sparsity ratio
+    int m_threshold;
+    int b_threshold;
+    double aggregate_threshold;
+    double extend_threshold;
 
-  // condition of sparse computation
-  // m_threshold < mDim, 
-  // b_threshold < nBlock, 
-  // aggregate_threshold >= aggrigated sparsity ratio
-  // extend_threshold    >= extended sparsity ratio
-  int m_threshold;
-  int b_threshold;
-  double aggregate_threshold;
-  double extend_threshold;
+    int Method[5];
+    int best; /* indicates the best ordering method */
+              /* indicates the used ordering method */
+    /* -1: dense computation */
+    /* 0: METIS 4.0.1 - nested dissection <--- not support*/
+    /* 1: Spooles 2.2 - mininum degree */
+    /* 2: Spooles 2.2 - generalized nested dissection */
+    /* 3: Spooles 2.2 - multisection */
+    /* 4: Spooles 2.2 - better of 2 and 3 */
 
-  int Method[5];
-  int   best;                     /* indicates the best ordering method */
-/* indicates the used ordering method */
-  /* -1: dense computation */
-  /* 0: METIS 4.0.1 - nested dissection <--- not support*/
-  /* 1: Spooles 2.2 - mininum degree */
-  /* 2: Spooles 2.2 - generalized nested dissection */
-  /* 3: Spooles 2.2 - multisection */
-  /* 4: Spooles 2.2 - better of 2 and 3 */
+    ETree *etree;
+    IVL *adjIVL;
+    IVL *symbfacIVL_MMD, *symbfacIVL_NDMS, *symbfacIVL_ND, *symbfacIVL_MS;
+    IV *newToOldIV_MMD, *newToOldIV_NDMS, *newToOldIV_ND, *newToOldIV_MS;
+    Graph *graph;
 
-  ETree *etree;
-  IVL *adjIVL;
-  IVL *symbfacIVL_MMD, *symbfacIVL_NDMS, *symbfacIVL_ND, *symbfacIVL_MS;
-  IV *newToOldIV_MMD, *newToOldIV_NDMS, *newToOldIV_ND,*newToOldIV_MS;
-  Graph *graph;
+    Chordal(void);
+    ~Chordal();
+    void initialize();
+    void terminate();
 
-  Chordal(void);
-  ~Chordal();
-  void initialize();
-  void terminate();
-
-  // marge array1 to array2
-  void margeArray(int na1, int* array1, int na2, int* array2);
-  void makeGraph(InputData& inputData, int m);
-  int countNonZero(int m, IVL *symbfacIVL);
-  int Spooles_MMD(int m);
-  int Spooles_NDMS(int m);
-  int Spooles_ND(int m);
-  int Spooles_MS(int m);
-  void ordering_bMat(int m, int nBlock,
-                     InputData& inputData, 
-                     FILE* fpOut);
-  int   Best_Ordering(int *Method);
+    // marge array1 to array2
+    void margeArray(int na1, int *array1, int na2, int *array2);
+    void makeGraph(InputData &inputData, int m);
+    int countNonZero(int m, IVL *symbfacIVL);
+    int Spooles_MMD(int m);
+    int Spooles_NDMS(int m);
+    int Spooles_ND(int m);
+    int Spooles_MS(int m);
+    void ordering_bMat(int m, int nBlock, InputData &inputData, FILE *fpOut);
+    int Best_Ordering(int *Method);
 };
 
-}
+} // namespace sdpa
 
 #endif // __sdpa_chordal_h__

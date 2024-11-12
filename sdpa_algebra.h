@@ -12,4 +12,3 @@
 #include "mplapack_gmp.h"
 
 #endif // __sdpa_algebra_h__
-

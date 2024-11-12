@@ -49,7 +49,7 @@ mpf_class RlamchS_gmp(void) {
     mpf_class sfmin;
     mpf_class one = 1.0;
     unsigned long exp2;
-#if defined _WIN32 //exponent investigated by MPFR
+#if defined _WIN32 // exponent investigated by MPFR
     exp2 = 0x3FFFFFFF;
 #else
     exp2 = 0x3FFFFFFFFFFFFFFFL;
@@ -129,10 +129,10 @@ mpf_class RlamchM_gmp(void) {
     unsigned long exp2;
     mpf_class tmp;
     mpf_class uflowmin, one = 1.0;
-#if defined _WIN32 //exponent investigated by MPFR
+#if defined _WIN32 // exponent investigated by MPFR
     exp2 = 0x3FFFFFFF;
 #else
-    exp2 = 0x3FFFFFFFFFFFFFFFL; //exponent investigated by MPFR
+    exp2 = 0x3FFFFFFFFFFFFFFFL; // exponent investigated by MPFR
 #endif
     tmp = exp2;
     return -tmp;

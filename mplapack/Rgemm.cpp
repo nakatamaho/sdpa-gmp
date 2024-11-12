@@ -1,10 +1,10 @@
 /*************************************************************************
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * 
+ *
  * Copyright 2008 by Nakata, Maho
- * 
- * $Id: Rgemm.cpp,v 1.5 2009/09/25 04:00:39 nakatamaho Exp $ 
+ *
+ * $Id: Rgemm.cpp,v 1.5 2009/09/25 04:00:39 nakatamaho Exp $
  *
  * MPACK - multiple precision arithmetic library
  *
@@ -40,28 +40,28 @@ modification, are permitted provided that the following conditions are
 met:
 
 - Redistributions of source code must retain the above copyright
-  notice, this list of conditions and the following disclaimer. 
-  
+  notice, this list of conditions and the following disclaimer.
+
 - Redistributions in binary form must reproduce the above copyright
   notice, this list of conditions and the following disclaimer listed
   in this license in the documentation and/or other materials
   provided with the distribution.
-  
+
 - Neither the name of the copyright holders nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
-  
+
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT  
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
 OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
 SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
 LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT  
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /*
@@ -76,11 +76,7 @@ an m by k matrix, op(B) a k by n matrix and C an m by n matrix.
 
 #include <mblas_gmp.h>
 
-void
-Rgemm(const char *transa, const char *transb, mpackint m, mpackint n,
-    mpackint k, mpf_class alpha, mpf_class * A, mpackint lda, mpf_class * B,
-    mpackint ldb, mpf_class beta, mpf_class * C, mpackint ldc)
-{
+void Rgemm(const char *transa, const char *transb, mpackint m, mpackint n, mpackint k, mpf_class alpha, mpf_class *A, mpackint lda, mpf_class *B, mpackint ldb, mpf_class beta, mpf_class *C, mpackint ldc) {
     mpackint nota, notb;
     mpackint nrowa, ncola;
     mpackint nrowb;
@@ -93,139 +89,136 @@ Rgemm(const char *transa, const char *transb, mpackint m, mpackint n,
     notb = Mlsame_gmp(transb, "N");
 
     if (nota) {
-	nrowa = m;
-	ncola = k;
+        nrowa = m;
+        ncola = k;
     } else {
-	nrowa = k;
-	ncola = m;
+        nrowa = k;
+        ncola = m;
     }
     if (notb) {
-	nrowb = k;
+        nrowb = k;
     } else {
-	nrowb = n;
+        nrowb = n;
     }
 
-    //Test the input parameters.
+    // Test the input parameters.
     info = 0;
     if (!nota && (!Mlsame_gmp(transa, "C")) && (!Mlsame_gmp(transa, "T")))
-	info = 1;
+        info = 1;
     else if (!notb && (!Mlsame_gmp(transb, "C")) && (!Mlsame_gmp(transb, "T")))
-	info = 2;
+        info = 2;
     else if (m < 0)
-	info = 3;
+        info = 3;
     else if (n < 0)
-	info = 4;
+        info = 4;
     else if (k < 0)
-	info = 5;
-    else if (lda < max((mpackint) 1, nrowa))
-	info = 8;
-    else if (ldb < max((mpackint) 1, nrowb))
-	info = 10;
-    else if (ldc < max((mpackint) 1, m))
-	info = 13;
+        info = 5;
+    else if (lda < max((mpackint)1, nrowa))
+        info = 8;
+    else if (ldb < max((mpackint)1, nrowb))
+        info = 10;
+    else if (ldc < max((mpackint)1, m))
+        info = 13;
     if (info != 0) {
-	Mxerbla_gmp("Rgemm ", info);
-	return;
+        Mxerbla_gmp("Rgemm ", info);
+        return;
     }
-//Quick return if possible.
-    if ((m == 0) || (n == 0) || (((alpha == Zero) || (k == 0))
-	    && (beta == One)))
-	return;
+    // Quick return if possible.
+    if ((m == 0) || (n == 0) || (((alpha == Zero) || (k == 0)) && (beta == One)))
+        return;
 
-//And when alpha == 0.0
+    // And when alpha == 0.0
     if (alpha == Zero) {
-	if (beta == Zero) {
-	    for (mpackint j = 0; j < n; j++) {
-		for (mpackint i = 0; i < m; i++) {
-		    C[i + j * ldc] = Zero;
-		}
-	    }
-	} else {
-	    for (mpackint j = 0; j < n; j++) {
-		for (mpackint i = 0; i < m; i++) {
-		    C[i + j * ldc] = beta * C[i + j * ldc];
-		}
-	    }
-	}
-	return;
+        if (beta == Zero) {
+            for (mpackint j = 0; j < n; j++) {
+                for (mpackint i = 0; i < m; i++) {
+                    C[i + j * ldc] = Zero;
+                }
+            }
+        } else {
+            for (mpackint j = 0; j < n; j++) {
+                for (mpackint i = 0; i < m; i++) {
+                    C[i + j * ldc] = beta * C[i + j * ldc];
+                }
+            }
+        }
+        return;
     }
-//Start the operations.
+    // Start the operations.
     if (notb) {
-	if (nota) {
-	    //Form C := alpha*A*B + beta*C.
-	    for (mpackint j = 0; j < n; j++) {
-		if (beta == Zero) {
-		    for (mpackint i = 0; i < m; i++) {
-			C[i + j * ldc] = Zero;
-		    }
-		} else if (beta != One) {
-		    for (mpackint i = 0; i < m; i++) {
-			C[i + j * ldc] = beta * C[i + j * ldc];
-		    }
-		}
-		for (mpackint l = 0; l < k; l++) {
-		    if (B[l + j * ldb] != Zero) {
-			temp = alpha * B[l + j * ldb];
-			for (mpackint i = 0; i < m; i++) {
-			    C[i + j * ldc] =
-				C[i + j * ldc] + temp * A[i + l * lda];
-			}
-		    }
-		}
-	    }
-	} else {
-//Form  C := alpha*A'*B + beta*C.
-	    for (mpackint j = 0; j < n; j++) {
-		for (mpackint i = 0; i < m; i++) {
-		    temp = Zero;
-		    for (mpackint l = 0; l < k; l++) {
-			temp = temp + A[l + i * lda] * B[l + j * ldb];
-		    }
-		    if (beta == Zero)
-			C[i + j * ldc] = alpha * temp;
-		    else
-			C[i + j * ldc] = alpha * temp + beta * C[i + j * ldc];
-		}
-	    }
-	}
+        if (nota) {
+            // Form C := alpha*A*B + beta*C.
+            for (mpackint j = 0; j < n; j++) {
+                if (beta == Zero) {
+                    for (mpackint i = 0; i < m; i++) {
+                        C[i + j * ldc] = Zero;
+                    }
+                } else if (beta != One) {
+                    for (mpackint i = 0; i < m; i++) {
+                        C[i + j * ldc] = beta * C[i + j * ldc];
+                    }
+                }
+                for (mpackint l = 0; l < k; l++) {
+                    if (B[l + j * ldb] != Zero) {
+                        temp = alpha * B[l + j * ldb];
+                        for (mpackint i = 0; i < m; i++) {
+                            C[i + j * ldc] = C[i + j * ldc] + temp * A[i + l * lda];
+                        }
+                    }
+                }
+            }
+        } else {
+            // Form  C := alpha*A'*B + beta*C.
+            for (mpackint j = 0; j < n; j++) {
+                for (mpackint i = 0; i < m; i++) {
+                    temp = Zero;
+                    for (mpackint l = 0; l < k; l++) {
+                        temp = temp + A[l + i * lda] * B[l + j * ldb];
+                    }
+                    if (beta == Zero)
+                        C[i + j * ldc] = alpha * temp;
+                    else
+                        C[i + j * ldc] = alpha * temp + beta * C[i + j * ldc];
+                }
+            }
+        }
     } else {
-	if (nota) {
-//Form  C := alpha*A*B' + beta*C.
-	    for (mpackint j = 0; j < n; j++) {
-		if (beta == Zero) {
-		    for (mpackint i = 0; i < m; i++) {
-			C[i + j * ldc] = Zero;
-		    }
-		} else if (beta != One) {
-		    for (mpackint i = 0; i < m; i++) {
-			C[i + j * ldc] = beta * C[i + j * ldc];
-		    }
-		}
-		for (mpackint l = 0; l < k; l++) {
-		    if (B[j + l * ldb] != Zero) {
-			temp = alpha * B[j + l * ldb];
-			for (mpackint i = 0; i < m; i++) {
-			    C[i + j * ldc] =
-				C[i + j * ldc] + temp * A[i + l * lda];
-			}
-		    }
-		}
-	    }
-	} else {
-//Form  C := alpha*A'*B' + beta*C.
-	    for (mpackint j = 0; j < n; j++) {
-		for (mpackint i = 0; i < m; i++) {
-		    temp = Zero;
-		    for (mpackint l = 0; l < k; l++) {
-			temp = temp + A[l + i * lda] * B[j + l * ldb];
-		    }
-		    if (beta == Zero)
-			C[i + j * ldc] = alpha * temp;
-		    else
-			C[i + j * ldc] = alpha * temp + beta * C[i + j * ldc];
-		}
-	    }
-	}
+        if (nota) {
+            // Form  C := alpha*A*B' + beta*C.
+            for (mpackint j = 0; j < n; j++) {
+                if (beta == Zero) {
+                    for (mpackint i = 0; i < m; i++) {
+                        C[i + j * ldc] = Zero;
+                    }
+                } else if (beta != One) {
+                    for (mpackint i = 0; i < m; i++) {
+                        C[i + j * ldc] = beta * C[i + j * ldc];
+                    }
+                }
+                for (mpackint l = 0; l < k; l++) {
+                    if (B[j + l * ldb] != Zero) {
+                        temp = alpha * B[j + l * ldb];
+                        for (mpackint i = 0; i < m; i++) {
+                            C[i + j * ldc] = C[i + j * ldc] + temp * A[i + l * lda];
+                        }
+                    }
+                }
+            }
+        } else {
+            // Form  C := alpha*A'*B' + beta*C.
+            for (mpackint j = 0; j < n; j++) {
+                for (mpackint i = 0; i < m; i++) {
+                    temp = Zero;
+                    for (mpackint l = 0; l < k; l++) {
+                        temp = temp + A[l + i * lda] * B[j + l * ldb];
+                    }
+                    if (beta == Zero)
+                        C[i + j * ldc] = alpha * temp;
+                    else
+                        C[i + j * ldc] = alpha * temp + beta * C[i + j * ldc];
+                }
+            }
+        }
     }
     return;
 }

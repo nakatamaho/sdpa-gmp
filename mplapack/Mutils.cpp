@@ -1,10 +1,10 @@
 /*************************************************************************
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * 
+ *
  * Copyright 2008 by Nakata, Maho
- * 
- * $Id: Mutils.cpp,v 1.7 2009/09/16 08:32:46 nakatamaho Exp $ 
+ *
+ * $Id: Mutils.cpp,v 1.7 2009/09/16 08:32:46 nakatamaho Exp $
  *
  * MPACK - multiple precision arithmetic library
  *
@@ -32,9 +32,7 @@
 #include <math.h>
 #define ___MPACK_BUILD_WITH_GMP___
 
-mpf_class
-mpf_approx_log2(mpf_class x)
-{
+mpf_class mpf_approx_log2(mpf_class x) {
 #if defined ___MPACK_BUILD_WITH_GMP___
     double d;
     double ln2_app;
@@ -45,23 +43,21 @@ mpf_approx_log2(mpf_class x)
     return ln2_app;
 #endif
 #if defined ___MPACK_BUILD_WITH_QD___
-  return log10(x) / (qd_real::_log2/qd_real::_log10);
+    return log10(x) / (qd_real::_log2 / qd_real::_log10);
 #endif
 #if defined ___MPACK_BUILD_WITH_DD___
-  return log10(x) / (mpf_class::_log2/mpf_class::_log10);
+    return log10(x) / (mpf_class::_log2 / mpf_class::_log10);
 #endif
 }
 
-mpf_class
-mpf_approx_log(mpf_class x)
-{
+mpf_class mpf_approx_log(mpf_class x) {
 #if defined ___MPACK_BUILD_WITH_GMP___
     double d;
     double ln_app;
     signed long int exp;
 
     d = mpf_get_d_2exp(&exp, x.get_mpf_t());
-    ln_app = (double)exp * log (2.0) + log(d);
+    ln_app = (double)exp * log(2.0) + log(d);
     return ln_app;
 #endif
 #if defined ___MPACK_BUILD_WITH_QD___
@@ -72,9 +68,7 @@ mpf_approx_log(mpf_class x)
 #endif
 }
 
-mpf_class
-mpf_approx_log10(mpf_class x)
-{
+mpf_class mpf_approx_log10(mpf_class x) {
 #if defined ___MPACK_BUILD_WITH_GMP___
     double d;
     double ln10_app;
@@ -92,9 +86,7 @@ mpf_approx_log10(mpf_class x)
 #endif
 }
 
-mpf_class
-mpf_approx_pow(mpf_class x, mpf_class y)
-{
+mpf_class mpf_approx_pow(mpf_class x, mpf_class y) {
 #if defined ___MPACK_BUILD_WITH_GMP___
     mpf_class mtemp1, mtemp2;
     mtemp1 = y * mpf_approx_log(x);
@@ -109,9 +101,7 @@ mpf_approx_pow(mpf_class x, mpf_class y)
 #endif
 }
 
-mpf_class
-mpf_approx_cos(mpf_class x)
-{
+mpf_class mpf_approx_cos(mpf_class x) {
 #if defined ___MPACK_BUILD_WITH_GMP___
     mpf_class mtemp1;
     mtemp1 = cos(x.get_d());
@@ -125,9 +115,7 @@ mpf_approx_cos(mpf_class x)
 #endif
 }
 
-mpf_class
-mpf_approx_sin(mpf_class x)
-{
+mpf_class mpf_approx_sin(mpf_class x) {
 #if defined ___MPACK_BUILD_WITH_GMP___
     mpf_class mtemp1;
     mtemp1 = sin(x.get_d());
@@ -141,9 +129,7 @@ mpf_approx_sin(mpf_class x)
 #endif
 }
 
-mpf_class
-mpf_approx_exp(mpf_class x)
-{
+mpf_class mpf_approx_exp(mpf_class x) {
 #if defined ___MPACK_BUILD_WITH_GMP___
     mpf_class mtemp1;
     mtemp1 = exp(x.get_d());
@@ -157,9 +143,7 @@ mpf_approx_exp(mpf_class x)
 #endif
 }
 
-mpf_class
-mpf_approx_pi()
-{
+mpf_class mpf_approx_pi() {
 #if defined ___MPACK_BUILD_WITH_GMP___
     mpf_class mtemp1;
     mtemp1 = M_PI;
