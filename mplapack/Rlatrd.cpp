@@ -118,7 +118,7 @@ void Rlatrd(const char *uplo, mplapackint const n, mplapackint const nb, mpf_cla
                 //              Generate elementary reflector H(i) to annihilate
                 //              A(i+2:n,i)
                 //
-	        Rlarfg(n - i, a[((i + 1) - 1) + (i - 1) * lda], &a[(std::min(i + 2, n) - 1) + (i - 1) * lda], 1, tau[i - 1]);
+                Rlarfg(n - i, a[((i + 1) - 1) + (i - 1) * lda], &a[(std::min(i + 2, n) - 1) + (i - 1) * lda], 1, tau[i - 1]);
                 e[i - 1] = a[((i + 1) - 1) + (i - 1) * lda];
                 a[((i + 1) - 1) + (i - 1) * lda] = one;
                 //

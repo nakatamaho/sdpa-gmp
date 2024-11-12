@@ -29,8 +29,7 @@
 #include <mpblas_gmp.h>
 #include <mplapack_gmp.h>
 
-mplapackint
-iMladlc(mplapackint const m, mplapackint const n, mpf_class *a, mplapackint const lda) {
+mplapackint iMladlc(mplapackint const m, mplapackint const n, mpf_class *a, mplapackint const lda) {
     mplapackint return_value = 0;
     //
     //  -- LAPACK auxiliary routine --

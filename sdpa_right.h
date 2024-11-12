@@ -30,8 +30,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
   the first character is r, that means 'rosemary'.
 ---------------------------------------------------*/
 
-static const char rsdpa_right[] =
-  "'rsdpa' has been written by Makoto Yamashita since 2002.03.28";
-
+static const char rsdpa_right[] = "'rsdpa' has been written by Makoto Yamashita since 2002.03.28";
 
 #endif // __sdpa_right_h__

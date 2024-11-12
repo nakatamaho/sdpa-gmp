@@ -30,16 +30,15 @@
 
 #include <mpblas_gmp.h>
 
-void Rgemm_NN_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class * A, mplapackint lda, mpf_class * B, mplapackint ldb, mpf_class beta, mpf_class * C, mplapackint ldc);
-void Rgemm_TN_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class * A, mplapackint lda, mpf_class * B, mplapackint ldb, mpf_class beta, mpf_class * C, mplapackint ldc);
-void Rgemm_NT_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class * A, mplapackint lda, mpf_class * B, mplapackint ldb, mpf_class beta, mpf_class * C, mplapackint ldc);
-void Rgemm_TT_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class * A, mplapackint lda, mpf_class * B, mplapackint ldb, mpf_class beta, mpf_class * C, mplapackint ldc);
-void Rgemm_ref(const char *transa, const char *transb, mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class * A, mplapackint lda, mpf_class * B, mplapackint ldb, mpf_class beta, mpf_class * C, mplapackint ldc);
+void Rgemm_NN_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class *A, mplapackint lda, mpf_class *B, mplapackint ldb, mpf_class beta, mpf_class *C, mplapackint ldc);
+void Rgemm_TN_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class *A, mplapackint lda, mpf_class *B, mplapackint ldb, mpf_class beta, mpf_class *C, mplapackint ldc);
+void Rgemm_NT_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class *A, mplapackint lda, mpf_class *B, mplapackint ldb, mpf_class beta, mpf_class *C, mplapackint ldc);
+void Rgemm_TT_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class *A, mplapackint lda, mpf_class *B, mplapackint ldb, mpf_class beta, mpf_class *C, mplapackint ldc);
+void Rgemm_ref(const char *transa, const char *transb, mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class *A, mplapackint lda, mpf_class *B, mplapackint ldb, mpf_class beta, mpf_class *C, mplapackint ldc);
 
 #define SINGLEOROMP 1000000
 
-void Rgemm(const char *transa, const char *transb, mplapackint const m, mplapackint const n, mplapackint const k, mpf_class const alpha, mpf_class *A, mplapackint const lda, mpf_class *B, mplapackint const ldb, mpf_class const beta, mpf_class *C, mplapackint const ldc)
-{
+void Rgemm(const char *transa, const char *transb, mplapackint const m, mplapackint const n, mplapackint const k, mpf_class const alpha, mpf_class *A, mplapackint const lda, mpf_class *B, mplapackint const ldb, mpf_class const beta, mpf_class *C, mplapackint const ldc) {
     mplapackint i, j, l, nota, notb, nrowa, ncola, nrowb, info;
     mpf_class temp;
     mpf_class Zero = 0.0, One = 1.0;
@@ -47,82 +46,82 @@ void Rgemm(const char *transa, const char *transb, mplapackint const m, mplapack
     nota = Mlsame_gmp(transa, "N");
     notb = Mlsame_gmp(transb, "N");
     if (nota) {
-	nrowa = m;
-	ncola = k;
+        nrowa = m;
+        ncola = k;
     } else {
-	nrowa = k;
-	ncola = m;
+        nrowa = k;
+        ncola = m;
     }
     if (notb) {
-	nrowb = k;
+        nrowb = k;
     } else {
-	nrowb = n;
+        nrowb = n;
     }
-//Test the input parameters.
+    // Test the input parameters.
     info = 0;
     if (!nota && (!Mlsame_gmp(transa, "C")) && (!Mlsame_gmp(transa, "T")))
-	info = 1;
+        info = 1;
     else if (!notb && (!Mlsame_gmp(transb, "C")) && (!Mlsame_gmp(transb, "T")))
-	info = 2;
+        info = 2;
     else if (m < 0)
-	info = 3;
+        info = 3;
     else if (n < 0)
-	info = 4;
+        info = 4;
     else if (k < 0)
-	info = 5;
-    else if (lda < std::max((mplapackint) 1, nrowa))
-	info = 8;
-    else if (ldb < std::max((mplapackint) 1, nrowb))
-	info = 10;
-    else if (ldc < std::max((mplapackint) 1, m))
-	info = 13;
+        info = 5;
+    else if (lda < std::max((mplapackint)1, nrowa))
+        info = 8;
+    else if (ldb < std::max((mplapackint)1, nrowb))
+        info = 10;
+    else if (ldc < std::max((mplapackint)1, m))
+        info = 13;
     if (info != 0) {
-	Mxerbla_gmp("Rgemm ", info);
-	return;
+        Mxerbla_gmp("Rgemm ", info);
+        return;
     }
-//Quick return if possible.
+    // Quick return if possible.
     if ((m == 0) || (n == 0) || (((alpha == Zero) || (k == 0)) && (beta == One)))
-	return;
+        return;
 
     if (0) {
         Rgemm_ref(transa, transb, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
         return;
     }
 
-//And when alpha == 0.0
+    // And when alpha == 0.0
     if (alpha == Zero) {
-	if (beta == Zero) {
-	    for (j = 0; j < n; j++) {
-		for (i = 0; i < m; i++) {
-		    C[i + j * ldc] = Zero;
-		}
-	    }
-	} else {
-	    for (j = 0; j < n; j++) {
-		for (i = 0; i < m; i++) {
-		    C[i + j * ldc] = beta * C[i + j * ldc];
-		}
-	    }
-	}
-	return;
+        if (beta == Zero) {
+            for (j = 0; j < n; j++) {
+                for (i = 0; i < m; i++) {
+                    C[i + j * ldc] = Zero;
+                }
+            }
+        } else {
+            for (j = 0; j < n; j++) {
+                for (i = 0; i < m; i++) {
+                    C[i + j * ldc] = beta * C[i + j * ldc];
+                }
+            }
+        }
+        return;
     }
-//Start the operations.
+    // Start the operations.
     if (notb) {
-	if (nota) {
-//Form C := alpha*A*B + beta*C.
-	    Rgemm_NN_omp(m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
-	} else {
-//Form  C := alpha*A'*B + beta*C.
-	    Rgemm_TN_omp(m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
-	}
+        if (nota) {
+            // Form C := alpha*A*B + beta*C.
+            Rgemm_NN_omp(m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+        } else {
+            // Form  C := alpha*A'*B + beta*C.
+            Rgemm_TN_omp(m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+        }
     } else {
-	if (nota) {
-//Form  C := alpha*A*B' + beta*C.
-	    Rgemm_NT_omp(m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
-	} else {
-//Form  C := alpha*A'*B' + beta*C.
-	    Rgemm_TT_omp(m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
-	}
+        if (nota) {
+            // Form  C := alpha*A*B' + beta*C.
+            Rgemm_NT_omp(m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+        } else {
+            // Form  C := alpha*A'*B' + beta*C.
+            Rgemm_TT_omp(m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+        }
     }
     return;
 }

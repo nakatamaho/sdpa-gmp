@@ -30,20 +30,24 @@
 
 #include <mpblas_gmp.h>
 
-void Raxpy_omp(mplapackint n, mpf_class da, mpf_class * dx, mplapackint incx, mpf_class * dy, mplapackint incy);
-void Raxpy_ref(mplapackint n, mpf_class da, mpf_class * dx, mplapackint incx, mpf_class * dy, mplapackint incy);
+void Raxpy_omp(mplapackint n, mpf_class da, mpf_class *dx, mplapackint incx, mpf_class *dy, mplapackint incy);
+void Raxpy_ref(mplapackint n, mpf_class da, mpf_class *dx, mplapackint incx, mpf_class *dy, mplapackint incy);
 
 #define SINGLEOROMP 1000
 
-void Raxpy(mplapackint const n, mpf_class const da, mpf_class *dx, mplapackint const incx, mpf_class *dy, mplapackint const incy)
-{
+void Raxpy(mplapackint const n, mpf_class const da, mpf_class *dx, mplapackint const incx, mpf_class *dy, mplapackint const incy) {
     mpf_class Zero = 0.0;
     mplapackint i;
 
-    if (n <= 0)	return;
-    if (da == Zero) return;
+    if (n <= 0)
+        return;
+    if (da == Zero)
+        return;
 
-    if (0) { Raxpy_ref(n, da, dx, incx, dy, incy); }
-    else { Raxpy_omp(n, da, dx, incx, dy, incy); }
+    if (0) {
+        Raxpy_ref(n, da, dx, incx, dy, incy);
+    } else {
+        Raxpy_omp(n, da, dx, incx, dy, incy);
+    }
     return;
 }

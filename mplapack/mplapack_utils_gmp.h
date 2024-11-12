@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- * 
+ *
  * Copyright 2009 by Nakata, Maho
  *
  * MPACK - multiple precision arithmetic library
@@ -60,12 +60,12 @@ inline mpf_class log10(mpf_class x) {
 
 inline mpf_class pow(mpf_class x, mplapackint y) {
     mpf_class mtemp1, mtemp2;
-  if (y >= 0) {
+    if (y >= 0) {
         mpf_pow_ui(mtemp1.get_mpf_t(), x.get_mpf_t(), y);
-  } else {
+    } else {
         mpf_pow_ui(mtemp2.get_mpf_t(), x.get_mpf_t(), -y);
         mtemp1 = 1.0 / mtemp2;
-  }
+    }
     return mtemp1;
 }
 
@@ -77,9 +77,9 @@ inline mpf_class pow2(mpf_class a) {
 inline mpf_class sign(mpf_class a, mpf_class b) {
     mpf_class mtmp;
     mpf_abs(mtmp.get_mpf_t(), a.get_mpf_t());
-  if (b != 0.0) {
+    if (b != 0.0) {
         mtmp = mpf_sgn(b.get_mpf_t()) * mtmp;
-  }
+    }
     return mtmp;
 }
 

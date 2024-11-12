@@ -59,4 +59,3 @@ void Rsyrk(const char *uplo, const char *trans, mplapackint const n, mplapackint
 void Rsyr2k(const char *uplo, const char *trans, mplapackint const n, mplapackint const k, mpf_class const alpha, mpf_class *a, mplapackint const lda, mpf_class *b, mplapackint const ldb, mpf_class const beta, mpf_class *c, mplapackint const ldc);
 
 #endif
-

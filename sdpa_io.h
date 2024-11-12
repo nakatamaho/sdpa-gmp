@@ -28,128 +28,41 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 namespace sdpa {
 
-class IO
-{
-public:
-  static void read(FILE* fpData, FILE* fpout, int& m, char* str);
-  static void read(FILE* fpData, int& nBlock);
-  static void read(FILE* fpData,
-				   int nBlock, int* blockStruct);
-  static void read(FILE* fpData, Vector& b);
-  static void read(FILE* fpData, DenseLinearSpace& xMat,
-		   Vector& yVec, DenseLinearSpace& zMat,
-		   bool inputSparse);
-  static void read(FILE* fpData, int m,
-		   int SDP_nBlock,int* SDP_blockStruct,
-		   int SOCP_nBlock,int* SOCP_blockStruct,
-		   int LP_nBlock, 
-		   int nBlock, int* blockStruct, int* blockType, int* blockNumber,
-		   InputData& inputData, bool isDataSparse);
+class IO {
+  public:
+    static void read(FILE *fpData, FILE *fpout, int &m, char *str);
+    static void read(FILE *fpData, int &nBlock);
+    static void read(FILE *fpData, int nBlock, int *blockStruct);
+    static void read(FILE *fpData, Vector &b);
+    static void read(FILE *fpData, DenseLinearSpace &xMat, Vector &yVec, DenseLinearSpace &zMat, bool inputSparse);
+    static void read(FILE *fpData, int m, int SDP_nBlock, int *SDP_blockStruct, int SOCP_nBlock, int *SOCP_blockStruct, int LP_nBlock, int nBlock, int *blockStruct, int *blockType, int *blockNumber, InputData &inputData, bool isDataSparse);
 
-  // 2008/02/27 kazuhide nakata   
-  // not use
-  static void read(FILE* fpData, int m,
-		   int SDP_nBlock, int* SDP_blockStruct,
-		   int* SDP_CNonZeroCount, int* SDP_ANonZeroCount,
-		   int SOCP_nBlock, int* SOCP_blockStruct,
-		   int* SOCP_CNonZeroCount, int* SOCP_ANonZeroCount,
-		   int LP_nBlock,
-		   bool* LP_CNonZeroCount, bool* LP_ANonZeroCount,
-		   int nBlock, int* blockStruct, int* blockType, int* blockNumber,
-		   bool isDataSparse);
+    // 2008/02/27 kazuhide nakata
+    // not use
+    static void read(FILE *fpData, int m, int SDP_nBlock, int *SDP_blockStruct, int *SDP_CNonZeroCount, int *SDP_ANonZeroCount, int SOCP_nBlock, int *SOCP_blockStruct, int *SOCP_CNonZeroCount, int *SOCP_ANonZeroCount, int LP_nBlock, bool *LP_CNonZeroCount, bool *LP_ANonZeroCount, int nBlock, int *blockStruct, int *blockType, int *blockNumber, bool isDataSparse);
 
-  // 2008/02/27 kazuhide nakata   
-  // not use
-  static void read(FILE* fpData, InputData& inputData, int m, 
-		   int SDP_nBlock, int* SDP_blockStruct, 
-		   int SOCP_nBlock, int* SOCP_blockStruct, 
-		   int LP_nBlock, 
-		   int nBlock, int* blockStruct, int* blockType, int* blockNumber,
-		   long position, bool isDataSparse);
+    // 2008/02/27 kazuhide nakata
+    // not use
+    static void read(FILE *fpData, InputData &inputData, int m, int SDP_nBlock, int *SDP_blockStruct, int SOCP_nBlock, int *SOCP_blockStruct, int LP_nBlock, int nBlock, int *blockStruct, int *blockType, int *blockNumber, long position, bool isDataSparse);
 
-  // 2008/02/27 kazuhide nakata   
-  // without LP_ANonZeroCount
-  static void setBlockStruct(FILE* fpData, InputData& inputData, int m,
-                             int SDP_nBlock, 
-                             int* SDP_blockStruct,
-                             int SOCP_nBlock, 
-                             int* SOCP_blockStruct,
-                             int LP_nBlock,
-                             int nBlock, int* blockStruct, 
-                             int* blockType, int* blockNumber,
-                             long position, bool isDataSparse);
-  
-  // 2008/02/27 kazuhide nakata   
-  // without LP_ANonZeroCount
-  static void setElement(FILE* fpData, InputData& inputData, int m, 
-                         int SDP_nBlock, int* SDP_blockStruct, 
-                         int SOCP_nBlock, int* SOCP_blockStruct, 
-                         int LP_nBlock, 
-                         int nBlock, int* blockStruct, 
-                         int* blockType, int* blockNumber,
-                         long position, bool isDataSparse);
+    // 2008/02/27 kazuhide nakata
+    // without LP_ANonZeroCount
+    static void setBlockStruct(FILE *fpData, InputData &inputData, int m, int SDP_nBlock, int *SDP_blockStruct, int SOCP_nBlock, int *SOCP_blockStruct, int LP_nBlock, int nBlock, int *blockStruct, int *blockType, int *blockNumber, long position, bool isDataSparse);
 
-  static void printHeader(FILE* fpout, FILE* Display);
+    // 2008/02/27 kazuhide nakata
+    // without LP_ANonZeroCount
+    static void setElement(FILE *fpData, InputData &inputData, int m, int SDP_nBlock, int *SDP_blockStruct, int SOCP_nBlock, int *SOCP_blockStruct, int LP_nBlock, int nBlock, int *blockStruct, int *blockType, int *blockNumber, long position, bool isDataSparse);
 
-  static void printOneIteration(int pIteration,
-				AverageComplementarity& mu,
-				RatioInitResCurrentRes& theta,
-				SolveInfo& solveInfo,
-				StepLength& alpha,
-				DirectionParameter& beta,
-				FILE* fpout,
-				FILE* Display);
-  static void printLastInfo(int pIteration,
-			    AverageComplementarity& mu,
-			    RatioInitResCurrentRes& theta,
-			    SolveInfo& solveInfo,
-			    StepLength& alpha,
-			    DirectionParameter& beta,
-			    Residuals& currentRes,
-			    Phase & phase,
-			    Solutions& currentPt,
-			    double cputime,
-			    InputData& inputData,
-                            WorkVariables& work,
-			    ComputeTime& com,
-			    Parameter& param,
-			    FILE* fpout,
-			    FILE* Display,
-			    bool printTime = true);
+    static void printHeader(FILE *fpout, FILE *Display);
 
-  static void printLastInfo(int pIteration,
-			    AverageComplementarity& mu,
-			    RatioInitResCurrentRes& theta,
-			    SolveInfo& solveInfo,
-			    StepLength& alpha,
-			    DirectionParameter& beta,
-			    Residuals& currentRes,
-			    Phase & phase,
-			    Solutions& currentPt,
-			    double cputime,
-			    int nBlok,
-			    int* blockStruct,
-			    int* blockType,
-			    int* blockNumber,
-			    InputData& inputData,
-                            WorkVariables& work,
-			    ComputeTime& com,
-			    Parameter& param,
-			    FILE* fpout,
-			    FILE* Display,
-			    bool printTime = true);
+    static void printOneIteration(int pIteration, AverageComplementarity &mu, RatioInitResCurrentRes &theta, SolveInfo &solveInfo, StepLength &alpha, DirectionParameter &beta, FILE *fpout, FILE *Display);
+    static void printLastInfo(int pIteration, AverageComplementarity &mu, RatioInitResCurrentRes &theta, SolveInfo &solveInfo, StepLength &alpha, DirectionParameter &beta, Residuals &currentRes, Phase &phase, Solutions &currentPt, double cputime, InputData &inputData, WorkVariables &work, ComputeTime &com, Parameter &param, FILE *fpout, FILE *Display, bool printTime = true);
 
+    static void printLastInfo(int pIteration, AverageComplementarity &mu, RatioInitResCurrentRes &theta, SolveInfo &solveInfo, StepLength &alpha, DirectionParameter &beta, Residuals &currentRes, Phase &phase, Solutions &currentPt, double cputime, int nBlok, int *blockStruct, int *blockType, int *blockNumber, InputData &inputData, WorkVariables &work, ComputeTime &com, Parameter &param, FILE *fpout, FILE *Display, bool printTime = true);
 
-  static void displayDenseLinarSpaceLast(DenseLinearSpace& aMat,
-                                         int nBlock,
-                                         int* blockStruct,
-                                         int* blockType,
-                                         int* blockNumber,
-                                         const char* printFormat, 
-                                         FILE* fpout);
-
+    static void displayDenseLinarSpaceLast(DenseLinearSpace &aMat, int nBlock, int *blockStruct, int *blockType, int *blockNumber, const char *printFormat, FILE *fpout);
 };
 
-}
+} // namespace sdpa
 
 #endif // __sdpa_io_h__
