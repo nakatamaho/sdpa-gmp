@@ -29,6 +29,17 @@
 #include <mpblas_gmp.h>
 #include <mplapack_gmp.h>
 
+mpf_class fast_approx_log(const mpf_class& value) {
+    // Get the mantissa (a) and exponent (b) such that value = a * 2^b
+    mp_exp_t exponent;
+    double mantissa = mpf_get_d_2exp(&exponent, value.get_mpf_t());
+
+    // Calculate log(a) + b * log(2)
+    double log_mantissa = std::log(mantissa);
+    double log_2 = std::log(2.0);
+    return log_mantissa + exponent * log_2;
+}
+
 void Rlartg(mpf_class const f, mpf_class const g, mpf_class &cs, mpf_class &sn, mpf_class &r) {
     mpf_class safmin = 0.0;
     mpf_class eps = 0.0;
@@ -45,7 +56,14 @@ void Rlartg(mpf_class const f, mpf_class const g, mpf_class &cs, mpf_class &sn, 
     //
     safmin = Rlamch_gmp("S");
     eps = Rlamch_gmp("E");
-    safmn2 = gmpxx::pow(Rlamch_gmp("B"), castINTEGER_gmp(gmpxx::log(safmin / eps) / gmpxx::log(Rlamch_gmp("B")) / two));
+
+    //mpf_class safmn2_org = gmpxx::pow(Rlamch_gmp("B"), castINTEGER_gmp(gmpxx::log(safmin / eps) / gmpxx::log(Rlamch_gmp("B")) / two));
+
+    mpf_class tmp = -fast_approx_log(safmin / eps) / fast_approx_log(Rlamch_gmp("B")) / two;
+    safmn2 = 1;
+    //safmn2.div_2exp(castINTEGER_gmp(tmp)); //div_2exp accepts unsigned long
+    mpf_div_2exp(safmn2.get_mpf_t(), safmn2.get_mpf_t(), castINTEGER_gmp(tmp));
+
     safmx2 = one / safmn2;
     //        FIRST = .FALSE.
     //     END IF
