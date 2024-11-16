@@ -937,45 +937,71 @@ void Newton::calF2(mpf_class &ret, DenseMatrix &F, DenseMatrix &G, DenseMatrix &
 }
 
 void Newton::calF3(mpf_class &ret, DenseMatrix &F, DenseMatrix &G, DenseMatrix &X, DenseMatrix &invZ, SparseMatrix &Ai, SparseMatrix &Aj) {
-    // Ai and Aj are SPARSE
     ret = 0.0;
-    mpf_class sum;
-    // rMessage("Aj.NonZeroCount = " << Aj.NonZeroCount);
-    for (int index1 = 0; index1 < Aj.NonZeroCount; ++index1) {
-        int alpha = Aj.row_index[index1];
-        int beta = Aj.column_index[index1];
-        mpf_class value1 = Aj.sp_ele[index1];
-        sum = 0.0;
-        for (int index2 = 0; index2 < Ai.NonZeroCount; ++index2) {
-            int gamma = Ai.row_index[index2];
-            int delta = Ai.column_index[index2];
-            mpf_class value2 = Ai.sp_ele[index2];
-            mpf_class plu = value2 * invZ.de_ele[delta + invZ.nCol * beta] * X.de_ele[alpha + X.nCol * gamma];
-            sum += plu;
-            if (gamma != delta) {
-                mpf_class plu2 = value2 * invZ.de_ele[gamma + invZ.nCol * beta] * X.de_ele[alpha + X.nCol * delta];
-                sum += plu2;
+
+#pragma omp parallel
+    {
+        mpf_class local_ret = 0.0;
+        mpf_class sum, value1, value2, plu;
+
+#pragma omp for nowait
+        for (int index1 = 0; index1 < Aj.NonZeroCount; ++index1) {
+            int alpha = Aj.row_index[index1];
+            int beta = Aj.column_index[index1];
+            value1 = Aj.sp_ele[index1];
+            sum = 0.0;
+
+            for (int index2 = 0; index2 < Ai.NonZeroCount; ++index2) {
+                int gamma = Ai.row_index[index2];
+                int delta = Ai.column_index[index2];
+                value2 = Ai.sp_ele[index2];
+
+                plu = value2;
+                plu *= invZ.de_ele[delta + invZ.nCol * beta];
+                plu *= X.de_ele[alpha + X.nCol * gamma];
+                sum += plu;
+
+                if (gamma != delta) {
+                    plu = value2;
+                    plu *= invZ.de_ele[gamma + invZ.nCol * beta];
+                    plu *= X.de_ele[alpha + X.nCol * delta];
+                    sum += plu;
+                }
             }
-        }
-        ret += value1 * sum;
-        if (alpha == beta) {
-            continue;
-        }
-        sum = 0.0;
-        for (int index2 = 0; index2 < Ai.NonZeroCount; ++index2) {
-            int gamma = Ai.row_index[index2];
-            int delta = Ai.column_index[index2];
-            mpf_class value2 = Ai.sp_ele[index2];
-            mpf_class plu = value2 * invZ.de_ele[delta + invZ.nCol * alpha] * X.de_ele[beta + X.nCol * gamma];
-            sum += plu;
-            if (gamma != delta) {
-                mpf_class plu2 = value2 * invZ.de_ele[gamma + invZ.nCol * alpha] * X.de_ele[beta + X.nCol * delta];
-                sum += plu2;
+
+            plu = value1;
+            plu *= sum;
+            local_ret += plu;
+
+            if (alpha == beta) {
+                continue;
             }
+
+            sum = 0.0;
+            for (int index2 = 0; index2 < Ai.NonZeroCount; ++index2) {
+                int gamma = Ai.row_index[index2];
+                int delta = Ai.column_index[index2];
+                value2 = Ai.sp_ele[index2];
+
+                plu = value2;
+                plu *= invZ.de_ele[delta + invZ.nCol * alpha];
+                plu *= X.de_ele[beta + X.nCol * gamma];
+                sum += plu;
+
+                if (gamma != delta) {
+                    plu = value2;
+                    plu *= invZ.de_ele[gamma + invZ.nCol * alpha];
+                    plu *= X.de_ele[beta + X.nCol * delta];
+                    sum += plu;
+                }
+            }
+            plu = value1;
+            plu *= sum;
+            local_ret += plu;
         }
-        ret += value1 * sum;
-    } // end of 'for (index1)'
-    return;
+#pragma omp critical
+        ret += local_ret;
+    }
 }
 
 void Newton::compute_bMat_dense_SDP(InputData &inputData, Solutions &currentPt, WorkVariables &work, ComputeTime &com) {
