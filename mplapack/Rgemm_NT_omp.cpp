@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2010
+ * Copyright (c) 2008-2024
  *	Nakata, Maho
  * 	All rights reserved.
  *
@@ -27,32 +27,48 @@
  * SUCH DAMAGE.
  *
  */
+
 #include <mpblas_gmp.h>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 void Rgemm_NT_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, mpf_class *A, mplapackint lda, mpf_class *B, mplapackint ldb, mpf_class beta, mpf_class *C, mplapackint ldc) {
-    // Form  C := alpha*A*B' + beta*C.
+    // Form C := alpha*A*B' + beta*C.
     mplapackint i, j, l;
-    mpf_class temp;
-    for (j = 0; j < n; j++) {
-        if (beta == 0.0) {
+    mpf_class temp, templ;
+
+    // Scale C by beta: C = alpha * A * B' + beta * C
+    // Handle special cases for beta to optimize performance
+    if (beta == 0.0) {
+        // If beta is 0, set C to zero
+#pragma omp parallel for collapse(2) schedule(static) private(i, j)
+        for (j = 0; j < n; j++) {
             for (i = 0; i < m; i++) {
                 C[i + j * ldc] = 0.0;
             }
-        } else if (beta != 1.0) {
+        }
+    } else if (beta != 1.0) {
+        // If beta is not 1, scale C by beta
+#pragma omp parallel for collapse(2) schedule(static) private(i, j)
+        for (j = 0; j < n; j++) {
             for (i = 0; i < m; i++) {
-                C[i + j * ldc] = beta * C[i + j * ldc];
+                C[i + j * ldc] *= beta;
             }
         }
     }
-// main loop
-#ifdef _OPENMP
-#pragma omp parallel for private(i, j, l, temp)
-#endif
+    // If beta is 1, no scaling is needed
+
+// Compute alpha * A * B' and add to C: C += alpha * A * B'
+#pragma omp parallel for private(j, l, i, temp, templ) schedule(static)
     for (j = 0; j < n; j++) {
         for (l = 0; l < k; l++) {
-            temp = alpha * B[j + l * ldb];
+            temp = alpha;
+            temp *= B[j + l * ldb];
             for (i = 0; i < m; i++) {
-                C[i + j * ldc] += temp * A[i + l * lda];
+                templ = temp;
+                templ *= A[i + l * lda];
+                C[i + j * ldc] += templ;
             }
         }
     }
