@@ -29,7 +29,7 @@
 #include <mpblas_gmp.h>
 #include <mplapack_gmp.h>
 
-mpf_class fast_approx_log(const mpf_class& value) {
+mpf_class fast_approx_log(const mpf_class &value) {
     // Get the mantissa (a) and exponent (b) such that value = a * 2^b
     mp_exp_t exponent;
     double mantissa = mpf_get_d_2exp(&exponent, value.get_mpf_t());
@@ -57,11 +57,11 @@ void Rlartg(mpf_class const f, mpf_class const g, mpf_class &cs, mpf_class &sn, 
     safmin = Rlamch_gmp("S");
     eps = Rlamch_gmp("E");
 
-    //mpf_class safmn2_org = pow(Rlamch_gmp("B"), castINTEGER_gmp(log(safmin / eps) / log(Rlamch_gmp("B")) / two));
+    // mpf_class safmn2_org = pow(Rlamch_gmp("B"), castINTEGER_gmp(log(safmin / eps) / log(Rlamch_gmp("B")) / two));
 
     mpf_class tmp = -fast_approx_log(safmin / eps) / fast_approx_log(Rlamch_gmp("B")) / two;
     safmn2 = 1;
-    //safmn2.div_2exp(castINTEGER_gmp(tmp)); //div_2exp accepts unsigned long
+    // safmn2.div_2exp(castINTEGER_gmp(tmp)); //div_2exp accepts unsigned long
     mpf_div_2exp(safmn2.get_mpf_t(), safmn2.get_mpf_t(), castINTEGER_gmp(tmp));
 
     safmx2 = one / safmn2;
