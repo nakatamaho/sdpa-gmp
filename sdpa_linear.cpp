@@ -207,6 +207,9 @@ bool Lal::getInnerProduct(mpf_class &ret, SparseMatrix &aMat, DenseMatrix &bMat)
     }
     int length;
     int amari, shou;
+    mpf_class temp;
+    mpf_class value1, value2, value3, value4;
+    mpf_class ret1, ret2, ret3, ret4;
 
     switch (aMat.type) {
     case SparseMatrix::SPARSE:
@@ -237,57 +240,72 @@ bool Lal::getInnerProduct(mpf_class &ret, SparseMatrix &aMat, DenseMatrix &bMat)
             mpf_class value = aMat.sp_ele[index];
             // rMessage("i=" << i << "  j=" << j);
             if (i == j) {
-                ret += value * bMat.de_ele[i + bMat.nRow * j];
+                temp = value;
+                temp *= bMat.de_ele[i + bMat.nRow * j];
+                ret += temp;
             } else {
-                ret += value * (bMat.de_ele[i + bMat.nRow * j] + bMat.de_ele[j + bMat.nRow * i]);
+                temp = bMat.de_ele[i + bMat.nRow * j];
+                temp += bMat.de_ele[j + bMat.nRow * i];
+                temp *= value;
+                ret += temp;
             }
         }
         for (int index = amari, counter = 0; counter < shou; ++counter, index += 4) {
             int i1 = aMat.row_index[index];
             int j1 = aMat.column_index[index];
-            mpf_class value1 = aMat.sp_ele[index];
-            mpf_class ret1;
+            value1 = aMat.sp_ele[index];
             // rMessage("i=" << i << "  j=" << j);
             if (i1 == j1) {
-                ret1 = value1 * bMat.de_ele[i1 + bMat.nRow * j1];
+                ret1 = value1;
+                ret1 *= bMat.de_ele[i1 + bMat.nRow * j1];
             } else {
-                ret1 = value1 * (bMat.de_ele[i1 + bMat.nRow * j1] + bMat.de_ele[j1 + bMat.nRow * i1]);
+                ret1 = bMat.de_ele[i1 + bMat.nRow * j1];
+                ret1 += bMat.de_ele[j1 + bMat.nRow * i1];
+                ret1 *= value1;
             }
             int i2 = aMat.row_index[index + 1];
             int j2 = aMat.column_index[index + 1];
-            mpf_class value2 = aMat.sp_ele[index + 1];
-            mpf_class ret2;
+            value2 = aMat.sp_ele[index + 1];
+            ret2 = 0.0;
             // rMessage("i=" << i << "  j=" << j);
             if (i2 == j2) {
-                ret2 = value2 * bMat.de_ele[i2 + bMat.nRow * j2];
+                ret2 = value2;
+                ret2 *= bMat.de_ele[i2 + bMat.nRow * j2];
             } else {
-                ret2 = value2 * (bMat.de_ele[i2 + bMat.nRow * j2] + bMat.de_ele[j2 + bMat.nRow * i2]);
+                ret2 = bMat.de_ele[i2 + bMat.nRow * j2];
+                ret2 += bMat.de_ele[j2 + bMat.nRow * i2];
+                ret2 *= value2;
             }
             int i3 = aMat.row_index[index + 2];
             int j3 = aMat.column_index[index + 2];
-            mpf_class value3 = aMat.sp_ele[index + 2];
-            mpf_class ret3;
+            value3 = aMat.sp_ele[index + 2];
+            ret3 = 0.0;
             // rMessage("i=" << i << "  j=" << j);
             if (i3 == j3) {
-                ret3 = value3 * bMat.de_ele[i3 + bMat.nRow * j3];
+                ret3 = value3;
+                ret3 *= bMat.de_ele[i3 + bMat.nRow * j3];
             } else {
-                ret3 = value3 * (bMat.de_ele[i3 + bMat.nRow * j3] + bMat.de_ele[j3 + bMat.nRow * i3]);
+                ret3 = bMat.de_ele[i3 + bMat.nRow * j3];
+                ret3 += bMat.de_ele[j3 + bMat.nRow * i3];
+                ret3 *= value3;
             }
             int i4 = aMat.row_index[index + 3];
             int j4 = aMat.column_index[index + 3];
-            mpf_class value4 = aMat.sp_ele[index + 3];
-            mpf_class ret4;
+            value4 = aMat.sp_ele[index + 3];
+            ret4 = 0.0;
             // rMessage("i=" << i << "  j=" << j);
             if (i4 == j4) {
-                ret4 = value4 * bMat.de_ele[i4 + bMat.nRow * j4];
+                ret4 = value4;
+                ret4 *= bMat.de_ele[i4 + bMat.nRow * j4];
             } else {
-                ret4 = value4 * (bMat.de_ele[i4 + bMat.nRow * j4] + bMat.de_ele[j4 + bMat.nRow * i4]);
+                ret4 = bMat.de_ele[i4 + bMat.nRow * j4];
+                ret4 += bMat.de_ele[j4 + bMat.nRow * i4];
+                ret4 *= value4;
             }
-            // ret += ret1;
-            // ret += ret2;
-            // ret += ret3;
-            // ret += ret4;
-            ret += (ret1 + ret2 + ret3 + ret4);
+            ret += ret1;
+            ret += ret2;
+            ret += ret3;
+            ret += ret4;
         }
 #endif
         break;
