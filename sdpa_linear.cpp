@@ -232,6 +232,27 @@ bool Lal::getInnerProduct(mpf_class &ret, SparseMatrix &aMat, DenseMatrix &bMat)
       }
     }
 #else
+#ifdef _OPENMP
+#pragma omp parallel for
+        for (int index = 0; index < aMat.NonZeroCount; ++index) {
+            int i = aMat.row_index[index];
+            int j = aMat.column_index[index];
+            mpf_class value = aMat.sp_ele[index];
+            mpf_class temp = 0.0;
+
+            if (i == j) {
+                temp += value;
+                temp *= bMat.de_ele[i + bMat.nRow * j];
+            } else {
+                temp += bMat.de_ele[i + bMat.nRow * j];
+                temp += bMat.de_ele[j + bMat.nRow * i];
+                temp *= value;
+            }
+
+#pragma omp critical
+            ret += temp;
+        }
+#else
         amari = aMat.NonZeroCount % 4;
         shou = aMat.NonZeroCount / 4;
         for (int index = 0; index < amari; ++index) {
@@ -307,6 +328,7 @@ bool Lal::getInnerProduct(mpf_class &ret, SparseMatrix &aMat, DenseMatrix &bMat)
             ret += ret3;
             ret += ret4;
         }
+#endif
 #endif
         break;
     case SparseMatrix::DENSE:
