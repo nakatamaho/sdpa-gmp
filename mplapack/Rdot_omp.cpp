@@ -36,10 +36,7 @@
 mpf_class Rdot_omp(mplapackint n, mpf_class *dx, mplapackint incx, mpf_class *dy, mplapackint incy) {
     mplapackint ix = 0;
     mplapackint iy = 0;
-    mplapackint i;
     mpf_class result = 0.0;
-    mpf_class temp;
-    mpf_class templ;
 
     if (incx < 0)
         ix = (-n + 1) * incx;
@@ -47,27 +44,35 @@ mpf_class Rdot_omp(mplapackint n, mpf_class *dx, mplapackint incx, mpf_class *dy
         iy = (-n + 1) * incy;
 
     if (incx == 1 && incy == 1) {
-#pragma omp parallel for private(temp)
-        for (i = 0; i < n; ++i) {
-            templ = 0.0;
-            temp = dx[i];
-            temp *= dy[i];
-            templ += temp;
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        {
+            mpf_class local_result = 0.0;
+
+#ifdef _OPENMP
+#pragma omp for
+#endif
+            for (mplapackint i = 0; i < n; i++) {
+                mpf_class temp = dx[i];
+                temp *= dy[i];
+                local_result += temp;
+            }
+
+#ifdef _OPENMP
 #pragma omp critical
-            result += templ;
+#endif
+            result += local_result;
         }
     } else {
-#pragma omp parallel for private(temp)
-        for (i = 0; i < n; i++) {
-            templ = 0.0;
-            temp = dx[ix];
+        for (mplapackint i = 0; i < n; i++) {
+            mpf_class temp = dx[ix];
             temp *= dy[iy];
-            templ += temp;
-#pragma omp critical
-            result += templ;
+            result += temp;
             ix += incx;
             iy += incy;
         }
     }
+
     return result;
 }
