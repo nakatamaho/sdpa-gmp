@@ -36,6 +36,7 @@ mplapack/Raxpy_omp.cpp\
 mplapack/Rcopy.cpp\
 mplapack/Rcopy_omp.cpp\
 mplapack/Rdot.cpp\
+mplapack/Rdot_serial.cpp\
 mplapack/Rdot_omp.cpp\
 mplapack/Rgemm_omp.cpp\
 mplapack/Rgemm_NN_omp.cpp\

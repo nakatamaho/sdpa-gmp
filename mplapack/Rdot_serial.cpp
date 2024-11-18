@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2024
+ * Copyright (c) 2008-2012
  *	Nakata, Maho
  * 	All rights reserved.
  *
- * $Id: Rdot.cpp,v 1.5 2010/08/07 05:50:09 nakatamaho Exp $
+ * $Id: Rdot.cpp,v 1.5 2010/08/07 05:50:10 nakatamaho Exp $
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,45 +29,35 @@
  */
 
 #include <mpblas_gmp.h>
-#ifdef _OPENMP
-#include <omp.h>
-#endif
 
-mpf_class Rdot_omp(mplapackint n, mpf_class *dx, mplapackint incx, mpf_class *dy, mplapackint incy) {
+mpf_class Rdot_serial(mplapackint n, mpf_class *dx, mplapackint incx, mpf_class *dy, mplapackint incy);
+
+mpf_class Rdot_serial(mplapackint n, mpf_class *dx, mplapackint incx, mpf_class *dy, mplapackint incy) {
     mplapackint ix = 0;
     mplapackint iy = 0;
     mplapackint i;
-    mpf_class result = 0.0;
-    mpf_class temp;
-    mpf_class templ;
+    mpf_t temp, templ;
+
+    mpf_init(temp);
+    mpf_init(templ);
+    mpf_set_d(temp, 0.0);
 
     if (incx < 0)
         ix = (-n + 1) * incx;
     if (incy < 0)
         iy = (-n + 1) * incy;
 
-    if (incx == 1 && incy == 1) {
-#pragma omp parallel for private(temp)
-        for (i = 0; i < n; ++i) {
-            templ = 0.0;
-            temp = dx[i];
-            temp *= dy[i];
-            templ += temp;
-#pragma omp critical
-            result += templ;
-        }
-    } else {
-#pragma omp parallel for private(temp)
-        for (i = 0; i < n; i++) {
-            templ = 0.0;
-            temp = dx[ix];
-            temp *= dy[iy];
-            templ += temp;
-#pragma omp critical
-            result += templ;
-            ix += incx;
-            iy += incy;
-        }
+    for (i = 0; i < n; i++) {
+        mpf_mul(templ, dx[ix].get_mpf_t(), dy[iy].get_mpf_t());
+        mpf_add(temp, temp, templ);
+        ix += incx;
+        iy += incy;
     }
+
+    mpf_class result{temp};
+
+    mpf_clear(temp);
+    mpf_clear(templ);
+
     return result;
 }
