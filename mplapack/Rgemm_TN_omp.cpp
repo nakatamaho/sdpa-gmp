@@ -46,7 +46,7 @@ void Rgemm_TN_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, 
     }
 // main loop
 #ifdef _OPENMP
-#pragma omp parallel for private(i, j, l, temp)
+//#pragma omp parallel for private(i, j, l, temp)
 #endif
     for (j = 0; j < n; j++) {
         for (i = 0; i < m; i++) {

@@ -45,13 +45,13 @@ mpf_class Rdot_omp(mplapackint n, mpf_class *dx, mplapackint incx, mpf_class *dy
 
     if (incx == 1 && incy == 1) {
 #ifdef _OPENMP
-#pragma omp parallel
+//#pragma omp parallel
 #endif
         {
             mpf_class local_result = 0.0;
 
 #ifdef _OPENMP
-#pragma omp for
+//#pragma omp for
 #endif
             for (mplapackint i = 0; i < n; i++) {
                 mpf_class temp = dx[i];
@@ -60,7 +60,7 @@ mpf_class Rdot_omp(mplapackint n, mpf_class *dx, mplapackint incx, mpf_class *dy
             }
 
 #ifdef _OPENMP
-#pragma omp critical
+//#pragma omp critical
 #endif
             result += local_result;
         }

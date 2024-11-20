@@ -95,7 +95,7 @@ void Raxpy_omp(mplapackint n, mpf_class da, mpf_class *dx, mplapackint incx, mpf
 
     if (incx == 1 && incy == 1) {
 #ifdef _OPENMP
-#pragma omp parallel for
+//#pragma omp parallel for
 #endif
         for (i = 0; i < n; i++) {
             dy[i] += da * dx[i];

@@ -233,7 +233,7 @@ bool Lal::getInnerProduct(mpf_class &ret, SparseMatrix &aMat, DenseMatrix &bMat)
     }
 #else
 #ifdef _OPENMP
-#pragma omp parallel for
+//#pragma omp parallel for
         for (int index = 0; index < aMat.NonZeroCount; ++index) {
             int i = aMat.row_index[index];
             int j = aMat.column_index[index];
@@ -249,7 +249,7 @@ bool Lal::getInnerProduct(mpf_class &ret, SparseMatrix &aMat, DenseMatrix &bMat)
                 temp *= value;
             }
 
-#pragma omp critical
+//#pragma omp critical
             ret += temp;
         }
 #else

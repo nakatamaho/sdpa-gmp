@@ -939,12 +939,12 @@ void Newton::calF2(mpf_class &ret, DenseMatrix &F, DenseMatrix &G, DenseMatrix &
 void Newton::calF3(mpf_class &ret, DenseMatrix &F, DenseMatrix &G, DenseMatrix &X, DenseMatrix &invZ, SparseMatrix &Ai, SparseMatrix &Aj) {
     ret = 0.0;
 
-#pragma omp parallel
+//#pragma omp parallel
     {
         mpf_class local_ret = 0.0;
         mpf_class sum, value1, value2, plu;
 
-#pragma omp for nowait
+//#pragma omp for nowait
         for (int index1 = 0; index1 < Aj.NonZeroCount; ++index1) {
             int alpha = Aj.row_index[index1];
             int beta = Aj.column_index[index1];
@@ -999,7 +999,7 @@ void Newton::calF3(mpf_class &ret, DenseMatrix &F, DenseMatrix &G, DenseMatrix &
             plu *= sum;
             local_ret += plu;
         }
-#pragma omp critical
+//#pragma omp critical
         ret += local_ret;
     }
 }
