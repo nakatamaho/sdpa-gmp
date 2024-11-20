@@ -140,10 +140,8 @@ LIBS="$LIBS $pthread_lib"
 CXXFLAGS="$CXXFLAGS $pthread_cflags"
 AC_SUBST(pthread_lib)
 
-CFLAGS="$CFLAGS -O2 -funroll-all-loops"
-CXXFLAGS="$CXXFLAGS -O2 -funroll-all-loops"
-AC_SUBST(CFLAGS)
-AC_SUBST(CXXFLAGS)
+AC_SUBST([CFLAGS], [""])
+AC_SUBST([CXXFLAGS], [""])
 
 dnl some dummy settings
 if test x$SPOOLES_INCLUDEDIR = x; then
