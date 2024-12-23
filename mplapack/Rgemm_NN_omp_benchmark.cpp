@@ -101,6 +101,12 @@ int main() {
 
                     // 平均と分散を計算
                     auto [mean_flops, variance_flops] = calculate_mean_and_variance(flops_results);
+                    // 各試行の FLOPS を表示
+                    std::cout << "FLOPS for each trial: ";
+                    for (const auto &flops : flops_results) {
+                        std::cout << flops << " ";
+                    }
+                    std::cout << "\n";
 
                     std::cout << "Threads: " << threads << ", Mean FLOPS: " << mean_flops << " MFLOPS"
                               << ", Variance: " << variance_flops << "\n";
