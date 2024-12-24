@@ -8,7 +8,9 @@ control5.dat-s.xz \
 control8.dat-s.xz \
 control9.dat-s.xz \
 control10.dat-s.xz \
-control11.dat-s.xz \
+control11.dat-s.xz"
+
+_SDPxzs="\
 control1.dat-s.xz \
 control2.dat-s.xz \
 control3.dat-s.xz \
@@ -102,6 +104,7 @@ for SDPxz in $SDPxzs; do
     ../sdpa_gmp -ds $SDP -o ${SDP%.*}.result -p ./param.sdpa
     end_time=$(date +%s%N)
     duration=$(( (end_time - start_time) / 1000000 ))
+    sed -i '/xVec =/,$d' "${SDP%.*}.result"
     echo "Execution time: $duration ms"
 
     cd /home/docker/sdpa-gmpxx_mkII_migration/SDPLIB
@@ -113,6 +116,7 @@ for SDPxz in $SDPxzs; do
     ../sdpa_gmp -ds $SDP -o ${SDP%.*}.result -p ./param.sdpa
     end_time=$(date +%s%N)
     duration=$(( (end_time - start_time) / 1000000 ))
+    sed -i '/xVec =/,$d' "${SDP%.*}.result"
     echo "Execution time: $duration ms"
 
 done
