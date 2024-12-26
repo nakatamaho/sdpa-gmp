@@ -42,7 +42,7 @@ void Rgemm_NT_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, 
     // Handle special cases for beta to optimize performance
     if (beta == 0.0) {
         // If beta is 0, set C to zero
-//#pragma omp parallel for collapse(2) schedule(static) private(i, j)
+        //#pragma omp parallel for collapse(2) schedule(static) private(i, j)
         for (j = 0; j < n; j++) {
             for (i = 0; i < m; i++) {
                 C[i + j * ldc] = 0.0;
@@ -50,7 +50,7 @@ void Rgemm_NT_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, 
         }
     } else if (beta != 1.0) {
         // If beta is not 1, scale C by beta
-//#pragma omp parallel for collapse(2) schedule(static) private(i, j)
+        //#pragma omp parallel for collapse(2) schedule(static) private(i, j)
         for (j = 0; j < n; j++) {
             for (i = 0; i < m; i++) {
                 C[i + j * ldc] *= beta;
@@ -59,8 +59,8 @@ void Rgemm_NT_omp(mplapackint m, mplapackint n, mplapackint k, mpf_class alpha, 
     }
     // If beta is 1, no scaling is needed
 
-// Compute alpha * A * B' and add to C: C += alpha * A * B'
-//#pragma omp parallel for private(j, l, i, temp, templ) schedule(static)
+    // Compute alpha * A * B' and add to C: C += alpha * A * B'
+    //#pragma omp parallel for private(j, l, i, temp, templ) schedule(static)
     for (j = 0; j < n; j++) {
         for (l = 0; l < k; l++) {
             temp = alpha;

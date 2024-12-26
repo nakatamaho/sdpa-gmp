@@ -29,59 +29,57 @@
 #include <mpblas_gmp.h>
 
 void Rscal(mplapackint const n, mpf_class const da, mpf_class *dx, mplapackint const incx) {
-    //
-    //  -- Reference BLAS level1 routine --
-    //  -- Reference BLAS is a software package provided by Univ. of Tennessee,    --
-    //  -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--
-    //
-    //     .. Scalar Arguments ..
-    //     ..
-    //     .. Array Arguments ..
-    //     ..
-    //
-    //  =====================================================================
-    //
-    //     .. Local Scalars ..
-    //     ..
-    //     .. Intrinsic Functions ..
-    //     ..
     if (n <= 0 || incx <= 0) {
         return;
     }
+
     mplapackint m = 0;
     mplapackint i = 0;
     mplapackint mp1 = 0;
     mplapackint nincx = 0;
+
     if (incx == 1) {
-        //
-        //        code for increment equal to 1
-        //
-        //        clean-up loop
-        //
-        m = fmod(n, 5);
+        // Code for increment equal to 1
+        m = n % 5; // Using modulo operator for cleanup
         if (m != 0) {
-            for (i = 1; i <= m; i = i + 1) {
-                dx[i - 1] = da * dx[i - 1];
+            for (i = 0; i < m; i++) {
+                mpf_class temp = dx[i];
+                temp *= da;
+                dx[i] = temp;
             }
             if (n < 5) {
                 return;
             }
         }
-        mp1 = m + 1;
-        for (i = mp1; i <= n; i = i + 5) {
-            dx[i - 1] = da * dx[i - 1];
-            dx[(i + 1) - 1] = da * dx[(i + 1) - 1];
-            dx[(i + 2) - 1] = da * dx[(i + 2) - 1];
-            dx[(i + 3) - 1] = da * dx[(i + 3) - 1];
-            dx[(i + 4) - 1] = da * dx[(i + 4) - 1];
+        for (i = m; i < n; i += 5) {
+            mpf_class temp1 = dx[i];
+            temp1 *= da;
+            dx[i] = temp1;
+
+            mpf_class temp2 = dx[i + 1];
+            temp2 *= da;
+            dx[i + 1] = temp2;
+
+            mpf_class temp3 = dx[i + 2];
+            temp3 *= da;
+            dx[i + 2] = temp3;
+
+            mpf_class temp4 = dx[i + 3];
+            temp4 *= da;
+            dx[i + 3] = temp4;
+
+            mpf_class temp5 = dx[i + 4];
+            temp5 *= da;
+            dx[i + 4] = temp5;
         }
     } else {
-        //
-        //        code for increment not equal to 1
-        //
-        nincx = n * incx;
-        for (i = 1; i <= nincx; i = i + incx) {
-            dx[i - 1] = da * dx[i - 1];
+        // Code for increment not equal to 1
+        mplapackint ix = 0;
+        for (i = 0; i < n; i++) {
+            mpf_class temp = dx[ix];
+            temp *= da;
+            dx[ix] = temp;
+            ix += incx;
         }
     }
 }

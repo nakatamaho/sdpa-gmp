@@ -77,16 +77,13 @@ Based on http://www.netlib.org/blas/daxpy.f
 #endif
 
 void Raxpy_omp(mplapackint n, mpf_class da, mpf_class *dx, mplapackint incx, mpf_class *dy, mplapackint incy) {
-    mpf_class Zero = 0.0;
-    mplapackint i;
+    mplapackint ix = 0;
+    mplapackint iy = 0;
 
     if (n <= 0)
         return;
-    if (da == Zero)
+    if (da == 0.0)
         return;
-
-    mplapackint ix = 0;
-    mplapackint iy = 0;
 
     if (incx < 0)
         ix = (-n + 1) * incx;
@@ -95,18 +92,25 @@ void Raxpy_omp(mplapackint n, mpf_class da, mpf_class *dx, mplapackint incx, mpf
 
     if (incx == 1 && incy == 1) {
 #ifdef _OPENMP
-//#pragma omp parallel for
+//#pragma omp parallel
 #endif
-        for (i = 0; i < n; i++) {
-            dy[i] += da * dx[i];
+        {
+#ifdef _OPENMP
+//#pragma omp for
+#endif
+            for (mplapackint i = 0; i < n; i++) {
+                mpf_class temp = dx[i];
+                temp *= da;
+                dy[i] += temp;
+            }
         }
-        return;
+    } else {
+        for (mplapackint i = 0; i < n; i++) {
+            mpf_class temp = dx[ix];
+            temp *= da;
+            dy[iy] += temp;
+            ix += incx;
+            iy += incy;
+        }
     }
-
-    for (i = 0; i < n; i++) {
-        dy[iy] += da * dx[ix];
-        ix = ix + incx;
-        iy = iy + incy;
-    }
-    return;
 }
