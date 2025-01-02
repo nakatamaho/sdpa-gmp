@@ -8,7 +8,8 @@ arch8.dat-s.xz \
 control4.dat-s.xz \
 control5.dat-s.xz \
 control8.dat-s.xz \
-control9.dat-s.xz"
+control9.dat-s.xz \
+control10.dat-s.xz"
 
 _SDPxzs="\
 arch0.dat-s.xz \
@@ -114,6 +115,7 @@ for SDPxz in $SDPxzs; do
     sudo perf record -o perf.data_${SDP%.*} -g -- ../sdpa_gmp -ds $SDP -o ${SDP%.*}.result -p ./param.sdpa
     end_time=$(date +%s%N)
     duration=$(( (end_time - start_time) / 1000000 ))
+    sed -i '/xVec =/,$d' "${SDP%.*}.result"
     echo "Execution time: $duration ms"
 
     sudo perf script -i perf.data_${SDP%.*} > out_${SDP%.*}.perf
@@ -135,6 +137,7 @@ for SDPxz in $SDPxzs; do
     sudo perf record -o perf.data_${SDP%.*} -g -- ../sdpa_gmp -ds $SDP -o ${SDP%.*}.result -p ./param.sdpa
     end_time=$(date +%s%N)
     duration=$(( (end_time - start_time) / 1000000 ))
+    sed -i '/xVec =/,$d' "${SDP%.*}.result"
     echo "Execution time: $duration ms"
 
     sudo perf script -i perf.data_${SDP%.*} > out_${SDP%.*}.perf

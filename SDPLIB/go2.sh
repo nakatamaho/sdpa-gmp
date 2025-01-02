@@ -7,8 +7,7 @@ control4.dat-s.xz \
 control5.dat-s.xz \
 control8.dat-s.xz \
 control9.dat-s.xz \
-control10.dat-s.xz \
-control11.dat-s.xz"
+control10.dat-s.xz"
 
 _SDPxzs="\
 control1.dat-s.xz \
