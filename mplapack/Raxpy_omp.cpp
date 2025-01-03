@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2012
+ * Copyright (c) 2010-2025
  *	Nakata, Maho
  * 	All rights reserved.
  *
@@ -27,45 +27,6 @@
  * SUCH DAMAGE.
  *
  */
-/*
-Copyright (c) 1992-2007 The University of Tennessee.  All rights reserved.
- *
- * $Id: Raxpy.cpp,v 1.11 2010/08/07 05:50:09 nakatamaho Exp $
-
-$COPYRIGHT$
-
-Additional copyrights may follow
-
-$HEADER$
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-- Redistributions of source code must retain the above copyright
-  notice, this list of conditions and the following disclaimer.
-
-- Redistributions in binary form must reproduce the above copyright
-  notice, this list of conditions and the following disclaimer listed
-  in this license in the documentation and/or other materials
-  provided with the distribution.
-
-- Neither the name of the copyright holders nor the names of its
-  contributors may be used to endorse or promote products derived from
-  this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
 
 /*
 Based on http://www.netlib.org/blas/daxpy.f
@@ -77,16 +38,13 @@ Based on http://www.netlib.org/blas/daxpy.f
 #endif
 
 void Raxpy_omp(mplapackint n, mpf_class da, mpf_class *dx, mplapackint incx, mpf_class *dy, mplapackint incy) {
-    mpf_class Zero = 0.0;
-    mplapackint i;
+    mplapackint ix = 0;
+    mplapackint iy = 0;
 
     if (n <= 0)
         return;
-    if (da == Zero)
+    if (da == 0.0)
         return;
-
-    mplapackint ix = 0;
-    mplapackint iy = 0;
 
     if (incx < 0)
         ix = (-n + 1) * incx;
@@ -95,18 +53,25 @@ void Raxpy_omp(mplapackint n, mpf_class da, mpf_class *dx, mplapackint incx, mpf
 
     if (incx == 1 && incy == 1) {
 #ifdef _OPENMP
-//#pragma omp parallel for
+//#pragma omp parallel
 #endif
-        for (i = 0; i < n; i++) {
-            dy[i] += da * dx[i];
+        {
+#ifdef _OPENMP
+//#pragma omp for
+#endif
+            for (mplapackint i = 0; i < n; i++) {
+                mpf_class temp = dx[i];
+                temp *= da;
+                dy[i] += temp;
+            }
         }
-        return;
+    } else {
+        for (mplapackint i = 0; i < n; i++) {
+            mpf_class temp = dx[ix];
+            temp *= da;
+            dy[iy] += temp;
+            ix += incx;
+            iy += incy;
+        }
     }
-
-    for (i = 0; i < n; i++) {
-        dy[iy] += da * dx[ix];
-        ix = ix + incx;
-        iy = iy + incy;
-    }
-    return;
 }
