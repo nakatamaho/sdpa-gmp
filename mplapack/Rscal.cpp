@@ -43,42 +43,24 @@ void Rscal(mplapackint const n, mpf_class const da, mpf_class *dx, mplapackint c
         m = n % 5; // Using modulo operator for cleanup
         if (m != 0) {
             for (i = 0; i < m; i++) {
-                mpf_class temp = dx[i];
-                temp *= da;
-                dx[i] = temp;
+                dx[i] *= da;
             }
             if (n < 5) {
                 return;
             }
         }
         for (i = m; i < n; i += 5) {
-            mpf_class temp1 = dx[i];
-            temp1 *= da;
-            dx[i] = temp1;
-
-            mpf_class temp2 = dx[i + 1];
-            temp2 *= da;
-            dx[i + 1] = temp2;
-
-            mpf_class temp3 = dx[i + 2];
-            temp3 *= da;
-            dx[i + 2] = temp3;
-
-            mpf_class temp4 = dx[i + 3];
-            temp4 *= da;
-            dx[i + 3] = temp4;
-
-            mpf_class temp5 = dx[i + 4];
-            temp5 *= da;
-            dx[i + 4] = temp5;
+            dx[i] *= da;
+            dx[i + 1] *= da;
+            dx[i + 2] *= da;
+            dx[i + 3] *= da;
+            dx[i + 4] *= da;
         }
     } else {
         // Code for increment not equal to 1
         mplapackint ix = 0;
         for (i = 0; i < n; i++) {
-            mpf_class temp = dx[ix];
-            temp *= da;
-            dx[ix] = temp;
+            dx[ix] *= da;
             ix += incx;
         }
     }
