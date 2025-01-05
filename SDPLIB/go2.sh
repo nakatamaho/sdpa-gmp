@@ -95,6 +95,7 @@ truss8.dat-s.xz"
 
 for SDPxz in $SDPxzs; do
     cd /home/docker/sdpa-gmp/SDPLIB
+    strip ../sdpa_gmp
     SDP="${SDPxz%.xz}"
     rm -f $SDP $SDPxz
     cp data/$SDPxz .
@@ -107,6 +108,7 @@ for SDPxz in $SDPxzs; do
     echo "Execution time: $duration ms"
 
     cd /home/docker/sdpa-gmpxx_mkII_migration/SDPLIB
+    strip ../sdpa_gmp
     SDP="${SDPxz%.xz}"
     rm -f $SDP $SDPxz
     cp data/$SDPxz .
