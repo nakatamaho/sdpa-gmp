@@ -1,4 +1,4 @@
-SDPA-GMP start at Fri Jan  3 12:53:38 2025
+SDPA-GMP start at Sat Jan  4 16:58:42 2025
 data      is control10.dat-s
 parameter is ./param.sdpa
 out       is control10.result
@@ -92,7 +92,7 @@ objValDual   = 3.8533032079581028e+01
 p.feas.error = 2.2351740250194302e-302
 d.feas.error = 2.3967983403154771e-280
 relative eps = 5.5626846462680035e-309
-total time   = 30232.472
+total time   = 29885.679
 
 
 Parameters are
@@ -114,38 +114,38 @@ YPrint       = %+50.40Fe
 infPrint     = %+50.40Fe 
 
                          Time(sec)  Ratio(% : MainLoop) 
- Predictor time  =       30078.294038,  99.493043
- Corrector time  =       104.568843,  0.345893
- Make bMat time  =       23879.999728,  78.990312
- Make bDia time  =       0.000002,  0.000000
- Make bF1  time  =       23488.849679,  77.696465
- Make bF2  time  =       320.867786,  1.061367
- Make bF3  time  =       69.713073,  0.230597
- Make bPRE time  =       19916.356215,  65.879364
- Make rMat time  =       31.137394,  0.102996
- Make gVec Mul   =       0.935987,  0.003096
- Make gVec time  =       14.129121,  0.046736
- Cholesky bMat   =       6135.660494,  20.295550
- Ste Pre time    =       0.003867,  0.000013
- Ste Cor time    =       15.532966,  0.051380
- solve           =       48.164504,  0.159319
- sumDz           =       11.981812,  0.039633
- makedX          =       61.127398,  0.202197
- symmetriseDx    =       0.125591,  0.000415
- makedXdZ        =       73.234902,  0.242247
- xMatTime        =       6.720820,  0.022231
- zMatTime        =       13.484847,  0.044605
+ Predictor time  =       29733.384142,  99.493438
+ Corrector time  =       103.301186,  0.345665
+ Make bMat time  =       23621.409941,  79.041635
+ Make bDia time  =       0.000005,  0.000000
+ Make bF1  time  =       23235.257065,  77.749496
+ Make bF2  time  =       316.808251,  1.060099
+ Make bF3  time  =       68.844042,  0.230365
+ Make bPRE time  =       19712.668377,  65.962258
+ Make rMat time  =       30.786116,  0.103016
+ Make gVec Mul   =       0.920375,  0.003080
+ Make gVec time  =       13.938782,  0.046642
+ Cholesky bMat   =       6050.097366,  20.244752
+ Ste Pre time    =       0.003854,  0.000013
+ Ste Cor time    =       15.321434,  0.051268
+ solve           =       47.502572,  0.158952
+ sumDz           =       11.839653,  0.039618
+ makedX          =       60.457563,  0.202302
+ symmetriseDx    =       0.123309,  0.000413
+ makedXdZ        =       72.420634,  0.242333
+ xMatTime        =       6.642637,  0.022228
+ zMatTime        =       13.330119,  0.044605
  invzMatTime     =       0.000000,  0.000000
  xMatzMatTime    =       0.000000,  0.000000
- EigxMatTime     =       7.340520,  0.024281
- EigzMatTime     =       8.064546,  0.026676
+ EigxMatTime     =       7.237624,  0.024218
+ EigzMatTime     =       7.957664,  0.026628
  EigxMatzMatTime =       0.000000,  0.000000
- updateRes       =       12.727153,  0.042099
- EigTime         =       15.405066,  0.050957
- sub_total_bMat  =       6351.555333,  21.009688
- Main Loop       =       30231.555061,  100.000000
+ updateRes       =       12.566079,  0.042048
+ EigTime         =       15.195288,  0.050846
+ sub_total_bMat  =       6263.358961,  20.958365
+ Main Loop       =       29884.768903,  100.000000
  File Check      =       0.000000,  0.000000
- File Change     =       0.000060,  0.000000
- File Read       =       0.711040,  0.002352
- Total           =       30232.472226,  100.003034
+ File Change     =       0.000062,  0.000000
+ File Read       =       0.707059,  0.002366
+ Total           =       29885.678842,  100.003045
 
