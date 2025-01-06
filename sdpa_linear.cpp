@@ -1665,7 +1665,8 @@ bool Lal::getInnerProduct(mpf_class &ret, DenseLinearSpace &aMat, DenseLinearSpa
         rError("getInnerProduct:: different memory size");
     }
     for (int l = 0; l < aMat.LP_nBlock; ++l) {
-        tmp_ret = aMat.LP_block[l] * bMat.LP_block[l];
+        tmp_ret = aMat.LP_block[l];
+        tmp_ret *= bMat.LP_block[l];
         ret += tmp_ret;
     }
 
@@ -1701,7 +1702,8 @@ bool Lal::getInnerProduct(mpf_class &ret, SparseLinearSpace &aMat, DenseLinearSp
 
     for (int l = 0; l < aMat.LP_sp_nBlock; ++l) {
         int index = aMat.LP_sp_index[l];
-        tmp_ret = aMat.LP_sp_block[l] * bMat.LP_block[index];
+        tmp_ret = aMat.LP_sp_block[l];
+        tmp_ret *= bMat.LP_block[index];
         ret += tmp_ret;
     }
 
