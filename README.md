@@ -9,7 +9,7 @@ git clone https://github.com/nakatamaho/sdpa-gmp.git
 cd sdpa-gmp
 aclocal ; autoconf ; automake --add-missing
 autoreconf --force --install
-./configure --enable-openmp=yes --enable-shared=yes
+./configure
 make -j4
 ```
 
@@ -25,7 +25,7 @@ doi={10.1109/CACSD.2010.5612693}
 }
 ```
 # SDPLIB
-binary64 optimals are taken from
+binary64 optimal are taken from
 https://github.com/vsdp/SDPLIB/blob/master/README.md
 .
 
